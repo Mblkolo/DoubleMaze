@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using DoubleMaze.Sockests;
 
 namespace DoubleMaze
 {
@@ -37,6 +38,10 @@ namespace DoubleMaze
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            app.UseWebSockets();
+            app.Map("/test", (_app) => _app.UseMiddleware<WebSocketManagerMiddleware>(new TestMessageHandler(new WebSocketConnectionManager())));
+
+            app.UseStaticFiles();
             app.UseMvc();
         }
     }
