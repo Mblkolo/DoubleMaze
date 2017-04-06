@@ -33,7 +33,7 @@ namespace DoubleMaze.Sockests
 
         private async Task Receive(WebSocket socket)
         {
-            var buffer = new byte[8 * 4];
+            var buffer = new byte[1024 * 4];
 
             while (socket.State == WebSocketState.Open)
             {
@@ -43,13 +43,11 @@ namespace DoubleMaze.Sockests
                 if (result.MessageType == WebSocketMessageType.Text)
                 {
                     await _webSocketHandler.ReceiveAsync(socket, result, buffer);
-                    return;
                 }
 
                 else if (result.MessageType == WebSocketMessageType.Close)
                 {
                     await _webSocketHandler.OnDisconnected(socket);
-                    return;
                 }
             }
         }
