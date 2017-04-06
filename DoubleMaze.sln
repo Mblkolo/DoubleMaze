@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A4BDB30F-7A8B-47DB-8CE2-7818D9055271}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DCB93FA9-8215-4B9B-9A4D-C02DB65AC1BA}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DoubleMaze", "src\DoubleMaze\DoubleMaze.xproj", "{27D4DD2D-87F3-4ABF-8AF9-714E3BA966C3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{27D4DD2D-87F3-4ABF-8AF9-714E3BA966C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27D4DD2D-87F3-4ABF-8AF9-714E3BA966C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27D4DD2D-87F3-4ABF-8AF9-714E3BA966C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27D4DD2D-87F3-4ABF-8AF9-714E3BA966C3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{27D4DD2D-87F3-4ABF-8AF9-714E3BA966C3} = {A4BDB30F-7A8B-47DB-8CE2-7818D9055271}
+	EndGlobalSection
+EndGlobal
