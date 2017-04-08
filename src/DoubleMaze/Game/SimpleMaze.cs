@@ -24,16 +24,17 @@ namespace DoubleMaze.Game
         public SimpleMaze(Func<GameState, Task> callback)
         {
             this.callback = callback;
-            timer = new Timer(Update, new object(), 0, 1000);
+            timer = new Timer(Update, new object(), 0, 100);
         }
 
+        Random r = new Random();
         public void Update(object o)
         {
-            Random r = new Random();
+            
 
             callback(new GameState
             {
-                pos = new Pos { x = 2 * r.Next(20), y = 5 * r.Next(20) }
+                pos = new Pos { x = (float)(200 * r.NextDouble()), y = (float)(200 * r.NextDouble()) }
             });
         }
 

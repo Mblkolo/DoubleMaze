@@ -8,6 +8,8 @@
 
 <body>
     <h1>This should be mapped to "/ws"</h1>
+    <canvas id="game-canvas" width="500" height="500" > </canvas>
+    <br />
     <input type=text id="textInput" placeholder="Enter your text" />
     <button id="sendButton">Send</button>
 
@@ -26,6 +28,12 @@
             socket.onmessage = function(event) {
                 appendItem(list, event.data);
                 console.log(event.data);
+
+                var res = JSON.parse(event.data);
+                //console.log(res);
+
+                var ctx = document.getElementById("game-canvas").getContext("2d");
+                ctx.fillRect(res.pos.x, res.pos.y, 3, 3);
             };
             socket.onerror = function(event) {
                 console.log("error: " + event.data);
@@ -45,10 +53,14 @@
             console.log("Sending: " + message);
             socket.send(message);
         }
+
+        var latestChild = null;
         function appendItem(list, message) {
             var item = document.createElement("li");
             item.appendChild(document.createTextNode(message));
-            list.appendChild(item);
+            list.insertBefore(item, latestChild);
+
+            latestChild = item;
         }
     </script>
 </body>
