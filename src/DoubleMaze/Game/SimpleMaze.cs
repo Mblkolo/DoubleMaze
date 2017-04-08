@@ -16,6 +16,13 @@ namespace DoubleMaze.Game
         public float y;
     }
 
+    public enum InputCommand
+    {
+        None,
+        BeganUp,
+        EndUp
+    }
+
     public class SimpleMaze
     {
         private readonly Func<GameState, Task> callback;
@@ -27,21 +34,28 @@ namespace DoubleMaze.Game
             timer = new Timer(Update, new object(), 0, 100);
         }
 
+        private volatile InputCommand latestCommand;
+
+        private Pos PlayerPos = new Pos();
         Random r = new Random();
         public void Update(object o)
         {
-            
+            var command = latestCommand;
+            if (command == InputCommand.BeganUp)
+            {
+                PlayerPos.y += 10;
+            }
 
             callback(new GameState
             {
-                pos = new Pos { x = (float)(200 * r.NextDouble()), y = (float)(200 * r.NextDouble()) }
+                pos = new Pos { x = PlayerPos.x, y = PlayerPos.y }
             });
         }
 
 
-        public void Execute()
+        public void Execute(InputCommand command)
         {
-
+            latestCommand = command;
         }
     }
 }
