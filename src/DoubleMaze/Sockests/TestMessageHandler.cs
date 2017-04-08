@@ -3,18 +3,27 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
+using DoubleMaze.Game;
+using Newtonsoft.Json;
 
 namespace DoubleMaze.Sockests
 {
     public class TestMessageHandler : WebSocketHandler
     {
-        public TestMessageHandler(WebSocketConnectionManager webSocketConnectionManager) : base(webSocketConnectionManager)
+        private SimpleMaze simpleMaze;
+
+        public TestMessageHandler(WebSocketConnectionManager webSocketConnectionManager) 
+            : base(webSocketConnectionManager)
         {
         }
 
         public override async Task OnConnected(WebSocket socket)
         {
             await base.OnConnected(socket);
+
+            simpleMaze = new SimpleMaze(async gs => {
+                await SendMessageAsync(socket, JsonConvert.SerializeObject(gs) );
+            });
 
             var socketId = WebSocketConnectionManager.GetId(socket);
             await SendMessageToAllAsync($"{socketId} is now connected");
