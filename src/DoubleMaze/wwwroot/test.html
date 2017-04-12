@@ -32,8 +32,8 @@
                 var res = JSON.parse(event.data);
                 //console.log(res);
 
-                var ctx = document.getElementById("game-canvas").getContext("2d");
-                ctx.fillRect(res.pos.x, res.pos.y, 3, 3);
+                moveTo(res.pos.x, res.pos.y);
+                
             };
             socket.onerror = function(event) {
                 console.log("error: " + event.data);
@@ -63,13 +63,60 @@
             latestChild = item;
         }
 
-        document.addEventListener("keydown", function () {
-            sendMessage('"BeganUp"');
+        var currentPos = { x: 0, y: 0 };
+        var serverPos = { x: 0, y: 0 };
+        var serverTime = 0;
+
+        function moveTo(x, y)
+        {
+            //if (x == pos.x && y == pos.y)
+            //    return;
+
+            currentPos.x = serverPos.x;
+            currentPos.y = serverPos.y;
+
+            serverPos.x = x;
+            serverPos.y = y;
+
+            serverTime = Date.now();
+        }
+
+        function drawLoop() {
+            var now = Date.now();
+            var t = (now - serverTime) / 100;
+
+            drawOn(t);
+
+            requestAnimationFrame(drawLoop);
+        }
+
+        function drawOn(t)
+        {
+            var ctx = document.getElementById("game-canvas").getContext("2d");
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+            x = currentPos.x * (1 - t) + serverPos.x * t;
+            y = currentPos.y * (1 - t) + serverPos.y * t;
+            //console.log(Date.now() + " " +  y);
+            ctx.fillRect(x, y, 30, 30);
+        }
+
+        document.addEventListener("keydown", function (e) {
+            if(e.key == 'w')
+                sendMessage('"Up"');
+            if (e.key == 's')
+                sendMessage('"Down"');
+            if (e.key == 'a')
+                sendMessage('"Left"');
+            if (e.key == 'd')
+                sendMessage('"Right"');
         });
 
         document.addEventListener("keyup", function () {
-            sendMessage('"EndUp"');
+            //sendMessage('"None"');
         });
+
+        drawLoop();
     </script>
 </body>
 </html>

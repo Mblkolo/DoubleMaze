@@ -19,8 +19,10 @@ namespace DoubleMaze.Game
     public enum InputCommand
     {
         None,
-        BeganUp,
-        EndUp
+        Up,
+        Left,
+        Right,
+        Down
     }
 
     public class SimpleMaze
@@ -41,10 +43,17 @@ namespace DoubleMaze.Game
         public void Update(object o)
         {
             var command = latestCommand;
-            if (command == InputCommand.BeganUp)
-            {
+            if (command == InputCommand.Down)
                 PlayerPos.y += 10;
-            }
+            if (command == InputCommand.Up)
+                PlayerPos.y -= 10;
+            if (command == InputCommand.Left)
+                PlayerPos.x -= 10;
+            if (command == InputCommand.Right)
+                PlayerPos.x += 10;
+
+
+
 
             callback(new GameState
             {
