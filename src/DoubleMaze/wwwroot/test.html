@@ -32,7 +32,10 @@
                 var res = JSON.parse(event.data);
                 //console.log(res);
 
-                moveTo(res.pos.x, res.pos.y);
+                if (res.command === "PlayerState")
+                    moveTo(res.pos.x, res.pos.y);
+                else if(res.command === "MazeFeild")
+                    setField(res.field)
                 
             };
             socket.onerror = function(event) {
@@ -66,6 +69,7 @@
         var currentPos = { x: 0, y: 0 };
         var serverPos = { x: 0, y: 0 };
         var serverTime = 0;
+        var mazeField = [[]];
 
         function moveTo(x, y)
         {
@@ -79,6 +83,11 @@
             serverPos.y = y;
 
             serverTime = Date.now();
+        }
+
+        function setField(field)
+        {
+            mazeField = field;
         }
 
         function drawLoop() {
@@ -95,10 +104,43 @@
             var ctx = document.getElementById("game-canvas").getContext("2d");
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
+            ctx.beginPath();
+            for (var y = 0; y < mazeField.length; ++y) {
+                for (var x = 0; x < mazeField[y].length; ++x) {
+                    const scale = 20;
+                    var topLeft = { x: x * scale, y: y * scale };
+                    var topRight = { x: (x + 1) * scale, y: y * scale };
+                    var bottomRight = { x: (x + 1) * scale, y: (y + 1) * scale };
+                    var bottomLeft = { x: x * scale, y: (y + 1) * scale };
+
+                    if ((mazeField[y][x] & 1) !== 0) {
+                        ctx.moveTo(topLeft.x, topLeft.y);
+                        ctx.lineTo(topRight.x, topRight.y);
+                    }
+
+                    if ((mazeField[y][x] & 2) !== 0) {
+                        ctx.moveTo(topRight.x, topRight.y);
+                        ctx.lineTo(bottomRight.x, bottomRight.y);
+                    }
+
+                    if ((mazeField[y][x] & 4) !== 0) {
+                        ctx.moveTo(bottomRight.x, bottomRight.y);
+                        ctx.lineTo(bottomLeft.x, bottomLeft.y);
+                    }
+
+                    if ((mazeField[y][x] & 8) !== 0) {
+                        ctx.moveTo(bottomLeft.x, bottomLeft.y);
+                        ctx.lineTo(topLeft.x, topLeft.y);
+                    }
+                }
+            }
+            ctx.stroke();
+
+
             x = currentPos.x * (1 - t) + serverPos.x * t;
             y = currentPos.y * (1 - t) + serverPos.y * t;
             //console.log(Date.now() + " " +  y);
-            ctx.fillRect(x, y, 30, 30);
+            ctx.fillRect(x, y, 5, 5);
         }
 
         document.addEventListener("keydown", function (e) {
