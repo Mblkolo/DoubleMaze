@@ -5,12 +5,15 @@ using System.Net.WebSockets;
 using System.Threading.Tasks;
 using DoubleMaze.Game;
 using Newtonsoft.Json;
+using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Sockests
 {
     public class TestMessageHandler : WebSocketHandler
     {
         private SimpleMaze simpleMaze;
+
+        private World world;
 
         public TestMessageHandler(WebSocketConnectionManager webSocketConnectionManager) 
             : base(webSocketConnectionManager)
@@ -25,6 +28,8 @@ namespace DoubleMaze.Sockests
                 await SendMessageAsync(socket, JsonConvert.SerializeObject(gs) );
             });
 
+            world = new World();
+
             var socketId = WebSocketConnectionManager.GetId(socket);
             await SendMessageToAllAsync($"{socketId} is now connected");
         }
@@ -37,6 +42,7 @@ namespace DoubleMaze.Sockests
             //await SendMessageToAllAsync(message);
 
             simpleMaze.Execute(JsonConvert.DeserializeObject<InputCommand>(message));
+            world.InputQueue.Post(new TextMessage { Text = message });
         }
 
         public override async Task OnDisconnected(WebSocket socket)
@@ -45,6 +51,16 @@ namespace DoubleMaze.Sockests
 
             await base.OnDisconnected(socket);
             await SendMessageToAllAsync($"{socketId} disconnected");
+        }
+
+        private class TextMessage : IMessage
+        {
+            public string Text;
+
+            public override string ToString()
+            {
+                return Text;
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game
 {
@@ -104,24 +105,67 @@ namespace DoubleMaze.Game
 
         private Pos PlayerPos = new Pos();
         Random r = new Random();
+
+        private const float progressInTick = 0.5f;
+        private int xPos = 0;
+        private int yPos = 0;
+        private int nextXPos = 0;
+        private int nextYPos = 0;
+        private float progress = 0;
+        private InputCommand currentCommand;
+
+        BufferBlock<int> actionBlock = new BufferBlock<int>();
+
         public void Update(object o)
         {
             var command = latestCommand;
-            if (command == InputCommand.Down)
-                PlayerPos.y += 10;
-            if (command == InputCommand.Up)
-                PlayerPos.y -= 10;
-            if (command == InputCommand.Left)
-                PlayerPos.x -= 10;
-            if (command == InputCommand.Right)
-                PlayerPos.x += 10;
 
+            //bool needUpdate = false;
+            //if(currentCommand == InputCommand.None && command != InputCommand.None)
+            //{
+            //    needUpdate = true;
+            //    //progress = 0;
+            //}
 
+            progress += progressInTick;
+            if (progress > 1 || currentCommand == InputCommand.None)
+            {
+                xPos = nextXPos;
+                yPos = nextYPos;
+                if (command == InputCommand.Down && (mazeField[yPos, xPos] & 4) == 0)
+                    nextYPos = yPos + 1;
 
+                if (command == InputCommand.Up && (mazeField[yPos, xPos] & 1) == 0)
+                    nextYPos = yPos - 1;
+
+                if (command == InputCommand.Left && (mazeField[yPos, xPos] & 8) == 0)
+                    nextXPos = xPos - 1;
+
+                if (command == InputCommand.Right && (mazeField[yPos, xPos] & 2) == 0)
+                    nextXPos = xPos + 1;
+
+                if (nextYPos != yPos || nextXPos != xPos)
+                {
+                    if(progress > 1)
+                        progress -= 1;
+                    currentCommand = command;
+                }
+                else
+                {
+                    progress = 0;
+                    currentCommand = InputCommand.None;
+                }
+            }
+            
+
+            //if(needUpdate)
+            //{
+                
+            //}
 
             callback(new PlayerPos
             {
-                pos = new Pos { x = PlayerPos.x, y = PlayerPos.y }
+                pos = new Pos { x = xPos*(1-progress) + nextXPos * progress, y = yPos * (1 - progress) + nextYPos * progress }
             });
         }
 

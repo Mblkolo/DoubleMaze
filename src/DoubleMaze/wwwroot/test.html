@@ -99,6 +99,8 @@
             requestAnimationFrame(drawLoop);
         }
 
+        const scale = 20;
+
         function drawOn(t)
         {
             var ctx = document.getElementById("game-canvas").getContext("2d");
@@ -107,7 +109,7 @@
             ctx.beginPath();
             for (var y = 0; y < mazeField.length; ++y) {
                 for (var x = 0; x < mazeField[y].length; ++x) {
-                    const scale = 20;
+
                     var topLeft = { x: x * scale, y: y * scale };
                     var topRight = { x: (x + 1) * scale, y: y * scale };
                     var bottomRight = { x: (x + 1) * scale, y: (y + 1) * scale };
@@ -137,10 +139,10 @@
             ctx.stroke();
 
 
-            x = currentPos.x * (1 - t) + serverPos.x * t;
-            y = currentPos.y * (1 - t) + serverPos.y * t;
+            x = (currentPos.x * (1 - t) + serverPos.x * t) * scale;
+            y = (currentPos.y * (1 - t) + serverPos.y * t) * scale;
             //console.log(Date.now() + " " +  y);
-            ctx.fillRect(x, y, 5, 5);
+            ctx.fillRect(x + (scale - 5) / 2, y + (scale - 5) / 2, 5, 5);
         }
 
         document.addEventListener("keydown", function (e) {
