@@ -24,16 +24,41 @@ namespace DoubleMaze.Sockests
         {
             await base.OnConnected(socket);
 
-            simpleMaze = new SimpleMaze(async gs => {
-                await SendMessageAsync(socket, JsonConvert.SerializeObject(gs) );
+            //simpleMaze = new SimpleMaze(async gs => {
+            //    await SendMessageAsync(socket, JsonConvert.SerializeObject(gs) );
+            //});
+            var socketId = WebSocketConnectionManager.GetId(socket);
+
+            var output = new OutputChanel(async gs => {
+                await SendMessageAsync(socket, JsonConvert.SerializeObject(gs));
             });
 
             world = new World();
-
-            var socketId = WebSocketConnectionManager.GetId(socket);
-            await SendMessageToAllAsync($"{socketId} is now connected");
+            world.InputQueue.Post(new NewConnection(new Guid(socketId), output.InputQueue));
         }
 
+        public class OutputChanel
+        {
+            public BufferBlock<object> InputQueue { get; private set; }
+            private readonly Task mainLoop;
+            private Func<object, Task> callback;
+
+            public OutputChanel(Func<object, Task> callback)
+            {
+                this.callback = callback;
+                InputQueue = new BufferBlock<object>();
+                mainLoop = MainLoop(InputQueue);
+            }
+
+            private async Task MainLoop(BufferBlock<object> messages)
+            {
+                while (await messages.OutputAvailableAsync())
+                {
+                    var message = await messages.ReceiveAsync();
+                    await callback(message);
+                }
+            }
+        }
         public override async Task ReceiveAsync(WebSocket socket, WebSocketReceiveResult result, byte[] buffer)
         {
             var socketId = WebSocketConnectionManager.GetId(socket);
@@ -41,8 +66,8 @@ namespace DoubleMaze.Sockests
             var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
             //await SendMessageToAllAsync(message);
 
-            simpleMaze.Execute(JsonConvert.DeserializeObject<InputCommand>(message));
-            world.InputQueue.Post(new TextMessage { Text = message });
+            //simpleMaze.Execute(JsonConvert.DeserializeObject<InputCommand>(message));
+            world.InputQueue.Post(new PlayerInput(new Guid(WebSocketConnectionManager.GetId(socket)), message) );
         }
 
         public override async Task OnDisconnected(WebSocket socket)

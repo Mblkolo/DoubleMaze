@@ -7,15 +7,11 @@ using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game
 {
-    public interface IMessage
-    {
-
-    }
-
     public class World
     {
         public BufferBlock<IMessage> InputQueue { get; private set; }
         private readonly Task mainLoop;
+        private readonly MessageDispatcher dispatcher = new MessageDispatcher();
 
         public World()
         {
@@ -28,7 +24,7 @@ namespace DoubleMaze.Game
             while (await messages.OutputAvailableAsync())
             {
                 var message = await messages.ReceiveAsync();
-                Console.WriteLine(message);
+                (dispatcher).Process((dynamic)message);
             }
         }
     }
