@@ -18,7 +18,8 @@ namespace DoubleMaze.Game
     public class PlayerPos : IGameState
     {
         public GameCommand command => GameCommand.PlayerState;
-        public Pos pos { get; set; }
+        public Pos myPos { get; set; }
+        public Pos enemyPos { get; set; }
     }
 
     public class MazeField : IGameState
@@ -39,28 +40,20 @@ namespace DoubleMaze.Game
         MazeFeild
     }
 
-    public enum InputCommand
-    {
-        None,
-        Up,
-        Left,
-        Right,
-        Down
-    }
-
     public class SimpleMaze
     {
-        private readonly Func<IGameState, Task> callback;
-        private readonly Timer timer;
+        private Timer timer;
+        private MazePlayer firstPlayer;
+        private MazePlayer secondPlayer;
+        private WorldState state;
+        private Guid gameId;
 
-        public SimpleMaze(Func<IGameState, Task> callback)
+        public SimpleMaze(WorldState state, Guid gameId, MazePlayer firstPlayer)
         {
-            this.callback = callback;
-
             LoadMaze();
-            callback(new MazeField { field = mazeField });
-
-            timer = new Timer(Update, new object(), 0, 100);
+            this.firstPlayer = firstPlayer;
+            this.state = state;
+            this.gameId = gameId;
         }
 
         private byte[,] mazeField;
@@ -101,12 +94,47 @@ namespace DoubleMaze.Game
         }
 
 
-        private volatile InputCommand latestCommand;
+        public void Join(MazePlayer secondPlayer)
+        {
+            if (this.secondPlayer != null)
+                throw new ArgumentException(nameof(secondPlayer));
 
-        private Pos PlayerPos = new Pos();
-        Random r = new Random();
+            this.secondPlayer = secondPlayer;
 
-        private const float progressInTick = 0.5f;
+            timer = new Timer(x => state.InputQueue.Post(new GameUpdate(gameId)), new object(), 100, 100);
+
+            firstPlayer.output.SendAsync(new MazeField { field = mazeField });
+            secondPlayer.output.SendAsync(new MazeField { field = mazeField });
+        }
+
+        BufferBlock<int> actionBlock = new BufferBlock<int>();
+        public bool IsStarted => secondPlayer != null;
+
+        public void Update()
+        {
+            firstPlayer.Update(mazeField);
+            secondPlayer.Update(mazeField);
+
+            firstPlayer.output.Post(new PlayerPos
+            {
+                myPos = firstPlayer.GetPos(),
+                enemyPos = secondPlayer.GetPos()
+            });
+
+            secondPlayer.output.Post(new PlayerPos
+            {
+                myPos = secondPlayer.GetPos(),
+                enemyPos = firstPlayer.GetPos()
+            });
+        }
+    }
+
+    public class MazePlayer
+    {
+        public InputCommand command;
+        public readonly BufferBlock<object> output;
+
+
         private int xPos = 0;
         private int yPos = 0;
         private int nextXPos = 0;
@@ -114,18 +142,16 @@ namespace DoubleMaze.Game
         private float progress = 0;
         private InputCommand currentCommand;
 
-        BufferBlock<int> actionBlock = new BufferBlock<int>();
-
-        public void Update(object o)
+        public MazePlayer(BufferBlock<object> output)
         {
-            var command = latestCommand;
+            this.output = output;
+        }
 
-            //bool needUpdate = false;
-            //if(currentCommand == InputCommand.None && command != InputCommand.None)
-            //{
-            //    needUpdate = true;
-            //    //progress = 0;
-            //}
+        public Pos GetPos() => new Pos { x = xPos * (1 - progress) + nextXPos * progress, y = yPos * (1 - progress) + nextYPos * progress };
+
+        public void Update(byte[,] mazeField)
+        {
+            const float progressInTick = 0.5f;
 
             progress += progressInTick;
             if (progress > 1 || currentCommand == InputCommand.None)
@@ -146,7 +172,7 @@ namespace DoubleMaze.Game
 
                 if (nextYPos != yPos || nextXPos != xPos)
                 {
-                    if(progress > 1)
+                    if (progress > 1)
                         progress -= 1;
                     currentCommand = command;
                 }
@@ -156,23 +182,6 @@ namespace DoubleMaze.Game
                     currentCommand = InputCommand.None;
                 }
             }
-            
-
-            //if(needUpdate)
-            //{
-                
-            //}
-
-            callback(new PlayerPos
-            {
-                pos = new Pos { x = xPos*(1-progress) + nextXPos * progress, y = yPos * (1 - progress) + nextYPos * progress }
-            });
-        }
-
-
-        public void Execute(InputCommand command)
-        {
-            latestCommand = command;
         }
     }
 }

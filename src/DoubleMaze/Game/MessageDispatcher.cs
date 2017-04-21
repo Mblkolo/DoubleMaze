@@ -8,8 +8,9 @@ namespace DoubleMaze.Game
     public class WorldState
     {
         public Dictionary<Guid, PlayerContex> Players = new Dictionary<Guid, PlayerContex>();
+        public Dictionary<Guid, SimpleMaze> Games = new Dictionary<Guid, SimpleMaze>();
 
-        public BufferBlock<IMessage> InputQueue { get; internal set; }
+        public BufferBlock<IMessage> InputQueue;
     }
 
     public class PlayerContex
@@ -50,6 +51,11 @@ namespace DoubleMaze.Game
         {
             Console.WriteLine(input.playerInput);
             state.Players[input.PlayerId].PlayerHandler.Process(input.playerInput);
+        }
+
+        public void Process(GameUpdate input)
+        {
+            state.Games[input.GameId].Update();
         }
     }
 }

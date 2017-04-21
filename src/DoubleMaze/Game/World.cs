@@ -22,10 +22,17 @@ namespace DoubleMaze.Game
 
         private async Task MainLoop(BufferBlock<IMessage> messages)
         {
-            while (await messages.OutputAvailableAsync())
+            try
             {
-                var message = await messages.ReceiveAsync();
-                (dispatcher).Process((dynamic)message);
+                while (await messages.OutputAvailableAsync())
+                {
+                    var message = await messages.ReceiveAsync();
+                    (dispatcher).Process((dynamic)message);
+                }
+            }
+            catch(Exception e)
+            {
+                throw;
             }
         }
     }

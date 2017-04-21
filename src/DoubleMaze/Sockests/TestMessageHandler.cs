@@ -13,9 +13,10 @@ namespace DoubleMaze.Sockests
     {
         private World world;
 
-        public TestMessageHandler(WebSocketConnectionManager webSocketConnectionManager) 
+        public TestMessageHandler(WebSocketConnectionManager webSocketConnectionManager, World world) 
             : base(webSocketConnectionManager)
         {
+            this.world = world;
         }
 
         public override async Task OnConnected(WebSocket socket)
@@ -31,7 +32,6 @@ namespace DoubleMaze.Sockests
                 await SendMessageAsync(socket, JsonConvert.SerializeObject(gs));
             });
 
-            world = new World();
             world.InputQueue.Post(new NewConnection(new Guid(socketId), output.InputQueue));
         }
 
@@ -82,6 +82,9 @@ namespace DoubleMaze.Sockests
             var checker = JsonConvert.DeserializeObject<CheckType>(message);
             if (checker.Type == InputType.PlayerName)
                 return JsonConvert.DeserializeObject<PlayerNameInput>(message);
+
+            if (checker.Type == InputType.KeyDown)
+                return JsonConvert.DeserializeObject<KeyDownInput>(message);
 
             throw new NotImplementedException();
         }

@@ -39,4 +39,14 @@ namespace DoubleMaze.Game
             return ObjectDumper.Dump(this);
         }
     }
+
+    public class GameUpdate : IMessage
+    {
+        public readonly Guid GameId;
+
+        public GameUpdate(Guid gameId)
+        {
+            GameId = gameId;
+        }
+    }
 }

@@ -1,8 +1,4 @@
 ﻿using DoubleMaze.Util;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DoubleMaze.Game
 {
@@ -15,6 +11,32 @@ namespace DoubleMaze.Game
     public interface IPlayerInput
     {
         InputType Type { get; }
+    }
+
+    public enum InputCommand
+    {
+        None,
+        Up,
+        Left,
+        Right,
+        Down
+    }
+
+    public class KeyDownInput : IPlayerInput
+    {
+        public InputType Type => InputType.KeyDown;
+
+        public readonly InputCommand Command;
+
+        public KeyDownInput(InputCommand command)
+        {
+            Command = command;
+        }
+
+        public override string ToString()
+        {
+            return ObjectDumper.Dump(this);
+        }
     }
 
     public class PlayerNameInput : IPlayerInput

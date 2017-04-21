@@ -33,7 +33,7 @@
                 //console.log(res);
 
                 if (res.command === "PlayerState")
-                    moveTo(res.pos.x, res.pos.y);
+                    moveTo(res.myPos, res.enemyPos);
                 else if(res.command === "MazeFeild")
                     setField(res.field)
                 
@@ -70,17 +70,17 @@
         var serverPos = { x: 0, y: 0 };
         var serverTime = 0;
         var mazeField = [[]];
+        var secondPlayerPos = { x: 0, y: 0 };
 
-        function moveTo(x, y)
+        function moveTo(myPos, enemyPos)
         {
-            //if (x == pos.x && y == pos.y)
-            //    return;
+            secondPlayerPos = enemyPos;
 
             currentPos.x = serverPos.x;
             currentPos.y = serverPos.y;
 
-            serverPos.x = x;
-            serverPos.y = y;
+            serverPos.x = myPos.x;
+            serverPos.y = myPos.y;
 
             serverTime = Date.now();
         }
@@ -139,22 +139,27 @@
             ctx.stroke();
 
 
-            x = (currentPos.x * (1 - t) + serverPos.x * t) * scale;
-            y = (currentPos.y * (1 - t) + serverPos.y * t) * scale;
-            //console.log(Date.now() + " " +  y);
+            var x = (currentPos.x * (1 - t) + serverPos.x * t) * scale;
+            var y = (currentPos.y * (1 - t) + serverPos.y * t) * scale;
             ctx.fillRect(x + (scale - 5) / 2, y + (scale - 5) / 2, 5, 5);
+
+            ctx.fillRect(secondPlayerPos.x * scale + (scale - 5) / 2, secondPlayerPos.y * scale + (scale - 5) / 2, 5, 5);
         }
 
         document.addEventListener("keydown", function (e) {
-            //if(e.key == 'w')
-            //    sendMessage('"Up"');
-            //if (e.key == 's')
-            //    sendMessage('"Down"');
-            //if (e.key == 'a')
-            //    sendMessage('"Left"');
-            //if (e.key == 'd')
-            //    sendMessage('"Right"');
+            if(e.key == 'w')
+                sendKey('Up');
+            if (e.key == 's')
+                sendKey('Down');
+            if (e.key == 'a')
+                sendKey('Left');
+            if (e.key == 'd')
+                sendKey('Right');
         });
+
+        function sendKey(key) {
+            sendMessage('{type:"keyDown", Command:"' + key + '"}');
+        }
 
         document.addEventListener("keyup", function () {
             //sendMessage('"None"');
