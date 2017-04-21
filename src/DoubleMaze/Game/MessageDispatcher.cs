@@ -1,50 +1,55 @@
-﻿using System;
+﻿using DoubleMaze.Util;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game
 {
-    public interface IMessage
+    public class WorldState
     {
+        public Dictionary<Guid, PlayerContex> Players = new Dictionary<Guid, PlayerContex>();
+
+        public BufferBlock<IMessage> InputQueue { get; internal set; }
     }
 
-    public class NewConnection : IMessage
+    public class PlayerContex
     {
-        public readonly Guid PlayerId;
-        public readonly BufferBlock<object> OutputQueue;
+        public BufferBlock<object> Output { get; private set; }
+        public IPlayerHandler PlayerHandler { get; set; }
 
-        public NewConnection(Guid playerId, BufferBlock<object> outputQueue)
+        public string Name { get; set; }
+
+        public PlayerContex(BufferBlock<object> output)
         {
-            PlayerId = playerId;
-            OutputQueue = outputQueue;
-        }
-    }
-
-    public class PlayerInput : IMessage
-    {
-        public readonly Guid PlayerId;
-        public readonly string Message;
-
-        public PlayerInput(Guid playerId, string input)
-        {
-            PlayerId = playerId;
-            Message = input;
+            Output = output;
         }
     }
 
     public class MessageDispatcher
     {
-        Dictionary<Guid, BufferBlock<object>> Players = new Dictionary<Guid, BufferBlock<object>>();
+        private BufferBlock<IMessage> inputQueue;
+        private WorldState state;
+
+        public MessageDispatcher(BufferBlock<IMessage> inputQueue)
+        {
+            state = new WorldState();
+            state.InputQueue = inputQueue;
+        }
 
         public void Process(NewConnection connection)
         {
-            Players[connection.PlayerId] = connection.OutputQueue;
+            var playerContext = new PlayerContex(connection.OutputQueue)
+            {
+                PlayerHandler = new WelcomeAreaHandler(connection.PlayerId, state)
+            };
+
+            state.Players.Add(connection.PlayerId, playerContext);
         }
 
         public void Process(PlayerInput input)
         {
-            Console.WriteLine(input.Message);
-            Players[input.PlayerId].Post(input.Message);
+            Console.WriteLine(input.playerInput);
+            state.Players[input.PlayerId].PlayerHandler.Process(input.playerInput);
         }
     }
 }

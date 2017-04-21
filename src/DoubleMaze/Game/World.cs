@@ -11,12 +11,13 @@ namespace DoubleMaze.Game
     {
         public BufferBlock<IMessage> InputQueue { get; private set; }
         private readonly Task mainLoop;
-        private readonly MessageDispatcher dispatcher = new MessageDispatcher();
+        private readonly MessageDispatcher dispatcher;
 
         public World()
         {
             InputQueue = new BufferBlock<IMessage>();
             mainLoop = MainLoop(InputQueue);
+            dispatcher = new MessageDispatcher(InputQueue);
         }
 
         private async Task MainLoop(BufferBlock<IMessage> messages)

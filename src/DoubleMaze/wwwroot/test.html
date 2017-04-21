@@ -48,7 +48,7 @@
         button.addEventListener("click", function() {
 
             var input = document.getElementById("textInput");
-            sendMessage(input.value);
+            sendMessage('{type:"PlayerName", Name:"' + input.value + '"}');
 
             input.value = "";
         });
@@ -146,14 +146,14 @@
         }
 
         document.addEventListener("keydown", function (e) {
-            if(e.key == 'w')
-                sendMessage('"Up"');
-            if (e.key == 's')
-                sendMessage('"Down"');
-            if (e.key == 'a')
-                sendMessage('"Left"');
-            if (e.key == 'd')
-                sendMessage('"Right"');
+            //if(e.key == 'w')
+            //    sendMessage('"Up"');
+            //if (e.key == 's')
+            //    sendMessage('"Down"');
+            //if (e.key == 'a')
+            //    sendMessage('"Left"');
+            //if (e.key == 'd')
+            //    sendMessage('"Right"');
         });
 
         document.addEventListener("keyup", function () {

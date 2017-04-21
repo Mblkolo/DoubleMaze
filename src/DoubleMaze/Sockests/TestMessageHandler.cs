@@ -11,8 +11,6 @@ namespace DoubleMaze.Sockests
 {
     public class TestMessageHandler : WebSocketHandler
     {
-        private SimpleMaze simpleMaze;
-
         private World world;
 
         public TestMessageHandler(WebSocketConnectionManager webSocketConnectionManager) 
@@ -67,7 +65,7 @@ namespace DoubleMaze.Sockests
             //await SendMessageToAllAsync(message);
 
             //simpleMaze.Execute(JsonConvert.DeserializeObject<InputCommand>(message));
-            world.InputQueue.Post(new PlayerInput(new Guid(WebSocketConnectionManager.GetId(socket)), message) );
+            world.InputQueue.Post(new PlayerInput(new Guid(WebSocketConnectionManager.GetId(socket)), DecodeMessage(message)) );
         }
 
         public override async Task OnDisconnected(WebSocket socket)
@@ -78,14 +76,19 @@ namespace DoubleMaze.Sockests
             await SendMessageToAllAsync($"{socketId} disconnected");
         }
 
-        private class TextMessage : IMessage
+        //Двойная расшифровка
+        private IPlayerInput DecodeMessage(string message)
         {
-            public string Text;
+            var checker = JsonConvert.DeserializeObject<CheckType>(message);
+            if (checker.Type == InputType.PlayerName)
+                return JsonConvert.DeserializeObject<PlayerNameInput>(message);
 
-            public override string ToString()
-            {
-                return Text;
-            }
+            throw new NotImplementedException();
+        }
+
+        private class CheckType : IPlayerInput
+        {
+            public InputType Type { get; set; }
         }
     }
 }
