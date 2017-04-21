@@ -8,6 +8,8 @@
 
 <body>
     <h1>This should be mapped to "/ws"</h1>
+    <canvas id="game-canvas" width="500" height="500" > </canvas>
+    <br />
     <input type=text id="textInput" placeholder="Enter your text" />
     <button id="sendButton">Send</button>
 
@@ -26,6 +28,15 @@
             socket.onmessage = function(event) {
                 appendItem(list, event.data);
                 console.log(event.data);
+
+                var res = JSON.parse(event.data);
+                //console.log(res);
+
+                if (res.command === "PlayerState")
+                    moveTo(res.myPos, res.enemyPos);
+                else if(res.command === "MazeFeild")
+                    setField(res.field)
+                
             };
             socket.onerror = function(event) {
                 console.log("error: " + event.data);
@@ -37,7 +48,7 @@
         button.addEventListener("click", function() {
 
             var input = document.getElementById("textInput");
-            sendMessage(input.value);
+            sendMessage('{type:"PlayerName", Name:"' + input.value + '"}');
 
             input.value = "";
         });
@@ -45,11 +56,116 @@
             console.log("Sending: " + message);
             socket.send(message);
         }
+
+        var latestChild = null;
         function appendItem(list, message) {
             var item = document.createElement("li");
             item.appendChild(document.createTextNode(message));
-            list.appendChild(item);
+            list.insertBefore(item, latestChild);
+
+            latestChild = item;
         }
+
+        var currentPos = { x: 0, y: 0 };
+        var serverPos = { x: 0, y: 0 };
+        var serverTime = 0;
+        var mazeField = [[]];
+        var secondPlayerPos = { x: 0, y: 0 };
+
+        function moveTo(myPos, enemyPos)
+        {
+            secondPlayerPos = enemyPos;
+
+            currentPos.x = serverPos.x;
+            currentPos.y = serverPos.y;
+
+            serverPos.x = myPos.x;
+            serverPos.y = myPos.y;
+
+            serverTime = Date.now();
+        }
+
+        function setField(field)
+        {
+            mazeField = field;
+        }
+
+        function drawLoop() {
+            var now = Date.now();
+            var t = (now - serverTime) / 100;
+
+            drawOn(t);
+
+            requestAnimationFrame(drawLoop);
+        }
+
+        const scale = 20;
+
+        function drawOn(t)
+        {
+            var ctx = document.getElementById("game-canvas").getContext("2d");
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+            ctx.beginPath();
+            for (var y = 0; y < mazeField.length; ++y) {
+                for (var x = 0; x < mazeField[y].length; ++x) {
+
+                    var topLeft = { x: x * scale, y: y * scale };
+                    var topRight = { x: (x + 1) * scale, y: y * scale };
+                    var bottomRight = { x: (x + 1) * scale, y: (y + 1) * scale };
+                    var bottomLeft = { x: x * scale, y: (y + 1) * scale };
+
+                    if ((mazeField[y][x] & 1) !== 0) {
+                        ctx.moveTo(topLeft.x, topLeft.y);
+                        ctx.lineTo(topRight.x, topRight.y);
+                    }
+
+                    if ((mazeField[y][x] & 2) !== 0) {
+                        ctx.moveTo(topRight.x, topRight.y);
+                        ctx.lineTo(bottomRight.x, bottomRight.y);
+                    }
+
+                    if ((mazeField[y][x] & 4) !== 0) {
+                        ctx.moveTo(bottomRight.x, bottomRight.y);
+                        ctx.lineTo(bottomLeft.x, bottomLeft.y);
+                    }
+
+                    if ((mazeField[y][x] & 8) !== 0) {
+                        ctx.moveTo(bottomLeft.x, bottomLeft.y);
+                        ctx.lineTo(topLeft.x, topLeft.y);
+                    }
+                }
+            }
+            ctx.stroke();
+
+
+            var x = (currentPos.x * (1 - t) + serverPos.x * t) * scale;
+            var y = (currentPos.y * (1 - t) + serverPos.y * t) * scale;
+            ctx.fillRect(x + (scale - 5) / 2, y + (scale - 5) / 2, 5, 5);
+
+            ctx.fillRect(secondPlayerPos.x * scale + (scale - 5) / 2, secondPlayerPos.y * scale + (scale - 5) / 2, 5, 5);
+        }
+
+        document.addEventListener("keydown", function (e) {
+            if(e.key == 'w')
+                sendKey('Up');
+            if (e.key == 's')
+                sendKey('Down');
+            if (e.key == 'a')
+                sendKey('Left');
+            if (e.key == 'd')
+                sendKey('Right');
+        });
+
+        function sendKey(key) {
+            sendMessage('{type:"keyDown", Command:"' + key + '"}');
+        }
+
+        document.addEventListener("keyup", function () {
+            //sendMessage('"None"');
+        });
+
+        drawLoop();
     </script>
 </body>
 </html>

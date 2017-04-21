@@ -1,0 +1,58 @@
+﻿using DoubleMaze.Util;
+
+namespace DoubleMaze.Game
+{
+    public enum InputType
+    {
+        KeyDown,
+        PlayerName,
+    }
+
+    public interface IPlayerInput
+    {
+        InputType Type { get; }
+    }
+
+    public enum InputCommand
+    {
+        None,
+        Up,
+        Left,
+        Right,
+        Down
+    }
+
+    public class KeyDownInput : IPlayerInput
+    {
+        public InputType Type => InputType.KeyDown;
+
+        public readonly InputCommand Command;
+
+        public KeyDownInput(InputCommand command)
+        {
+            Command = command;
+        }
+
+        public override string ToString()
+        {
+            return ObjectDumper.Dump(this);
+        }
+    }
+
+    public class PlayerNameInput : IPlayerInput
+    {
+        public InputType Type => InputType.PlayerName;
+
+        public readonly string Name;
+
+        public PlayerNameInput(string name)
+        {
+            Name = name;
+        }
+
+        public override string ToString()
+        {
+            return ObjectDumper.Dump(this);
+        }
+    }
+}
