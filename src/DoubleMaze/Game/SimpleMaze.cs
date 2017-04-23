@@ -100,6 +100,7 @@ namespace DoubleMaze.Game
                 throw new ArgumentException(nameof(secondPlayer));
 
             this.secondPlayer = secondPlayer;
+            secondPlayer.SetStart(mazeField.GetLength(1)-1, mazeField.GetLength(0)-1);
 
             timer = new Timer(x => state.InputQueue.Post(new GameUpdate(gameId)), new object(), 100, 100);
 
@@ -148,6 +149,13 @@ namespace DoubleMaze.Game
         }
 
         public Pos GetPos() => new Pos { x = xPos * (1 - progress) + nextXPos * progress, y = yPos * (1 - progress) + nextYPos * progress };
+
+        public void SetStart(int x, int y)
+        {
+            xPos = nextXPos = x;
+            yPos = nextYPos = y;
+            progress = 0;
+        }
 
         public void Update(byte[,] mazeField)
         {
