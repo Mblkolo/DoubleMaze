@@ -9,23 +9,29 @@ using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game
 {
-    public interface IGameState
+    public interface IGameCommand
     {
         [JsonConverter(typeof(StringEnumConverter))]
         GameCommand command { get; }
     }
 
-    public class PlayerPos : IGameState
+    public class PlayerPos : IGameCommand
     {
         public GameCommand command => GameCommand.PlayerState;
         public Pos myPos { get; set; }
         public Pos enemyPos { get; set; }
     }
 
-    public class MazeField : IGameState
+    public class MazeField : IGameCommand
     {
         public GameCommand command => GameCommand.MazeFeild;
         public byte[,] field { get; set; }
+    }
+
+    public class SetTokenCommand : IGameCommand
+    {
+        public GameCommand command => GameCommand.SetToken;
+        public string Token { get; set; }
     }
 
 
@@ -37,7 +43,9 @@ namespace DoubleMaze.Game
     public enum GameCommand
     {
         PlayerState,
-        MazeFeild
+        MazeFeild,
+        CloseConnection,
+        SetToken
     }
 
     public class SimpleMaze
@@ -133,7 +141,7 @@ namespace DoubleMaze.Game
     public class MazePlayer
     {
         public InputCommand command;
-        public readonly BufferBlock<object> output;
+        public readonly BufferBlock<IGameCommand> output;
 
 
         private int xPos = 0;
@@ -143,7 +151,7 @@ namespace DoubleMaze.Game
         private float progress = 0;
         private InputCommand currentCommand;
 
-        public MazePlayer(BufferBlock<object> output)
+        public MazePlayer(BufferBlock<IGameCommand> output)
         {
             this.output = output;
         }

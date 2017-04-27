@@ -6,6 +6,7 @@ namespace DoubleMaze.Game
     {
         KeyDown,
         PlayerName,
+        Token,
     }
 
     public interface IPlayerInput
@@ -49,6 +50,18 @@ namespace DoubleMaze.Game
         {
             Name = name;
         }
+
+        public override string ToString()
+        {
+            return ObjectDumper.Dump(this);
+        }
+    }
+
+    public class TokenInput : IPlayerInput
+    {
+        public InputType Type => InputType.Token;
+
+        public string Token { get; set; }
 
         public override string ToString()
         {

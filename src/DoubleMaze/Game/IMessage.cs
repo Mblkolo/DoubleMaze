@@ -14,9 +14,9 @@ namespace DoubleMaze.Game
     public class NewConnection : IMessage
     {
         public readonly Guid PlayerId;
-        public readonly BufferBlock<object> OutputQueue;
+        public readonly BufferBlock<IGameCommand> OutputQueue;
 
-        public NewConnection(Guid playerId, BufferBlock<object> outputQueue)
+        public NewConnection(Guid playerId, BufferBlock<IGameCommand> outputQueue)
         {
             PlayerId = playerId;
             OutputQueue = outputQueue;

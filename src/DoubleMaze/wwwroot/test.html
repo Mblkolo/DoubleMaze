@@ -21,6 +21,7 @@
             socket = new WebSocket(uri);
             socket.onopen = function(event) {
                 console.log("opened connection to " + uri);
+                sendMessage(JSON.stringify({ Type: "Token", Token: localStorage.getItem("token") }))
             };
             socket.onclose = function(event) {
                 console.log("closed connection from " + uri);
@@ -36,13 +37,19 @@
                     moveTo(res.myPos, res.enemyPos);
                 else if(res.command === "MazeFeild")
                     setField(res.field)
-                
+                else if(res.command == "SetToken")
+                    localStorage.setItem("token", res.Token)
             };
             socket.onerror = function(event) {
                 console.log("error: " + event.data);
             };
         }
         connect();
+        function sendMessage(message) {
+            console.log("Sending: " + message);
+            socket.send(message);
+        }
+
         var list = document.getElementById("messages");
         var button = document.getElementById("sendButton");
         button.addEventListener("click", function() {
@@ -52,10 +59,7 @@
 
             input.value = "";
         });
-        function sendMessage(message) {
-            console.log("Sending: " + message);
-            socket.send(message);
-        }
+
 
         var latestChild = null;
         function appendItem(list, message) {

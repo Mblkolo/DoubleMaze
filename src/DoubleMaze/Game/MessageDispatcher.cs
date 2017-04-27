@@ -15,12 +15,12 @@ namespace DoubleMaze.Game
 
     public class PlayerContex
     {
-        public BufferBlock<object> Output { get; private set; }
+        public BufferBlock<IGameCommand> Output { get; private set; }
         public IPlayerHandler PlayerHandler { get; set; }
 
         public string Name { get; set; }
 
-        public PlayerContex(BufferBlock<object> output)
+        public PlayerContex(BufferBlock<IGameCommand> output)
         {
             Output = output;
         }
@@ -39,6 +39,9 @@ namespace DoubleMaze.Game
 
         public void Process(NewConnection connection)
         {
+            if (state.Players.ContainsKey(connection.PlayerId))
+                return;
+
             var playerContext = new PlayerContex(connection.OutputQueue)
             {
                 PlayerHandler = new WelcomeAreaHandler(connection.PlayerId, state)
