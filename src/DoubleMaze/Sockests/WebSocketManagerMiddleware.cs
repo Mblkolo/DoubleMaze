@@ -48,7 +48,7 @@ namespace DoubleMaze.Sockests
             Guid playerId = _outConnectionManager.PlayerConnected(loginInput.Token, socket);
             await socket.SendDataAsync(new SetTokenCommand { Token = playerId.ToString("N") });
 
-            _world.InputQueue.Post(new NewConnection(playerId, _outConnectionManager.GetQueue(playerId)));
+            _world.InputQueue.Post(new PlayerConnected(playerId, _outConnectionManager.GetQueue(playerId)));
             while (socket.State == WebSocketState.Open)
             {
                 input = await socket.ReadInputAsync(buffer);
@@ -85,6 +85,7 @@ namespace DoubleMaze.Sockests
                 }
                 else
                 {
+                    playerId = Guid.NewGuid();
                     PlayerChanals[playerId] = new OutputChanel(socket);
                 }
 

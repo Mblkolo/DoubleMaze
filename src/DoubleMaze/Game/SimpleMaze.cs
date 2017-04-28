@@ -112,8 +112,8 @@ namespace DoubleMaze.Game
 
             timer = new Timer(x => state.InputQueue.Post(new GameUpdate(gameId)), new object(), 100, 100);
 
-            firstPlayer.output.SendAsync(new MazeField { field = mazeField });
-            secondPlayer.output.SendAsync(new MazeField { field = mazeField });
+            SendState(firstPlayer);
+            SendState(secondPlayer);
         }
 
         BufferBlock<int> actionBlock = new BufferBlock<int>();
@@ -124,24 +124,29 @@ namespace DoubleMaze.Game
             firstPlayer.Update(mazeField);
             secondPlayer.Update(mazeField);
 
-            firstPlayer.output.Post(new PlayerPos
+            firstPlayer.Output.Post(new PlayerPos
             {
                 myPos = firstPlayer.GetPos(),
                 enemyPos = secondPlayer.GetPos()
             });
 
-            secondPlayer.output.Post(new PlayerPos
+            secondPlayer.Output.Post(new PlayerPos
             {
                 myPos = secondPlayer.GetPos(),
                 enemyPos = firstPlayer.GetPos()
             });
         }
+
+        internal void SendState(MazePlayer player)
+        {
+            player.Output.SendAsync(new MazeField { field = mazeField });
+        }
     }
 
     public class MazePlayer
     {
-        public InputCommand command;
-        public readonly BufferBlock<IGameCommand> output;
+        public InputCommand Сommand;
+        public readonly BufferBlock<IGameCommand> Output;
 
 
         private int xPos = 0;
@@ -153,7 +158,7 @@ namespace DoubleMaze.Game
 
         public MazePlayer(BufferBlock<IGameCommand> output)
         {
-            this.output = output;
+            Output = output;
         }
 
         public Pos GetPos() => new Pos { x = xPos * (1 - progress) + nextXPos * progress, y = yPos * (1 - progress) + nextYPos * progress };
@@ -174,23 +179,23 @@ namespace DoubleMaze.Game
             {
                 xPos = nextXPos;
                 yPos = nextYPos;
-                if (command == InputCommand.Down && (mazeField[yPos, xPos] & 4) == 0)
+                if (Сommand == InputCommand.Down && (mazeField[yPos, xPos] & 4) == 0)
                     nextYPos = yPos + 1;
 
-                if (command == InputCommand.Up && (mazeField[yPos, xPos] & 1) == 0)
+                if (Сommand == InputCommand.Up && (mazeField[yPos, xPos] & 1) == 0)
                     nextYPos = yPos - 1;
 
-                if (command == InputCommand.Left && (mazeField[yPos, xPos] & 8) == 0)
+                if (Сommand == InputCommand.Left && (mazeField[yPos, xPos] & 8) == 0)
                     nextXPos = xPos - 1;
 
-                if (command == InputCommand.Right && (mazeField[yPos, xPos] & 2) == 0)
+                if (Сommand == InputCommand.Right && (mazeField[yPos, xPos] & 2) == 0)
                     nextXPos = xPos + 1;
 
                 if (nextYPos != yPos || nextXPos != xPos)
                 {
                     if (progress > 1)
                         progress -= 1;
-                    currentCommand = command;
+                    currentCommand = Сommand;
                 }
                 else
                 {

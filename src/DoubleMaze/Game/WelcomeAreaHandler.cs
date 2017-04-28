@@ -13,6 +13,10 @@ namespace DoubleMaze.Game
             this.state = state;
         }
 
+        public void PlayerJoin()
+        {
+        }
+
         public void Process(IPlayerInput inputCommand)
         {
             var o = inputCommand as PlayerNameInput;

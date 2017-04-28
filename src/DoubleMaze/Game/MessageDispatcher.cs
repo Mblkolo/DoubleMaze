@@ -37,10 +37,13 @@ namespace DoubleMaze.Game
             state.InputQueue = inputQueue;
         }
 
-        public void Process(NewConnection connection)
+        public void Process(PlayerConnected connection)
         {
             if (state.Players.ContainsKey(connection.PlayerId))
+            {
+                state.Players[connection.PlayerId].PlayerHandler.PlayerJoin();
                 return;
+            }
 
             var playerContext = new PlayerContex(connection.OutputQueue)
             {
