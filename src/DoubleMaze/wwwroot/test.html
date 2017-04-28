@@ -21,7 +21,7 @@
             socket = new WebSocket(uri);
             socket.onopen = function(event) {
                 console.log("opened connection to " + uri);
-                sendMessage(JSON.stringify({ Type: "Token", Token: localStorage.getItem("token") }))
+                sendMessage(JSON.stringify({ Type: "token", Token: localStorage.getItem("token") }))
             };
             socket.onclose = function(event) {
                 console.log("closed connection from " + uri);
@@ -33,12 +33,15 @@
                 var res = JSON.parse(event.data);
                 //console.log(res);
 
-                if (res.command === "PlayerState")
+                if (res.command === "playerState")
                     moveTo(res.myPos, res.enemyPos);
-                else if(res.command === "MazeFeild")
+                else if (res.command === "mazeFeild")
                     setField(res.field)
-                else if(res.command == "SetToken")
+                else if (res.command == "getToken")
                     localStorage.setItem("token", res.Token)
+                else if (res.command == "gameOwer")
+                    inGame = false;
+                    
             };
             socket.onerror = function(event) {
                 console.log("error: " + event.data);
@@ -76,6 +79,7 @@
         var mazeField = [[]];
         var secondPlayerPos = { x: 0, y: 0 };
         var latestTimes = [];
+        var inGame = false;
 
         function moveTo(myPos, enemyPos)
         {
@@ -99,11 +103,15 @@
         function setField(field)
         {
             mazeField = field;
+            inGame = true;
         }
 
         function drawLoop() {
-            var now = Date.now();
-            var t = (now - serverTime) / 100;
+            if(inGame)
+            {
+                var now = Date.now();
+                var t = (now - serverTime) / 100;
+            }
 
             drawOn(t);
 
