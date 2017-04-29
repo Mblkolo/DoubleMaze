@@ -1,0 +1,81 @@
+﻿body {
+    padding: 0;
+    margin: 0;
+    background-color: #ccc;
+    font-family: Verdana;
+}
+
+html {
+    background-color: #fff;
+    font-size: 8px;
+}
+
+.center-block {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.link-button {
+    display: block;
+    text-decoration: none;
+    color: #FFF;
+    background: #227F32;
+    text-transform: uppercase;
+    font-weight: 500;
+    text-align: center;
+}
+
+    .link-button:hover {
+        box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5);
+    }
+
+    .link-button:active {
+        color: #227F32;
+        background: #fff;
+    }
+
+#main-content{
+    width: 100rem;
+}
+
+.content {
+    background-color: #fff;
+    width: 100%; 
+    padding: 2rem;
+    font-size: 1.5rem;
+}
+
+.welcome-play-button{
+    font-size: 4rem;
+    line-height: 8rem;
+    width: 32rem;
+    margin-bottom: 10rem;
+}
+
+.welcome-player-name{
+    width: 60rem;
+    text-align: center;
+    font-size: 3rem;
+    height: 4rem;
+    margin-bottom: 4rem;
+}
+.welcome-intro
+{
+    font-size: 2rem;
+    width: 60rem;
+    margin-bottom: 7rem;
+    margin-top: 7rem;
+}
+
+.welcome-intro p{
+    margin: 0 0 1rem 0;
+}
+
+.welcome-title
+{
+    text-align: center;
+    color: #227F32;
+    text-transform: uppercase;
+    font-size: 5rem;
+}

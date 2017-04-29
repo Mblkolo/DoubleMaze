@@ -39,7 +39,7 @@ namespace DoubleMaze
             loggerFactory.AddDebug();
 
             app.UseWebSockets();
-            app.Map("/test", (_app) => _app.UseMiddleware<WebSocketManagerMiddleware>(new TestMessageHandler(new WebSocketConnectionManager(), new Game.World())));
+            app.Map("/test", (_app) => _app.UseMiddleware<WebSocketManagerMiddleware>(new OutputConnectionManager(), new Game.World()));
 
             app.UseStaticFiles();
             app.UseMvc();

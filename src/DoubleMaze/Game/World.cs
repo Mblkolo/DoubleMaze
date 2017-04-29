@@ -30,7 +30,7 @@ namespace DoubleMaze.Game
                     (dispatcher).Process((dynamic)message);
                 }
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 throw;
             }

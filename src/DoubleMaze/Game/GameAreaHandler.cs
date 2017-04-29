@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace DoubleMaze.Game
 {
@@ -10,6 +8,7 @@ namespace DoubleMaze.Game
         private readonly Guid playerId;
         private readonly WorldState state;
         private readonly MazePlayer player;
+        private readonly SimpleMaze game;
 
         public GameAreaHandler(Guid playerId, WorldState state)
         {
@@ -17,7 +16,7 @@ namespace DoubleMaze.Game
             this.state = state;
             player = new MazePlayer(state.Players[playerId].Output);
 
-            var game = state.Games.Values.SingleOrDefault(x => x.IsStarted == false);
+            game = state.Games.Values.SingleOrDefault(x => x.IsStarted == false);
             if (game == null)
             {
                 Guid gameId = Guid.NewGuid();
@@ -32,7 +31,12 @@ namespace DoubleMaze.Game
         {
             var o = inputCommand as KeyDownInput;
             if (o != null)
-                player.command = o.Command;
+                player.Сommand = o.Command;
+        }
+
+        public void PlayerJoin()
+        {
+            game.SendState(player);
         }
     }
 }
