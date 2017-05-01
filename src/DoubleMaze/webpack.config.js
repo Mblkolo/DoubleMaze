@@ -15,5 +15,6 @@
     },
     resolve: {
         extensions: [".tsx", ".ts", ".js"]
-    }
+    },
+    devtool: 'inline-source-map',
 };
