@@ -1,6 +1,5 @@
 ﻿import {AreaController } from "./AreaController.ts";
 
-alert("ololo");
 let controller = new AreaController(sendMessage);
 
 

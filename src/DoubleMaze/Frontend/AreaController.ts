@@ -47,7 +47,7 @@ class LoadingArea implements IArea {
 
     public process(data: any) {
         if (data.command === "setToken") {
-            localStorage.setItem("token", data.Token);
+            localStorage.setItem("token", data.token);
         }
     }
 
@@ -61,6 +61,7 @@ class WelcomeArea implements IArea {
     }
 
     public enter() {
+        $("#main-content").html($("#welcome-area-tempalte").html());
     }
 
     public leave() {
