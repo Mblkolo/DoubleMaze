@@ -28,7 +28,7 @@ namespace DoubleMaze.Game
 
     public class MessageDispatcher
     {
-        private BufferBlock<IMessage> inputQueue;
+        //private BufferBlock<IMessage> inputQueue;
         private WorldState state;
 
         public MessageDispatcher(BufferBlock<IMessage> inputQueue)
@@ -39,18 +39,16 @@ namespace DoubleMaze.Game
 
         public void Process(PlayerConnected connection)
         {
-            if (state.Players.ContainsKey(connection.PlayerId))
+            if (state.Players.ContainsKey(connection.PlayerId) == false)
             {
-                state.Players[connection.PlayerId].PlayerHandler.PlayerJoin();
-                return;
+                var playerContext = new PlayerContex(connection.OutputQueue)
+                {
+                    PlayerHandler = new WelcomeAreaHandler(connection.PlayerId, state)
+                };
+                state.Players.Add(connection.PlayerId, playerContext);
             }
 
-            var playerContext = new PlayerContex(connection.OutputQueue)
-            {
-                PlayerHandler = new WelcomeAreaHandler(connection.PlayerId, state)
-            };
-
-            state.Players.Add(connection.PlayerId, playerContext);
+            state.Players[connection.PlayerId].PlayerHandler.PlayerJoin();
         }
 
         public void Process(PlayerInput input)

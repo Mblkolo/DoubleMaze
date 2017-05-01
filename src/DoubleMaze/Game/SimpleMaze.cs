@@ -128,11 +128,11 @@ namespace DoubleMaze.Game
             timer.Dispose();
             winner.Output.Post(new GameOverCommand
             {
-                Status = GameOverCommand.Statuses.Win
+                status = GameOverCommand.Statuses.Win
             });
             looser.Output.Post(new GameOverCommand
             {
-                Status = GameOverCommand.Statuses.Lose
+                status = GameOverCommand.Statuses.Lose
             });
         }
     }

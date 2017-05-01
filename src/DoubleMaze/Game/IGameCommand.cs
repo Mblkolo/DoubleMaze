@@ -11,7 +11,8 @@
         MazeFeild,
         CloseConnection,
         SetToken,
-        GameOver
+        GameOver,
+        Goto
     }
 
     public class PlayerPos : IGameCommand
@@ -30,7 +31,7 @@
     public class SetTokenCommand : IGameCommand
     {
         public GameCommand command => GameCommand.SetToken;
-        public string Token { get; set; }
+        public string token { get; set; }
     }
 
 
@@ -44,6 +45,18 @@
         }
 
         public GameCommand command => GameCommand.GameOver;
-        public Statuses Status { get; set; }
+        public Statuses status { get; set; }
+    }
+
+    public class GotoCommand : IGameCommand
+    {
+        public enum Areas
+        {
+            Welcome,
+            Game
+        }
+
+        public GameCommand command => GameCommand.Goto;
+        public Areas area { get; set; }
     }
 }

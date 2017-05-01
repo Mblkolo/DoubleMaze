@@ -8,9 +8,10 @@ var AreaController = (function () {
         this.areas["game"] = new GameArea(sendData);
     }
     AreaController.prototype.gotoArea = function (area) {
-        if (this.currentArea != null)
+        if (this.currentArea != null) {
             this.currentArea.leave();
-        this.currentArea = this.areas["area"];
+        }
+        this.currentArea = this.areas[area];
         this.currentArea.enter();
     };
     AreaController.prototype.process = function (data) {
@@ -18,8 +19,9 @@ var AreaController = (function () {
             this.gotoArea(data.area);
             return;
         }
-        if (this.currentArea != null)
+        if (this.currentArea != null) {
             this.currentArea.process(data);
+        }
     };
     return AreaController;
 }());
@@ -34,7 +36,7 @@ var LoadingArea = (function () {
     LoadingArea.prototype.leave = function () {
     };
     LoadingArea.prototype.process = function (data) {
-        if (data.command == "setToken") {
+        if (data.command === "setToken") {
             localStorage.setItem("token", data.Token);
         }
     };

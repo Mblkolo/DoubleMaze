@@ -4,15 +4,16 @@ export class AreaController {
     private areas: { [id: string]: IArea } = {};
     private currentArea: IArea = null;
 
-    public constructor(sendData: (data) => void) {
+    public constructor(sendData: (data: any) => void) {
         this.areas["loading"] = new LoadingArea(sendData);
         this.areas["welcome"] = new WelcomeArea(sendData);
         this.areas["game"] = new GameArea(sendData);
     }
 
     public gotoArea(area: string) {
-        if (this.currentArea != null)
+        if (this.currentArea != null) {
             this.currentArea.leave();
+        }
 
         this.currentArea = this.areas[area];
         this.currentArea.enter();
@@ -24,37 +25,38 @@ export class AreaController {
             return;
         }
 
-        if (this.currentArea != null)
+        if (this.currentArea != null) {
             this.currentArea.process(data);
+        }
     }
 }
 
 class LoadingArea implements IArea {
-    private sendData: (data) => void;
+    private sendData: (data: any) => void;
 
-    public constructor(sendData: (data) => void) {
+    public constructor(sendData: (data: any) => void) {
         this.sendData = sendData;
     }
 
     public enter() {
-        this.sendData(JSON.stringify({ Type: "token", Token: localStorage.getItem("token") }))
+        this.sendData(JSON.stringify({ Type: "token", Token: localStorage.getItem("token") }));
     }
 
     public leave() {
     }
 
     public process(data: any) {
-        if (data.command == "setToken") {
-            localStorage.setItem("token", data.Token)
+        if (data.command === "setToken") {
+            localStorage.setItem("token", data.Token);
         }
     }
 
 }
 
-class WelcomeArea implements IArea{
-    private sendData: (data) => void;
+class WelcomeArea implements IArea {
+    private sendData: (data: any) => void;
 
-    public constructor(sendData: (data) => void) {
+    public constructor(sendData: (data: any) => void) {
         this.sendData = sendData;
     }
 
@@ -71,9 +73,9 @@ class WelcomeArea implements IArea{
 }
 
 class GameArea implements IArea {
-    private sendData: (data) => void;
+    private sendData: (data: any) => void;
 
-    public constructor(sendData: (data) => void) {
+    public constructor(sendData: (data: any) => void) {
         this.sendData = sendData;
     }
 

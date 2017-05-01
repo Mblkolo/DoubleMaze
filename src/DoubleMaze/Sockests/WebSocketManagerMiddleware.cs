@@ -46,7 +46,7 @@ namespace DoubleMaze.Sockests
                 throw new Exception($"Это не {nameof(TokenInput)}");
 
             Guid playerId = _outConnectionManager.PlayerConnected(loginInput.Token, socket);
-            await socket.SendDataAsync(new SetTokenCommand { Token = playerId.ToString("N") });
+            await socket.SendDataAsync(new SetTokenCommand { token = playerId.ToString("N") });
 
             _world.InputQueue.Post(new PlayerConnected(playerId, _outConnectionManager.GetQueue(playerId)));
             while (socket.State == WebSocketState.Open)

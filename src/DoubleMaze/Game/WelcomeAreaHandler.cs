@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game
 {
@@ -15,6 +16,7 @@ namespace DoubleMaze.Game
 
         public void PlayerJoin()
         {
+            state.Players[playerId].Output.Post(new GotoCommand { area = GotoCommand.Areas.Welcome });
         }
 
         public void Process(IPlayerInput inputCommand)
