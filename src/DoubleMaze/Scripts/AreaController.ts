@@ -62,6 +62,12 @@ class WelcomeArea implements IArea {
 
     public enter() {
         $("#main-content").html($("#welcome-area-tempalte").html());
+        $(".welcome-play-button").on("click", (arg: JQueryEventObject) => this.onClick(arg));
+    }
+
+    public onClick(arg: JQueryEventObject) {
+        const name = $("welcome-player-name").val();
+        this.sendData(JSON.stringify({ Type: "PlayerName", Name: name }));
     }
 
     public leave() {

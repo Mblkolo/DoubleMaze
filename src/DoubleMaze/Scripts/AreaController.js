@@ -37,7 +37,7 @@ var LoadingArea = (function () {
     };
     LoadingArea.prototype.process = function (data) {
         if (data.command === "setToken") {
-            localStorage.setItem("token", data.Token);
+            localStorage.setItem("token", data.token);
         }
     };
     return LoadingArea;
@@ -47,6 +47,13 @@ var WelcomeArea = (function () {
         this.sendData = sendData;
     }
     WelcomeArea.prototype.enter = function () {
+        var _this = this;
+        $("#main-content").html($("#welcome-area-tempalte").html());
+        $(".welcome-play-button").on("click", function (arg) { return _this.onClick(arg); });
+    };
+    WelcomeArea.prototype.onClick = function (arg) {
+        var name = $("welcome-player-name").val();
+        this.sendData({ Type: "PlayerName", Name: name });
     };
     WelcomeArea.prototype.leave = function () {
     };

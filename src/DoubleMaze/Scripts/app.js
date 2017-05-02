@@ -1,6 +1,5 @@
 "use strict";
 var AreaController_ts_1 = require("./AreaController.ts");
-alert("ololo");
 var controller = new AreaController_ts_1.AreaController(sendMessage);
 var uri = "ws://" + window.location.host + "/test";
 var socket;
