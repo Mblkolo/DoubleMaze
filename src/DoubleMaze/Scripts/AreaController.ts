@@ -87,13 +87,32 @@ class GameArea implements IArea {
     }
 
     public enter() {
+        $("#main-content").html($("#game-area-tempalte").html());
     }
 
     public leave() {
     }
 
     public process(data: any) {
+        if (data.command === "waitOpponent") {
+            this.state = "waitOpponent";
+        }
+        if (data.command === "mazeFeild") {
+            this.state = "mazeFeild";
+        }
+        if (data.command === "gameOver") {
+            this.state = "gameOver";
+        }
 
+        this.render();
+    }
+
+    private state: string;
+
+    private render() {
+        $("#game-wait-screen").toggleClass("hidden", this.state !== "waitOpponent");
+        $("#game-canvas-screen").toggleClass("hidden", this.state !== "mazeFeild");
+        $("#game-gameover-screen").toggleClass("hidden", this.state !== "gameOver");
     }
 }
 

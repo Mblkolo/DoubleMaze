@@ -24,8 +24,9 @@ namespace DoubleMaze.Game
             var o = inputCommand as PlayerNameInput;
             if (o != null)
             {
-                state.Players[playerId].Name = o.Name;
+                state.Players[playerId].Name = o.Name ?? "Вася, да?";
                 state.Players[playerId].PlayerHandler = new GameAreaHandler(playerId, state);
+                state.Players[playerId].PlayerHandler.PlayerJoin();
             }
         }
     }

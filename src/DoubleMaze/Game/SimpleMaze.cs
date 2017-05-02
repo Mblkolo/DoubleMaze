@@ -91,18 +91,16 @@ namespace DoubleMaze.Game
             firstPlayer.Update(mazeField);
             secondPlayer.Update(mazeField);
 
-            if (WinZone.Contians(firstPlayer.GetCurrentCeil()))
+            if (WinZone.Contains(firstPlayer.GetCurrentCeil()) || WinZone.Contains(secondPlayer.GetCurrentCeil()))
             {
-                GameOver(firstPlayer, secondPlayer);
+                IsFinished = true;
+                timer.Dispose();
+
+                SendState(firstPlayer);
+                SendState(secondPlayer);
                 return;
             }
-
-            if (WinZone.Contians(secondPlayer.GetCurrentCeil()))
-            {
-                GameOver(secondPlayer, firstPlayer);
-                return;
-            }
-
+            
             firstPlayer.Output.Post(new PlayerPos
             {
                 myPos = firstPlayer.GetPos(),
@@ -116,24 +114,25 @@ namespace DoubleMaze.Game
             });
         }
 
-        internal void SendState(MazePlayer player)
+        public void SendState(MazePlayer player)
         {
-            player.Output.SendAsync(new MazeField { field = mazeField });
-        }
-
-        private void GameOver(MazePlayer winner, MazePlayer looser)
-        {
-            IsFinished = true;
-
-            timer.Dispose();
-            winner.Output.Post(new GameOverCommand
+            if(IsStarted == false)
             {
-                status = GameOverCommand.Statuses.Win
-            });
-            looser.Output.Post(new GameOverCommand
+                player.Output.SendAsync(new WaitOpponent());
+            }
+            else if (IsFinished == false)
             {
-                status = GameOverCommand.Statuses.Lose
-            });
+                player.Output.SendAsync(new MazeField { field = mazeField });
+            }
+            else
+            {
+                player.Output.Post(new GameOverCommand
+                {
+                    status = WinZone.Contains(player.GetCurrentCeil())
+                        ? GameOverCommand.Statuses.Win
+                        : GameOverCommand.Statuses.Lose
+                });
+            }
         }
     }
 
@@ -152,7 +151,7 @@ namespace DoubleMaze.Game
             Height = height;
         }
 
-        public bool Contians(Point pos)
+        public bool Contains(Point pos)
         {
             return Left <= pos.X && pos.X < Left + Width && Top < pos.Y && pos.Y < Top + Height ;
         }

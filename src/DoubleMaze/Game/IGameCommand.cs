@@ -1,4 +1,6 @@
-﻿namespace DoubleMaze.Game
+﻿using System;
+
+namespace DoubleMaze.Game
 {
     public interface IGameCommand
     {
@@ -12,7 +14,8 @@
         CloseConnection,
         SetToken,
         GameOver,
-        Goto
+        Goto,
+        WaitOpponent
     }
 
     public class PlayerPos : IGameCommand
@@ -58,5 +61,10 @@
 
         public GameCommand command => GameCommand.Goto;
         public Areas area { get; set; }
+    }
+
+    public class WaitOpponent : IGameCommand
+    {
+        public GameCommand command => GameCommand.WaitOpponent;
     }
 }

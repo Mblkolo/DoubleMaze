@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game
 {
@@ -36,6 +37,7 @@ namespace DoubleMaze.Game
 
         public void PlayerJoin()
         {
+            player.Output.Post(new GotoCommand { area = GotoCommand.Areas.Game });
             game.SendState(player);
         }
     }

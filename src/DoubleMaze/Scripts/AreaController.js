@@ -53,7 +53,7 @@ var WelcomeArea = (function () {
     };
     WelcomeArea.prototype.onClick = function (arg) {
         var name = $("welcome-player-name").val();
-        this.sendData({ Type: "PlayerName", Name: name });
+        this.sendData(JSON.stringify({ Type: "PlayerName", Name: name }));
     };
     WelcomeArea.prototype.leave = function () {
     };
@@ -66,10 +66,26 @@ var GameArea = (function () {
         this.sendData = sendData;
     }
     GameArea.prototype.enter = function () {
+        $("#main-content").html($("#game-area-tempalte").html());
     };
     GameArea.prototype.leave = function () {
     };
     GameArea.prototype.process = function (data) {
+        if (data.command === "waitOpponent") {
+            this.state = "waitOpponent";
+        }
+        if (data.command === "mazeFeild") {
+            this.state = "mazeFeild";
+        }
+        if (data.command === "gameOver") {
+            this.state = "gameOver";
+        }
+        this.render();
+    };
+    GameArea.prototype.render = function () {
+        $("#game-wait-screen").toggleClass("hidden", this.state !== "waitOpponent");
+        $("#game-canvas-screen").toggleClass("hidden", this.state !== "mazeFeild");
+        $("#game-gameover-screen").toggleClass("hidden", this.state !== "gameOver");
     };
     return GameArea;
 }());

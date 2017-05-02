@@ -16,21 +16,36 @@
     </div>
 
     <script type="text/template" id="welcome-area-tempalte">
-        <div id="main-content" class="center-block">
-            <div class="content center-block welcome-page">
-                <h1 class="welcome-title">Лабиринт наперегонки</h1>
-                <div class="welcome-intro center-block">
-                    <p>Доберись до центра лабирина быстрее противника</p>
-                    <p>Управлять стрелочками или WASD</p>
-                    <p>У тебя и твоего противника одинаковые лабиринты</p>
-                    <p>И они составляют один большой лабиринт</p>
-                    <p>Вводи имя и тыкай играть</p>
-                </div>
-                <input type="text" name="player-name" value="" class="center-block welcome-player-name" placeholder="Имя, да?" />
-                <a class="link-button welcome-play-button center-block" href="#play">Играть</a>
+        <div class="content center-block welcome-page">
+            <h1 class="title">Лабиринт наперегонки</h1>
+            <div class="welcome-intro center-block">
+                <p>Доберись до центра лабирина быстрее противника</p>
+                <p>Управлять стрелочками или WASD</p>
+                <p>У тебя и твоего противника одинаковые лабиринты</p>
+                <p>И они составляют один большой лабиринт</p>
+                <p>Вводи имя и тыкай играть</p>
+            </div>
+            <input type="text" name="player-name" value="" class="center-block welcome-player-name" placeholder="Имя, да?" />
+            <a class="link-button welcome-play-button center-block" href="#play">Играть</a>
+        </div>
+    </script>
+
+    <script type="text/template" id="game-area-tempalte">
+        <div class="content center-block">
+            <div class="hidden" id="game-wait-screen">
+                <h1 class="title">Ожидаем оппонента</h1>
+                <img class="center-block" src="images/preloader.gif" />
+            </div>
+            <div class="hidden" id="game-canvas-screen">
+                <canvas width="500" height="500"></canvas>
+            </div>
+            <div class="hidden" id="game-gameover-screen">
+                <h1>Игра окончена</h1>
+                <a href="#again">Ещё раз</a>
             </div>
         </div>
     </script>
+
     <!--
         <h1>This should be mapped to "/ws"</h1>
         <canvas id="game-canvas" width="500" height="500"> </canvas>
