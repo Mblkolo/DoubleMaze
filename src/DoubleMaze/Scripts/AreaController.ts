@@ -127,6 +127,7 @@ class GameArea implements IArea {
         }
         if (data.command === "gameOver") {
             this.state = "gameOver";
+            this.isWin = data.status === "win";
         }
 
         if (data.command === "playerState")
@@ -137,11 +138,16 @@ class GameArea implements IArea {
 
     private state: string;
     private mazeField: any;
+    private isWin: boolean;
 
     private render() {
         $("#game-wait-screen").toggleClass("hidden", this.state !== "waitOpponent");
         $("#game-canvas-screen").toggleClass("hidden", this.state !== "mazeFeild");
         $("#game-gameover-screen").toggleClass("hidden", this.state !== "gameOver");
+        if (this.state === "gameOver") {
+            $("#game-gameover-screen .winner").toggleClass("hidden", this.isWin == false);
+            $("#game-gameover-screen .looser").toggleClass("hidden", this.isWin);
+        }
     }
 
     private currentPos = { x: 0, y: 0 };
