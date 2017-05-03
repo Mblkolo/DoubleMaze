@@ -1,4 +1,5 @@
 "use strict";
+var key_code_ts_1 = require("./key_code.ts");
 var AreaController = (function () {
     function AreaController(sendData) {
         this.areas = {};
@@ -70,10 +71,30 @@ var GameArea = (function () {
         this.sendData = sendData;
     }
     GameArea.prototype.enter = function () {
+        var _this = this;
         $("#main-content").html($("#game-area-tempalte").html());
+        $("body").on("keydown", function (arg) { return _this.onKeyDown(arg); });
     };
     GameArea.prototype.leave = function () {
         this.state = null;
+    };
+    GameArea.prototype.onKeyDown = function (e) {
+        if (e.keyCode === key_code_ts_1.KeyCode.DOWN_ARROW || e.keyCode === key_code_ts_1.KeyCode.KEY_S) {
+            this.sendKey("Down", e);
+        }
+        if (e.keyCode === key_code_ts_1.KeyCode.UP_ARROW || e.keyCode === key_code_ts_1.KeyCode.KEY_W) {
+            this.sendKey("Up", e);
+        }
+        if (e.keyCode === key_code_ts_1.KeyCode.LEFT_ARROW || e.keyCode === key_code_ts_1.KeyCode.KEY_A) {
+            this.sendKey("Left", e);
+        }
+        if (e.keyCode === key_code_ts_1.KeyCode.RIGHT_ARROW || e.keyCode === key_code_ts_1.KeyCode.KEY_D) {
+            this.sendKey("Right", e);
+        }
+    };
+    GameArea.prototype.sendKey = function (key, e) {
+        e.preventDefault();
+        this.sendData(JSON.stringify({ type: "keyDown", Command: key }));
     };
     GameArea.prototype.process = function (data) {
         if (data.command === "waitOpponent") {

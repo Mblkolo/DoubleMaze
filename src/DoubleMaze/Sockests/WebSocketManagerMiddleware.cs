@@ -114,11 +114,18 @@ namespace DoubleMaze.Sockests
 
         private async Task MainLoop(BufferBlock<IGameCommand> messages)
         {
-            while (await messages.OutputAvailableAsync())
+            try
             {
-                var data = await messages.ReceiveAsync();
+                while (await messages.OutputAvailableAsync())
+                {
+                    var data = await messages.ReceiveAsync();
 
-                await socket.SendDataAsync(data);
+                    await socket.SendDataAsync(data);
+                }
+            }
+            catch(Exception e)
+            {
+                throw;
             }
         }
 

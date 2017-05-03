@@ -1,4 +1,5 @@
 ﻿import {IArea} from "./IArea.ts";
+import {KeyCode} from "./key_code.ts";
 
 export class AreaController {
     private areas: { [id: string]: IArea } = {};
@@ -88,10 +89,31 @@ class GameArea implements IArea {
 
     public enter() {
         $("#main-content").html($("#game-area-tempalte").html());
+        $("#game-canvas").on("keydown", (arg: JQueryEventObject) => this.onKeyDown(arg));
     }
 
     public leave() {
         this.state = null;
+    }
+
+    private onKeyDown(e: JQueryEventObject) {
+        if (e.keyCode === KeyCode.DOWN_ARROW || e.keyCode === KeyCode.KEY_S) {
+            this.sendKey("Down", e);
+        }
+        if (e.keyCode === KeyCode.UP_ARROW || e.keyCode === KeyCode.KEY_W) {
+            this.sendKey("Up", e);
+        }
+        if (e.keyCode === KeyCode.LEFT_ARROW || e.keyCode === KeyCode.KEY_A) {
+            this.sendKey("Left", e);
+        }
+        if (e.keyCode === KeyCode.RIGHT_ARROW || e.keyCode === KeyCode.KEY_D) {
+            this.sendKey("Right", e);
+        }
+    }
+
+    sendKey(key: string, e) {
+        e.preventDefault();
+        this.sendData(JSON.stringify({ type: "keyDown", Command: key }));
     }
 
     public process(data: any) {
