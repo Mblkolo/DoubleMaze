@@ -73,7 +73,8 @@ var GameArea = (function () {
     GameArea.prototype.enter = function () {
         var _this = this;
         $("#main-content").html($("#game-area-tempalte").html());
-        $("body").on("keydown", function (arg) { return _this.onKeyDown(arg); });
+        $("#game-canvas").on("keydown", function (arg) { return _this.onKeyDown(arg); });
+        $(".game-gameover-screen-button").on("click", function (arg) { return _this.onPlayAgain(arg); });
     };
     GameArea.prototype.leave = function () {
         this.state = null;
@@ -92,6 +93,10 @@ var GameArea = (function () {
             this.sendKey("Right", e);
         }
     };
+    GameArea.prototype.onPlayAgain = function (e) {
+        e.preventDefault();
+        this.sendData(JSON.stringify({ type: "playAgain" }));
+    };
     GameArea.prototype.sendKey = function (key, e) {
         e.preventDefault();
         this.sendData(JSON.stringify({ type: "keyDown", Command: key }));
@@ -107,6 +112,7 @@ var GameArea = (function () {
         }
         if (data.command === "gameOver") {
             this.state = "gameOver";
+            this.isWin = data.status === "win";
         }
         if (data.command === "playerState")
             this.moveTo(data.myPos, data.enemyPos);
@@ -116,6 +122,10 @@ var GameArea = (function () {
         $("#game-wait-screen").toggleClass("hidden", this.state !== "waitOpponent");
         $("#game-canvas-screen").toggleClass("hidden", this.state !== "mazeFeild");
         $("#game-gameover-screen").toggleClass("hidden", this.state !== "gameOver");
+        if (this.state === "gameOver") {
+            $("#game-gameover-screen .winner").toggleClass("hidden", this.isWin == false);
+            $("#game-gameover-screen .looser").toggleClass("hidden", this.isWin);
+        }
     };
     GameArea.prototype.moveTo = function (myPos, enemyPos) {
         this.secondPlayerPos = enemyPos;

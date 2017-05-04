@@ -90,6 +90,7 @@ class GameArea implements IArea {
     public enter() {
         $("#main-content").html($("#game-area-tempalte").html());
         $("#game-canvas").on("keydown", (arg: JQueryEventObject) => this.onKeyDown(arg));
+        $(".game-gameover-screen-button").on("click", (arg: JQueryEventObject) => this.onPlayAgain(arg));
     }
 
     public leave() {
@@ -109,6 +110,11 @@ class GameArea implements IArea {
         if (e.keyCode === KeyCode.RIGHT_ARROW || e.keyCode === KeyCode.KEY_D) {
             this.sendKey("Right", e);
         }
+    }
+
+    private onPlayAgain(e: JQueryEventObject) {
+        e.preventDefault();
+        this.sendData(JSON.stringify({ type: "playAgain" }));
     }
 
     sendKey(key: string, e) {

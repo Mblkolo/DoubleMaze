@@ -30,6 +30,18 @@ namespace DoubleMaze.Game
 
         public void Process(IPlayerInput inputCommand)
         {
+            var playAgain = inputCommand as PlayAgainInput;
+            if(playAgain != null)
+            {
+                if(game.IsFinished)
+                {
+                    state.Players[playerId].PlayerHandler = new GameAreaHandler(playerId, state);
+                    state.Players[playerId].PlayerHandler.PlayerJoin();
+                }
+                return;
+            }
+
+
             var o = inputCommand as KeyDownInput;
             if (o != null)
                 player.Сommand = o.Command;
