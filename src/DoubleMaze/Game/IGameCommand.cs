@@ -25,7 +25,7 @@ namespace DoubleMaze.Game
         public Pos enemyPos { get; set; }
     }
 
-    public class MazeField : IGameCommand
+    public class MazeFieldCommand : IGameCommand
     {
         public GameCommand command => GameCommand.MazeFeild;
         public byte[,] field { get; set; }

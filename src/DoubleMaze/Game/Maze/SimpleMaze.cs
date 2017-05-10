@@ -122,7 +122,7 @@ namespace DoubleMaze.Game
             }
             else if (IsFinished == false)
             {
-                player.Output.SendAsync(new MazeField { field = mazeField });
+                player.Output.SendAsync(new MazeFieldCommand { field = mazeField });
             }
             else
             {
