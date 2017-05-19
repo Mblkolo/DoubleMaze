@@ -11,55 +11,21 @@ namespace DoubleMaze.Game
 
     public class SimpleMaze
     {
+        private MazeGenerator mazeGenerator = new MazeGenerator();
+
         private Timer timer;
         private MazePlayer firstPlayer;
         private MazePlayer secondPlayer;
         private WorldState state;
         private Guid gameId;
+        private MazeField mazeField;
 
         public SimpleMaze(WorldState state, Guid gameId, MazePlayer firstPlayer)
         {
-            LoadMaze();
+            mazeField = mazeGenerator.Generate(20, 15);
             this.firstPlayer = firstPlayer;
             this.state = state;
             this.gameId = gameId;
-        }
-
-        private byte[,] mazeField;
-
-        private void LoadMaze()
-        {
-            var s = Resources.Resource.maze;
-            string[] lines = s.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-
-            int width = int.Parse(lines[0]);
-            int height = int.Parse(lines[1]);
-
-            bool[,] maze = new bool[height, width];
-            for (int y = 0; y < height; ++y)
-                for (int x = 0; x < width; ++x)
-                    maze[y, x] = lines[width * y + x + 2] == "0";
-
-            mazeField = new byte[height / 2, width / 2];
-            for (int y = 0; y < mazeField.GetLength(0); ++y)
-                for (int x = 0; x < mazeField.GetLength(1); ++x)
-                {
-                    int mazeX = 2 * x + 1;
-                    int mazeY = 2 * y + 1;
-
-                    if (maze[mazeY - 1, mazeX])
-                        mazeField[y, x] |= 1;
-
-                    if (maze[mazeY, mazeX + 1])
-                        mazeField[y, x] |= 2;
-
-                    if (maze[mazeY + 1, mazeX])
-                        mazeField[y, x] |= 4;
-
-                    if (maze[mazeY, mazeX - 1])
-                        mazeField[y, x] |= 8;
-                }
-
         }
 
 
@@ -69,7 +35,7 @@ namespace DoubleMaze.Game
                 throw new ArgumentException(nameof(secondPlayer));
 
             this.secondPlayer = secondPlayer;
-            secondPlayer.SetStart(mazeField.GetLength(1)-1, mazeField.GetLength(0)-1);
+            secondPlayer.SetStart(mazeField.Field.GetLength(1)-1, mazeField.Field.GetLength(0)-1);
 
             timer = new Timer(x => state.InputQueue.Post(new GameUpdate(gameId)), new object(), 100, 100);
 
@@ -77,21 +43,18 @@ namespace DoubleMaze.Game
             SendState(secondPlayer);
         }
 
-        BufferBlock<int> actionBlock = new BufferBlock<int>();
         public bool IsStarted => secondPlayer != null;
         public bool IsFinished { get; private set; } = false;
-
-        private RectZone WinZone = new RectZone(10, 6, 4, 3);
 
         public void Update()
         {
             if (IsFinished)
                 return;
 
-            firstPlayer.Update(mazeField);
-            secondPlayer.Update(mazeField);
+            firstPlayer.Update(mazeField.Field);
+            secondPlayer.Update(mazeField.Field);
 
-            if (WinZone.Contains(firstPlayer.GetCurrentCeil()) || WinZone.Contains(secondPlayer.GetCurrentCeil()))
+            if (mazeField.WinZone.Contains(firstPlayer.GetCurrentCeil()) || mazeField.WinZone.Contains(secondPlayer.GetCurrentCeil()))
             {
                 IsFinished = true;
                 timer.Dispose();
@@ -122,13 +85,13 @@ namespace DoubleMaze.Game
             }
             else if (IsFinished == false)
             {
-                player.Output.SendAsync(new MazeFieldCommand { field = mazeField });
+                player.Output.SendAsync(new MazeFieldCommand { field = mazeField.Field });
             }
             else
             {
                 player.Output.Post(new GameOverCommand
                 {
-                    status = WinZone.Contains(player.GetCurrentCeil())
+                    status = mazeField.WinZone.Contains(player.GetCurrentCeil())
                         ? GameOverCommand.Statuses.Win
                         : GameOverCommand.Statuses.Lose
                 });
@@ -210,7 +173,7 @@ namespace DoubleMaze.Game
             progress = 0;
         }
 
-        public void Update(byte[,] mazeField)
+        public void Update(Wall[,] mazeField)
         {
             const float progressInTick = 0.5f;
 
@@ -218,16 +181,16 @@ namespace DoubleMaze.Game
             if (progress > 1 || currentCommand == InputCommand.None)
             {
                 pos = nextpos;
-                if (Сommand == InputCommand.Down && (mazeField[pos.Y, pos.X] & 4) == 0)
+                if (Сommand == InputCommand.Down && (mazeField[pos.Y, pos.X] & Wall.Bottom) == 0)
                     nextpos = pos.Move(0, 1);
 
-                if (Сommand == InputCommand.Up && (mazeField[pos.Y, pos.X] & 1) == 0)
+                if (Сommand == InputCommand.Up && (mazeField[pos.Y, pos.X] & Wall.Top) == 0)
                     nextpos = pos.Move(0, -1);
 
-                if (Сommand == InputCommand.Left && (mazeField[pos.Y, pos.X] & 8) == 0)
+                if (Сommand == InputCommand.Left && (mazeField[pos.Y, pos.X] & Wall.Left) == 0)
                     nextpos = pos.Move(-1, 0);
 
-                if (Сommand == InputCommand.Right && (mazeField[pos.Y, pos.X] & 2) == 0)
+                if (Сommand == InputCommand.Right && (mazeField[pos.Y, pos.X] & Wall.Right) == 0)
                     nextpos = pos.Move(1, 0);
 
                 if (nextpos.Y != pos.Y || nextpos.X != pos.X)

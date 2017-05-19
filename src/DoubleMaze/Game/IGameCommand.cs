@@ -28,7 +28,8 @@ namespace DoubleMaze.Game
     public class MazeFieldCommand : IGameCommand
     {
         public GameCommand command => GameCommand.MazeFeild;
-        public byte[,] field { get; set; }
+
+        public Wall[,] field { get; set; }
     }
 
     public class SetTokenCommand : IGameCommand

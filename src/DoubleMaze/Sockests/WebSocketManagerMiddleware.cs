@@ -118,7 +118,7 @@ namespace DoubleMaze.Sockests
             {
                 while (await messages.OutputAvailableAsync())
                 {
-                    var data = await messages.ReceiveAsync();
+                    IGameCommand data = await messages.ReceiveAsync();
 
                     await socket.SendDataAsync(data);
                 }
