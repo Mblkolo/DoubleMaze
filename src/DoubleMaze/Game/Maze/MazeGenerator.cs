@@ -36,6 +36,7 @@ namespace DoubleMaze.Game
             var field = CreateField(width, height);
             var winZone = CreateWinZone(width, height);
             EraseWinZone(field, winZone);
+            GenerateWays(field, winZone);
 
             return new MazeField(field, winZone);
         }
@@ -78,6 +79,49 @@ namespace DoubleMaze.Game
                     if (x != winZone.Width-1)
                         field[realY, realX] &= (~Wall.Right);
                 }
+            }
+        }
+
+        protected void GenerateWays(Wall[,] field, RectZone winZone)
+        {
+            var ololos = new[]
+            {
+                new {Direction = new Point(0, 1),  FromWall = Wall.Bottom, ToWall = Wall.Top },
+                new {Direction = new Point(0, -1), FromWall = Wall.Top, ToWall = Wall.Bottom },
+                new {Direction = new Point(1, 0),  FromWall = Wall.Right, ToWall = Wall.Left },
+                new {Direction = new Point(-1, 0), FromWall = Wall.Left, ToWall = Wall.Right }
+            };
+
+            int fullCells = field.GetLength(0) * field.GetLength(1) - winZone.Width * winZone.Height;
+
+            int rightCell = field.GetLength(1)-1;
+            int bottomCell = field.GetLength(0)-1;
+
+            var r = new Random();
+            var currentPos = new Point(0, 0);
+            while (fullCells > 0)
+            {
+                var o = ololos[r.Next(4)];
+                var newPos = currentPos.Move(o.Direction.X, o.Direction.Y);
+
+                if (newPos.X < 0 || rightCell < newPos.X ||
+                    newPos.Y < 0 || bottomCell < newPos.Y)
+                {
+                    continue;
+                }
+
+                if (field[newPos.Y, newPos.X] == Wall.Full && winZone.Contains(currentPos) == false)
+                {
+                    field[currentPos.Y, currentPos.X] &= (~o.FromWall);
+                    field[newPos.Y, newPos.X] &= (~o.ToWall);
+
+                    field[bottomCell - currentPos.Y, rightCell - currentPos.X] &= (~o.ToWall);
+                    field[bottomCell - newPos.Y, rightCell - newPos.X] &= (~o.FromWall);
+
+                    fullCells -= 2;
+                }
+                
+                currentPos = newPos;
             }
         }
     }

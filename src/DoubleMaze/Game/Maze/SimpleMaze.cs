@@ -116,7 +116,8 @@ namespace DoubleMaze.Game
 
         public bool Contains(Point pos)
         {
-            return Left <= pos.X && pos.X < Left + Width && Top < pos.Y && pos.Y < Top + Height ;
+            return Left <= pos.X && pos.X < Left + Width && 
+                    Top <= pos.Y && pos.Y < Top + Height ;
         }
 
         public override string ToString()
