@@ -1,0 +1,15 @@
+{
+    "version": "1.0.0",
+    "name": "asp.net",
+    "private": true,
+    "scripts": {
+        "webpack": "webpack -w"
+    },
+    "devDependencies": {
+        "webpack": "2.4.1",
+        "typings": "2.1.1",
+        "typescript": "2.3.2",
+        "ts-loader": "2.0.3",
+        "source-map-loader": "0.2.1"
+    }
+}

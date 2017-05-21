@@ -1,4 +1,5 @@
-﻿using DoubleMaze.Util;
+﻿using System;
+using DoubleMaze.Util;
 
 namespace DoubleMaze.Game
 {
@@ -7,6 +8,7 @@ namespace DoubleMaze.Game
         KeyDown,
         PlayerName,
         Token,
+        PlayAgain,
     }
 
     public interface IPlayerInput
@@ -67,5 +69,10 @@ namespace DoubleMaze.Game
         {
             return ObjectDumper.Dump(this);
         }
+    }
+
+    class PlayAgainInput : IPlayerInput
+    {
+        public InputType Type => InputType.PlayAgain;
     }
 }

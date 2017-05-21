@@ -9,6 +9,7 @@ using System.Threading;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using DoubleMaze.Util;
 
 namespace DoubleMaze
 {
@@ -20,7 +21,7 @@ namespace DoubleMaze
             JsonConvert.DefaultSettings = (() =>
             {
                 var settings = new JsonSerializerSettings();
-                settings.Converters.Add(new StringEnumConverter { CamelCaseText = true });
+                settings.Converters.Add(new WithoutWallStringEnumConverter { CamelCaseText = true });
                 return settings;
             });
 

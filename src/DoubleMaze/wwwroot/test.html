@@ -5,17 +5,19 @@
     <meta charset="utf-8" />
     <link href="styles/main.css" rel="stylesheet" />
     <title>Double maze — лабиринт на двоих</title>
+    <script src="js/jquery-3.2.1.min.js"></script>
 </head>
 
 <body>
-    <!--<div id="main-content" class="center-block">
+    <div id="main-content" class="center-block">
         <div class="content center-block loading-page">
             Загрузка двойного лабиринта
         </div>
-    </div>-->
-    <div id="main-content" class="center-block">
+    </div>
+
+    <script type="text/template" id="welcome-area-tempalte">
         <div class="content center-block welcome-page">
-            <h1 class="welcome-title">Лабиринт наперегонки</h1>
+            <h1 class="title">Лабиринт наперегонки</h1>
             <div class="welcome-intro center-block">
                 <p>Доберись до центра лабирина быстрее противника</p>
                 <p>Управлять стрелочками или WASD</p>
@@ -26,15 +28,38 @@
             <input type="text" name="player-name" value="" class="center-block welcome-player-name" placeholder="Имя, да?" />
             <a class="link-button welcome-play-button center-block" href="#play">Играть</a>
         </div>
-    </div>
+    </script>
 
-    <h1>This should be mapped to "/ws"</h1>
-    <canvas id="game-canvas" width="500" height="500"> </canvas>
-    <br />
-    <input type=text id="textInput" placeholder="Enter your text" />
-    <button id="sendButton">Send</button>
+    <script type="text/template" id="game-area-tempalte">
+        <div class="content center-block">
+            <div class="hidden" id="game-wait-screen">
+                <h1 class="title">Ждём вражину</h1>
+                <img class="center-block" src="images/preloader.gif" />
+            </div>
+            <div class="hidden" id="game-canvas-screen">
+                <h1 class="title">Пошла жара</h1>
+                <canvas width="500" height="500" id="game-canvas" tabindex="1"></canvas>
+            </div>
+            <div class="hidden" id="game-gameover-screen">
+                <h1 class="title winner hidden">Ты победил</h1>
+                <h1 class="title looser hidden">Ты проиграл</h1>
+                <br />
+                <br />
+                <a href="#again" class="link-button game-gameover-screen-button center-block">Ещё раз</a>
+            </div>
+        </div>
+    </script>
 
-    <ul id="messages"></ul>
+    <!--
+        <h1>This should be mapped to "/ws"</h1>
+        <canvas id="game-canvas" width="500" height="500"> </canvas>
+        <br />
+        <input type=text id="textInput" placeholder="Enter your text" />
+        <button id="sendButton">Send</button>-->
+
+    <script src="js/bundle.js"></script>
+
+    <!--<ul id="messages"></ul>
 
     <script language="javascript" type="text/javascript">
         var uri = "ws://" + window.location.host + "/test";
@@ -215,6 +240,6 @@
         });
 
         drawLoop();
-    </script>
+    </script>-->
 </body>
 </html>

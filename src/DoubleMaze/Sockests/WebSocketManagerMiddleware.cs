@@ -46,7 +46,7 @@ namespace DoubleMaze.Sockests
                 throw new Exception($"Это не {nameof(TokenInput)}");
 
             Guid playerId = _outConnectionManager.PlayerConnected(loginInput.Token, socket);
-            await socket.SendDataAsync(new SetTokenCommand { Token = playerId.ToString("N") });
+            await socket.SendDataAsync(new SetTokenCommand { token = playerId.ToString("N") });
 
             _world.InputQueue.Post(new PlayerConnected(playerId, _outConnectionManager.GetQueue(playerId)));
             while (socket.State == WebSocketState.Open)
@@ -114,11 +114,18 @@ namespace DoubleMaze.Sockests
 
         private async Task MainLoop(BufferBlock<IGameCommand> messages)
         {
-            while (await messages.OutputAvailableAsync())
+            try
             {
-                var data = await messages.ReceiveAsync();
+                while (await messages.OutputAvailableAsync())
+                {
+                    IGameCommand data = await messages.ReceiveAsync();
 
-                await socket.SendDataAsync(data);
+                    await socket.SendDataAsync(data);
+                }
+            }
+            catch(Exception e)
+            {
+                throw;
             }
         }
 
@@ -168,6 +175,9 @@ namespace DoubleMaze.Sockests
 
             if (checker.Type == InputType.Token)
                 return JsonConvert.DeserializeObject<TokenInput>(message);
+
+            if (checker.Type == InputType.PlayAgain)
+                return JsonConvert.DeserializeObject<PlayAgainInput>(message);
 
             throw new NotImplementedException();
         }

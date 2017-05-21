@@ -1,4 +1,6 @@
-﻿namespace DoubleMaze.Game
+﻿using System;
+
+namespace DoubleMaze.Game
 {
     public interface IGameCommand
     {
@@ -11,7 +13,9 @@
         MazeFeild,
         CloseConnection,
         SetToken,
-        GameOver
+        GameOver,
+        Goto,
+        WaitOpponent
     }
 
     public class PlayerPos : IGameCommand
@@ -21,16 +25,17 @@
         public Pos enemyPos { get; set; }
     }
 
-    public class MazeField : IGameCommand
+    public class MazeFieldCommand : IGameCommand
     {
         public GameCommand command => GameCommand.MazeFeild;
-        public byte[,] field { get; set; }
+
+        public Wall[,] field { get; set; }
     }
 
     public class SetTokenCommand : IGameCommand
     {
         public GameCommand command => GameCommand.SetToken;
-        public string Token { get; set; }
+        public string token { get; set; }
     }
 
 
@@ -44,6 +49,23 @@
         }
 
         public GameCommand command => GameCommand.GameOver;
-        public Statuses Status { get; set; }
+        public Statuses status { get; set; }
+    }
+
+    public class GotoCommand : IGameCommand
+    {
+        public enum Areas
+        {
+            Welcome,
+            Game
+        }
+
+        public GameCommand command => GameCommand.Goto;
+        public Areas area { get; set; }
+    }
+
+    public class WaitOpponent : IGameCommand
+    {
+        public GameCommand command => GameCommand.WaitOpponent;
     }
 }

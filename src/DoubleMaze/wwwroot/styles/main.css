@@ -10,6 +10,15 @@ html {
     font-size: 8px;
 }
 
+.show {
+    display: block !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+
 .center-block {
     display: block;
     margin-left: auto;
@@ -72,10 +81,26 @@ html {
     margin: 0 0 1rem 0;
 }
 
+.title
+{
+    text-align: center;
+    color: #227F32;
+    text-transform: uppercase;
+    font-size: 5rem;
+}
+
 .welcome-title
 {
     text-align: center;
     color: #227F32;
     text-transform: uppercase;
     font-size: 5rem;
+}
+
+.game-gameover-screen-button
+{
+    width: 20rem;
+    line-height: 5rem;
+    height: 5rem;
+    font-size: 3rem;
 }
