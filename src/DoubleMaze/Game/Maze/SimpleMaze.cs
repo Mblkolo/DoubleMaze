@@ -22,7 +22,7 @@ namespace DoubleMaze.Game
 
         public SimpleMaze(WorldState state, Guid gameId, MazePlayer firstPlayer)
         {
-            mazeField = mazeGenerator.Generate(20, 15);
+            mazeField = mazeGenerator.Generate(21, 19);
             this.firstPlayer = firstPlayer;
             this.state = state;
             this.gameId = gameId;
@@ -117,7 +117,7 @@ namespace DoubleMaze.Game
         public bool Contains(Point pos)
         {
             return Left <= pos.X && pos.X < Left + Width && 
-                    Top <= pos.Y && pos.Y < Top + Height ;
+                    Top <= pos.Y && pos.Y < Top + Height;
         }
 
         public override string ToString()
@@ -176,7 +176,7 @@ namespace DoubleMaze.Game
 
         public void Update(Wall[,] mazeField)
         {
-            const float progressInTick = 0.5f;
+            const float progressInTick = 0.3f;
 
             progress += progressInTick;
             if (progress > 1 || currentCommand == InputCommand.None)

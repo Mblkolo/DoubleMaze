@@ -91,6 +91,7 @@ namespace DoubleMaze.Game
             int moveCount = (fieldRect.Width * fieldRect.Height - winZone.Width * winZone.Height - 2) / 2;
 
             var currentPos = new Point(0, 0);
+            var latestMove = Moves[random.Next(4)];
             int count = 0;
             while (moveCount > 0)
             {
@@ -98,8 +99,12 @@ namespace DoubleMaze.Game
                 if (count > 100000)
                     throw new Exception("Слишком долго!");
 
-                var o = Movies[random.Next(4)];
-                var newPos = currentPos.Move(o.Direction.X, o.Direction.Y);
+                var randNumber = random.Next(5);
+
+                var move = randNumber < Moves.Length ? Moves[randNumber] : latestMove;
+                latestMove = move;
+
+                var newPos = currentPos.Move(move.Direction.X, move.Direction.Y);
 
                 if (fieldRect.Contains(newPos) == false)
                 {
@@ -113,12 +118,7 @@ namespace DoubleMaze.Game
 
                 if (notInWinZone && (fromNotFullCell || fromStartPoint) && toFullCell)
                 {
-                    field[currentPos.Y, currentPos.X] &= (~o.FromWall);
-                    field[newPos.Y, newPos.X] &= (~o.ToWall);
-
-                    field[fieldRect.Height - currentPos.Y - 1, fieldRect.Width - currentPos.X - 1] &= (~o.ToWall);
-                    field[fieldRect.Height - newPos.Y - 1, fieldRect.Width - newPos.X - 1] &= (~o.FromWall);
-
+                    DestroyWall(field, move, currentPos, newPos);
                     moveCount--;
                 }
                 
@@ -128,7 +128,7 @@ namespace DoubleMaze.Game
             Console.WriteLine(count);
         }
 
-        private readonly static Move[] Movies = new[]
+        private readonly static Move[] Moves = new[]
             {
                 new Move{Direction = new Point(0, 1),  FromWall = Wall.Bottom, ToWall = Wall.Top },
                 new Move{Direction = new Point(0, -1), FromWall = Wall.Top, ToWall = Wall.Bottom },
@@ -138,15 +138,17 @@ namespace DoubleMaze.Game
 
         protected void GenerateWinZoneEnter(Wall[,] field, RectZone winZone, Random random)
         {
+            var fieldRect = new RectZone(0, 0, field.GetLength(1), field.GetLength(0));
             var curretPos = new Point(random.Next(winZone.Width) + winZone.Left, random.Next(winZone.Height) + winZone.Top);
             while(true)
             {
-                var move = Movies[random.Next(Movies.Length)];
+                var move = Moves[random.Next(Moves.Length)];
                 var nextPos = curretPos.Move(move.Direction.X, move.Direction.Y);
 
                 if(winZone.Contains(nextPos) == false)
                 {
-                    DestroyWall(field, move, curretPos, nextPos);
+                    if(fieldRect.Contains(nextPos))
+                        DestroyWall(field, move, curretPos, nextPos);
                     return;
                 }
 
@@ -154,16 +156,17 @@ namespace DoubleMaze.Game
             }
         }
 
-        private void DestroyWall(Wall[,] field, Move move, Point from, Point to)
+        private void DestroyWall(Wall[,] field, Move move, Point fromCell, Point toCell)
         {
-            var rightCell = field.GetLength(0) - 1;
-            var bottomCell = field.GetLength(1) - 1;
+            var width = field.GetLength(1);
+            var height = field.GetLength(0);
 
-            field[from.Y, from.X] &= (~move.FromWall);
-            field[to.Y, to.X] &= (~move.ToWall);
 
-            field[bottomCell - from.Y, bottomCell - from.X] &= (~move.ToWall);
-            field[bottomCell - to.Y, bottomCell - to.X] &= (~move.FromWall);
+            field[fromCell.Y, fromCell.X] &= (~move.FromWall);
+            field[toCell.Y, toCell.X] &= (~move.ToWall);
+
+            field[height - fromCell.Y - 1, width - fromCell.X - 1] &= (~move.ToWall);
+            field[height - toCell.Y - 1, width - toCell.X - 1] &= (~move.FromWall);
         }
 
         private class Move
