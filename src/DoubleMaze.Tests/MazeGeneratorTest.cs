@@ -1,5 +1,6 @@
 ﻿using DoubleMaze.Game;
 using NUnit.Framework;
+using System;
 
 namespace DoubleMaze.Tests
 {
@@ -23,9 +24,9 @@ namespace DoubleMaze.Tests
                 EraseWinZone(field, winZone);
             }
 
-            public void GenerateWaysWrapper(Wall[,] field, RectZone winZone)
+            public void GenerateWaysWrapper(Wall[,] field, RectZone winZone, Random random )
             {
-                GenerateWays(field, winZone);
+                GenerateWays(field, winZone, random);
             }
         }
 
@@ -75,8 +76,11 @@ namespace DoubleMaze.Tests
             var mazeGenerator = new MazeGeneratorMock();
             var field = mazeGenerator.CreateFieldWrapper(width, height);
 
+            var seed = DateTime.Now.Millisecond;
+            TestContext.WriteLine($"seed: {seed}");
+
             var winZone = new RectZone(left, top, rw, rh);
-            mazeGenerator.GenerateWaysWrapper(field, winZone);
+            mazeGenerator.GenerateWaysWrapper(field, winZone, new Random(seed));
 
             for (int y = 0; y < height; ++y)
                 for (int x = 0; x < width; ++x)

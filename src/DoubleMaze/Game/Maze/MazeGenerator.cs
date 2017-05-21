@@ -36,7 +36,10 @@ namespace DoubleMaze.Game
             var field = CreateField(width, height);
             var winZone = CreateWinZone(width, height);
             EraseWinZone(field, winZone);
-            GenerateWays(field, winZone);
+
+            var random = new Random();
+            GenerateWays(field, winZone, random);
+            GenerateWinZoneEnter(field, winZone, random);
 
             return new MazeField(field, winZone);
         }
@@ -82,47 +85,92 @@ namespace DoubleMaze.Game
             }
         }
 
-        protected void GenerateWays(Wall[,] field, RectZone winZone)
+        protected void GenerateWays(Wall[,] field, RectZone winZone, Random random)
         {
-            var ololos = new[]
-            {
-                new {Direction = new Point(0, 1),  FromWall = Wall.Bottom, ToWall = Wall.Top },
-                new {Direction = new Point(0, -1), FromWall = Wall.Top, ToWall = Wall.Bottom },
-                new {Direction = new Point(1, 0),  FromWall = Wall.Right, ToWall = Wall.Left },
-                new {Direction = new Point(-1, 0), FromWall = Wall.Left, ToWall = Wall.Right }
-            };
+            var fieldRect = new RectZone(0, 0, field.GetLength(1), field.GetLength(0));
+            int moveCount = (fieldRect.Width * fieldRect.Height - winZone.Width * winZone.Height - 2) / 2;
 
-            int fullCells = field.GetLength(0) * field.GetLength(1) - winZone.Width * winZone.Height;
-
-            int rightCell = field.GetLength(1)-1;
-            int bottomCell = field.GetLength(0)-1;
-
-            var r = new Random();
             var currentPos = new Point(0, 0);
-            while (fullCells > 0)
+            int count = 0;
+            while (moveCount > 0)
             {
-                var o = ololos[r.Next(4)];
+                count++;
+                if (count > 100000)
+                    throw new Exception("Слишком долго!");
+
+                var o = Movies[random.Next(4)];
                 var newPos = currentPos.Move(o.Direction.X, o.Direction.Y);
 
-                if (newPos.X < 0 || rightCell < newPos.X ||
-                    newPos.Y < 0 || bottomCell < newPos.Y)
+                if (fieldRect.Contains(newPos) == false)
                 {
                     continue;
                 }
 
-                if (field[newPos.Y, newPos.X] == Wall.Full && winZone.Contains(currentPos) == false)
+                bool notInWinZone = winZone.Contains(newPos) == false && winZone.Contains(currentPos) == false;
+                bool fromNotFullCell = field[currentPos.Y, currentPos.X] != Wall.Full;
+                bool toFullCell = field[newPos.Y, newPos.X] == Wall.Full;
+                bool fromStartPoint = currentPos.Y == 0 && currentPos.X == 0;
+
+                if (notInWinZone && (fromNotFullCell || fromStartPoint) && toFullCell)
                 {
                     field[currentPos.Y, currentPos.X] &= (~o.FromWall);
                     field[newPos.Y, newPos.X] &= (~o.ToWall);
 
-                    field[bottomCell - currentPos.Y, rightCell - currentPos.X] &= (~o.ToWall);
-                    field[bottomCell - newPos.Y, rightCell - newPos.X] &= (~o.FromWall);
+                    field[fieldRect.Height - currentPos.Y - 1, fieldRect.Width - currentPos.X - 1] &= (~o.ToWall);
+                    field[fieldRect.Height - newPos.Y - 1, fieldRect.Width - newPos.X - 1] &= (~o.FromWall);
 
-                    fullCells -= 2;
+                    moveCount--;
                 }
                 
                 currentPos = newPos;
             }
+
+            Console.WriteLine(count);
+        }
+
+        private readonly static Move[] Movies = new[]
+            {
+                new Move{Direction = new Point(0, 1),  FromWall = Wall.Bottom, ToWall = Wall.Top },
+                new Move{Direction = new Point(0, -1), FromWall = Wall.Top, ToWall = Wall.Bottom },
+                new Move{Direction = new Point(1, 0),  FromWall = Wall.Right, ToWall = Wall.Left },
+                new Move{Direction = new Point(-1, 0), FromWall = Wall.Left, ToWall = Wall.Right }
+            };
+
+        protected void GenerateWinZoneEnter(Wall[,] field, RectZone winZone, Random random)
+        {
+            var curretPos = new Point(random.Next(winZone.Width) + winZone.Left, random.Next(winZone.Height) + winZone.Top);
+            while(true)
+            {
+                var move = Movies[random.Next(Movies.Length)];
+                var nextPos = curretPos.Move(move.Direction.X, move.Direction.Y);
+
+                if(winZone.Contains(nextPos) == false)
+                {
+                    DestroyWall(field, move, curretPos, nextPos);
+                    return;
+                }
+
+                curretPos = nextPos;
+            }
+        }
+
+        private void DestroyWall(Wall[,] field, Move move, Point from, Point to)
+        {
+            var rightCell = field.GetLength(0) - 1;
+            var bottomCell = field.GetLength(1) - 1;
+
+            field[from.Y, from.X] &= (~move.FromWall);
+            field[to.Y, to.X] &= (~move.ToWall);
+
+            field[bottomCell - from.Y, bottomCell - from.X] &= (~move.ToWall);
+            field[bottomCell - to.Y, bottomCell - to.X] &= (~move.FromWall);
+        }
+
+        private class Move
+        {
+            public Point Direction;
+            public Wall FromWall;
+            public Wall ToWall;
         }
     }
 }
