@@ -30,13 +30,23 @@ namespace DoubleMaze.Sockests
                 return;
 
             var socket = await context.WebSockets.AcceptWebSocketAsync();
-            await Receive(socket);
+            Guid? playerId = null;
+            try
+            {
+                playerId = await LoginPlayer(socket);
+                await Receive(socket, playerId.Value);
+            }
+            finally
+            {
+                if (playerId != null)
+                    _outConnectionManager.PlayerDiconnected(playerId.Value);
+            }
 
             //TODO - investigate the Kestrel exception thrown when this is the last middleware
             //await _next.Invoke(context);
         }
 
-        private async Task Receive(WebSocket socket)
+        private async Task<Guid> LoginPlayer(WebSocket socket)
         {
             byte[] buffer = new byte[1024 * 4];
 
@@ -48,10 +58,17 @@ namespace DoubleMaze.Sockests
             Guid playerId = _outConnectionManager.PlayerConnected(loginInput.Token, socket);
             await socket.SendDataAsync(new SetTokenCommand { token = playerId.ToString("N") });
 
+            return playerId;
+        }
+
+        private async Task Receive(WebSocket socket, Guid playerId)
+        {
+            byte[] buffer = new byte[1024 * 4];
+
             _world.InputQueue.Post(new PlayerConnected(playerId, _outConnectionManager.GetQueue(playerId)));
             while (socket.State == WebSocketState.Open)
             {
-                input = await socket.ReadInputAsync(buffer);
+                var input = await socket.ReadInputAsync(buffer);
                 _world.InputQueue.Post(new PlayerInput(playerId, input));
             }
         }
@@ -61,6 +78,7 @@ namespace DoubleMaze.Sockests
     {
         private object Locker = new object();
         private Dictionary<Guid, OutputChanel> PlayerChanals = new Dictionary<Guid, OutputChanel>();
+        private Dictionary<Guid, Timer> TimeoutTimers = new Dictionary<Guid, Timer>();
 
 
         internal BufferBlock<IGameCommand> GetQueue(Guid playerId)
@@ -89,9 +107,37 @@ namespace DoubleMaze.Sockests
                     PlayerChanals[playerId] = new OutputChanel(socket);
                 }
 
+                DisploseAndRemoveTimer(playerId);
+
                 return playerId;
             }
         }
+
+        internal void PlayerDiconnected(Guid playerId)
+        {
+            var timer = new Timer(TimeoutPlayer, playerId, TimeSpan.FromSeconds(10), Timeout.InfiniteTimeSpan);
+            TimeoutTimers.Add(playerId, timer);
+        }
+
+        private void TimeoutPlayer(object playerIdObject)
+        {
+            Guid playerId = (Guid)playerIdObject;
+            lock (Locker)
+            {
+                PlayerChanals.Remove(playerId);
+                DisploseAndRemoveTimer(playerId);
+            }
+        }
+
+        private void DisploseAndRemoveTimer(Guid playerId)
+        {
+            if(TimeoutTimers.ContainsKey(playerId))
+            {
+                TimeoutTimers[playerId].Dispose();
+                TimeoutTimers.Remove(playerId);
+            }
+        }
+
     }
 
     public class OutputChanel
