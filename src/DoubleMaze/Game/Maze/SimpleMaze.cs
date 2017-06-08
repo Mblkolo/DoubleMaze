@@ -62,18 +62,9 @@ namespace DoubleMaze.Game
                 SendState(secondPlayer);
                 return;
             }
-            
-            firstPlayer.Output.Post(new PlayerPos
-            {
-                myPos = firstPlayer.GetPos(),
-                enemyPos = secondPlayer.GetPos()
-            });
 
-            secondPlayer.Output.Post(new PlayerPos
-            {
-                myPos = secondPlayer.GetPos(),
-                enemyPos = firstPlayer.GetPos()
-            });
+            SendPosition(firstPlayer, secondPlayer);
+            SendPosition(secondPlayer, firstPlayer);
         }
 
         internal bool AllPlayersLeft()
@@ -81,8 +72,23 @@ namespace DoubleMaze.Game
             return firstPlayer.IsLeft && secondPlayer?.IsLeft != false;
         }
 
+        private static void SendPosition(MazePlayer player, MazePlayer enemyPlayer)
+        {
+            if (player.IsLeft)
+                return;
+
+            player.Output.Post(new PlayerPos
+            {
+                myPos = player.GetPos(),
+                enemyPos = enemyPlayer.GetPos()
+            });
+        }
+
         public void SendState(MazePlayer player)
         {
+            if(player.IsLeft)
+                return;
+
             if(IsStarted == false)
             {
                 player.Output.Post(new WaitOpponent());
