@@ -80,6 +80,12 @@ namespace DoubleMaze.Sockests
         private Dictionary<Guid, OutputChanel> PlayerChanals = new Dictionary<Guid, OutputChanel>();
         private Dictionary<Guid, Timer> TimeoutTimers = new Dictionary<Guid, Timer>();
 
+        private Action<Guid> playerDisconnected;
+
+        public OutputConnectionManager(Action<Guid> playerDisconnected)
+        {
+            this.playerDisconnected = playerDisconnected;
+        }
 
         internal BufferBlock<IGameCommand> GetQueue(Guid playerId)
         {
@@ -124,8 +130,15 @@ namespace DoubleMaze.Sockests
             Guid playerId = (Guid)playerIdObject;
             lock (Locker)
             {
-                PlayerChanals.Remove(playerId);
+                if (TimeoutTimers.ContainsKey(playerId) == false)
+                    return;
+
                 DisploseAndRemoveTimer(playerId);
+                PlayerChanals[playerId].InputQueue.Complete();
+                PlayerChanals.Remove(playerId);
+
+                playerDisconnected(playerId);
+
             }
         }
 
@@ -168,6 +181,8 @@ namespace DoubleMaze.Sockests
 
                     await socket.SendDataAsync(data);
                 }
+
+                Console.WriteLine("Игрок отключился");
             }
             catch(Exception e)
             {

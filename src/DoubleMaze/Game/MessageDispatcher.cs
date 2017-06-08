@@ -16,13 +16,22 @@ namespace DoubleMaze.Game
     public class PlayerContex
     {
         public BufferBlock<IGameCommand> Output { get; private set; }
-        public IPlayerHandler PlayerHandler { get; set; }
+        public IPlayerHandler PlayerHandler { get; private set; }
 
         public string Name { get; set; }
 
         public PlayerContex(BufferBlock<IGameCommand> output)
         {
             Output = output;
+        }
+
+        public void SetHandler(IPlayerHandler handler)
+        {
+            if (PlayerHandler != null)
+                PlayerHandler.PlayerLeft();
+
+            PlayerHandler = handler;
+            PlayerHandler.PlayerJoin();
         }
     }
 
@@ -41,14 +50,22 @@ namespace DoubleMaze.Game
         {
             if (state.Players.ContainsKey(connection.PlayerId) == false)
             {
-                var playerContext = new PlayerContex(connection.OutputQueue)
-                {
-                    PlayerHandler = new WelcomeAreaHandler(connection.PlayerId, state)
-                };
+                var playerContext = new PlayerContex(connection.OutputQueue);
                 state.Players.Add(connection.PlayerId, playerContext);
-            }
 
-            state.Players[connection.PlayerId].PlayerHandler.PlayerJoin();
+                playerContext.SetHandler(new WelcomeAreaHandler(connection.PlayerId, state));
+            }
+            else
+                state.Players[connection.PlayerId].PlayerHandler.PlayerJoin();
+        }
+
+        public void Process(PlayerDisconnected disconnected)
+        {
+            if (state.Players.ContainsKey(disconnected.PlayerId) == false)
+                return;
+
+            state.Players[disconnected.PlayerId].PlayerHandler.PlayerLeft();
+            state.Players.Remove(disconnected.PlayerId);
         }
 
         public void Process(PlayerInput input)

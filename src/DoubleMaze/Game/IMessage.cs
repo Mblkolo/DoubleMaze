@@ -23,6 +23,16 @@ namespace DoubleMaze.Game
         }
     }
 
+    public class PlayerDisconnected : IMessage
+    {
+        public readonly Guid PlayerId;
+
+        public PlayerDisconnected(Guid playerId)
+        {
+            PlayerId = playerId;
+        }
+    }
+
     public class PlayerInput : IMessage
     {
         public readonly Guid PlayerId;

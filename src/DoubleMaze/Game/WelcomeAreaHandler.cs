@@ -19,14 +19,17 @@ namespace DoubleMaze.Game
             state.Players[playerId].Output.Post(new GotoCommand { area = GotoCommand.Areas.Welcome });
         }
 
+        public void PlayerLeft()
+        {
+        }
+
         public void Process(IPlayerInput inputCommand)
         {
             var o = inputCommand as PlayerNameInput;
             if (o != null)
             {
                 state.Players[playerId].Name = o.Name ?? "Вася, да?";
-                state.Players[playerId].PlayerHandler = new GameAreaHandler(playerId, state);
-                state.Players[playerId].PlayerHandler.PlayerJoin();
+                state.Players[playerId].SetHandler(new GameAreaHandler(playerId, state));
             }
         }
     }

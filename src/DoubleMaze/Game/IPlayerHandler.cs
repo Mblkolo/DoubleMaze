@@ -4,5 +4,6 @@
     {
         void Process(IPlayerInput inputCommand);
         void PlayerJoin();
+        void PlayerLeft();
     }
 }

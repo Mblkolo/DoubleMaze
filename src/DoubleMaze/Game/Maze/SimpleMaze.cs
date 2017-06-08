@@ -17,7 +17,7 @@ namespace DoubleMaze.Game
         private MazePlayer firstPlayer;
         private MazePlayer secondPlayer;
         private WorldState state;
-        private Guid gameId;
+        public Guid gameId;
         private MazeField mazeField;
 
         public SimpleMaze(WorldState state, Guid gameId, MazePlayer firstPlayer)
@@ -56,8 +56,7 @@ namespace DoubleMaze.Game
 
             if (mazeField.WinZone.Contains(firstPlayer.GetCurrentCeil()) || mazeField.WinZone.Contains(secondPlayer.GetCurrentCeil()))
             {
-                IsFinished = true;
-                timer.Dispose();
+                FinishGame();
 
                 SendState(firstPlayer);
                 SendState(secondPlayer);
@@ -77,15 +76,20 @@ namespace DoubleMaze.Game
             });
         }
 
+        internal bool AllPlayersLeft()
+        {
+            return firstPlayer.IsLeft && secondPlayer?.IsLeft != false;
+        }
+
         public void SendState(MazePlayer player)
         {
             if(IsStarted == false)
             {
-                player.Output.SendAsync(new WaitOpponent());
+                player.Output.Post(new WaitOpponent());
             }
             else if (IsFinished == false)
             {
-                player.Output.SendAsync(new MazeFieldCommand { field = mazeField.Field });
+                player.Output.Post(new MazeFieldCommand { field = mazeField.Field });
             }
             else
             {
@@ -96,6 +100,12 @@ namespace DoubleMaze.Game
                         : GameOverCommand.Statuses.Lose
                 });
             }
+        }
+
+        public void FinishGame()
+        {
+            IsFinished = true;
+            timer?.Dispose();
         }
     }
 
@@ -158,6 +168,8 @@ namespace DoubleMaze.Game
         private Point nextpos = new Point();
         private float progress = 0;
         private InputCommand currentCommand;
+
+        public bool IsLeft { get; internal set; }
 
         public MazePlayer(BufferBlock<IGameCommand> output)
         {
