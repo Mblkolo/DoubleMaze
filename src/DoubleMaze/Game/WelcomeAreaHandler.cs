@@ -28,9 +28,86 @@ namespace DoubleMaze.Game
             var o = inputCommand as PlayerNameInput;
             if (o != null)
             {
-                state.Players[playerId].Name = o.Name ?? "Вася, да?";
+                state.Players[playerId].Name = o.Name ?? GenerateName(new Random());
                 state.Players[playerId].SetHandler(new GameAreaHandler(playerId, state));
             }
+        }
+
+        private static string[] FirstPart =
+        {
+            "Быстрый",
+            "Неспешный",
+            "Ленивый",
+            "Энергичный",
+            "Толстый",
+            "Худой",
+            "Задумчивый",
+            "Резвый",
+            "Суровый",
+            "Хромой",
+            "Сонный",
+            "Весёлый",
+            "Грустный",
+            "Жизнерадостный",
+            "Забавный",
+            "Остроумный",
+            "Находчивый",
+            "Торопливый",
+            "Квёлый",
+            "Борзый",
+            "Милый",
+            "Расчётливый",
+            "Приветливый",
+            "Улыбчивый",
+            "Задорный",
+            "Космический",
+        };
+
+        private static string[] SecondPart =
+        {
+            "ленивец",
+            "робот",
+            "попугай",
+            "слон",
+            "носорог",
+            "жираф",
+            "заяц",
+            "медведь",
+            "волк",
+            "пёс",
+            "суслик",
+            "сурок",
+            "кот",
+            "петух",
+            "енот",
+            "бык",
+            "опоссум",
+            "орёл",
+            "воробей",
+            "голубь",
+            "скат",
+            "карась",
+            "кит",
+            "дельфин",
+            "зяблик",
+            "тюлень",
+            "дятел",
+            "муравей",
+            "комар",
+            "шмель",
+            "шершень",
+            "верблюд",
+            "утконос",
+            "окунь",
+            "воран",
+            "павлин",
+            "фламинго",
+            "броненосец",
+        };
+
+        public static string GenerateName(Random r)
+        {
+            return FirstPart[r.Next(FirstPart.Length)] + " " + SecondPart[r.Next(SecondPart.Length)];
         }
     }
 }

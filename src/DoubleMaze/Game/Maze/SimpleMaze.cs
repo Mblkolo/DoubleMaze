@@ -95,7 +95,13 @@ namespace DoubleMaze.Game
             }
             else if (IsFinished == false)
             {
-                player.Output.Post(new MazeFieldCommand { field = mazeField.Field });
+                player.Output.Post(new MazeFieldCommand
+                {
+                    field = mazeField.Field,
+                    myName = player.Name,
+                    enemyName = GetEnemy(player).Name
+                }
+                );
             }
             else
             {
@@ -106,6 +112,17 @@ namespace DoubleMaze.Game
                         : GameOverCommand.Statuses.Lose
                 });
             }
+        }
+
+        private MazePlayer GetEnemy(MazePlayer player)
+        {
+            if (player == firstPlayer)
+                return secondPlayer;
+
+            if (player == secondPlayer)
+                return firstPlayer;
+
+            throw new Exception("Это не наш игрок!");
         }
 
         public void FinishGame()
@@ -168,7 +185,7 @@ namespace DoubleMaze.Game
     {
         public InputCommand Сommand;
         public readonly BufferBlock<IGameCommand> Output;
-
+        public readonly string Name;
 
         private Point pos = new Point();
         private Point nextpos = new Point();
@@ -177,9 +194,10 @@ namespace DoubleMaze.Game
 
         public bool IsLeft { get; internal set; }
 
-        public MazePlayer(BufferBlock<IGameCommand> output)
+        public MazePlayer(BufferBlock<IGameCommand> output, string name)
         {
             Output = output;
+            Name = name;
         }
 
         public Pos GetPos() => new Pos { x = pos.X * (1 - progress) + nextpos.X * progress, y = pos.Y * (1 - progress) + nextpos.Y * progress };

@@ -16,7 +16,7 @@ namespace DoubleMaze.Game
         {
             this.playerId = playerId;
             this.state = state;
-            mazePlayer = new MazePlayer(state.Players[playerId].Output);
+            mazePlayer = new MazePlayer(state.Players[playerId].Output, state.Players[playerId].Name);
 
             game = state.Games.Values.SingleOrDefault(x => x.IsStarted == false);
             if (game == null)

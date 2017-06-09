@@ -30,6 +30,9 @@ namespace DoubleMaze.Game
         public GameCommand command => GameCommand.MazeFeild;
 
         public Wall[,] field { get; set; }
+
+        public string myName { get; set; }
+        public string enemyName { get; set; }
     }
 
     public class SetTokenCommand : IGameCommand
