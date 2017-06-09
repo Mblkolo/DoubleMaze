@@ -60,13 +60,12 @@ namespace DoubleMaze.Game
             "Приветливый",
             "Улыбчивый",
             "Задорный",
-            "Космический",
+            "Стройный",
         };
 
         private static string[] SecondPart =
         {
             "ленивец",
-            "робот",
             "попугай",
             "слон",
             "носорог",
@@ -103,6 +102,7 @@ namespace DoubleMaze.Game
             "павлин",
             "фламинго",
             "броненосец",
+            "пингвин",
         };
 
         public static string GenerateName(Random r)

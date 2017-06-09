@@ -22,7 +22,7 @@ namespace DoubleMaze.Game
 
         public SimpleMaze(WorldState state, Guid gameId, MazePlayer firstPlayer)
         {
-            mazeField = mazeGenerator.Generate(21, 19);
+            mazeField = mazeGenerator.Generate(31, 21);
             this.firstPlayer = firstPlayer;
             this.state = state;
             this.gameId = gameId;

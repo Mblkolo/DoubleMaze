@@ -202,9 +202,10 @@ namespace DoubleMaze.Sockests
                 return;
 
             var message = JsonConvert.SerializeObject(data);
-            await socket.SendAsync(buffer: new ArraySegment<byte>(array: Encoding.UTF8.GetBytes(message),
+            byte[] bytes = Encoding.UTF8.GetBytes(message);
+            await socket.SendAsync(buffer: new ArraySegment<byte>(array: bytes,
                                                                   offset: 0,
-                                                                  count: message.Length),
+                                                                  count: bytes.Length),
                                    messageType: WebSocketMessageType.Text,
                                    endOfMessage: true,
                                    cancellationToken: CancellationToken.None);

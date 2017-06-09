@@ -108,6 +108,7 @@ var GameArea = (function () {
         if (data.command === "mazeFeild") {
             this.state = "mazeFeild";
             this.mazeField = data.field;
+            $(".game-canvas-vs-block").text(data.myName + " vs " + data.enemyName);
             this.drawLoop();
         }
         if (data.command === "gameOver") {

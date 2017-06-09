@@ -104,3 +104,19 @@ html {
     height: 5rem;
     font-size: 3rem;
 }
+
+.game-canvas-vs-block
+{
+    padding: 2rem 0;
+    text-align: center;
+    font-size: 2rem;
+    line-height: 2rem;
+    text-transform: uppercase;
+}
+
+.game-canvas-my-name, .game-canvas-enemy-name
+{
+    font-size: 3rem;
+    line-height: 3rem;
+    color: #227F32;
+}
