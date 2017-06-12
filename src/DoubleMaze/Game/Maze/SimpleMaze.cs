@@ -101,13 +101,23 @@ namespace DoubleMaze.Game
             }
             else if (IsFinished == false)
             {
-                player.Output.Post(new MazeFieldCommand
+                var enemy = GetEnemy(player);
+                var command = new MazeFieldCommand
                 {
                     field = mazeField.Field,
-                    myName = player.Name,
-                    enemyName = GetEnemy(player).Name
-                }
-                );
+                    me = new MazeFieldCommandPlayer
+                    {
+                        name = player.Name,
+                        rating = Math.Round(player.Rating.Value, 1)
+                    },
+                    enemy = new MazeFieldCommandPlayer
+                    {
+                        name = enemy.Name,
+                        rating = Math.Round(enemy.Rating.Value, 1)
+                    }
+                };
+
+                player.Output.Post(command);
             }
             else
             {

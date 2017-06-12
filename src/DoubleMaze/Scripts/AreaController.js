@@ -108,8 +108,10 @@ var GameArea = (function () {
         if (data.command === "mazeFeild") {
             this.state = "mazeFeild";
             this.mazeField = data.field;
-            $(".game-canvas-my-name").text(data.myName);
-            $(".game-canvas-enemy-name").text(data.enemyName);
+            $(".game-canvas-my-name").text(data.me.name).prop("title", data.me.name);
+            $(".game-canvas-my-rating").text(data.me.rating);
+            $(".game-canvas-enemy-name").text(data.enemy.name).prop("title", data.enemy.name);
+            $(".game-canvas-enemy-rating").text(data.enemy.rating);
             this.drawLoop();
         }
         if (data.command === "gameOver") {

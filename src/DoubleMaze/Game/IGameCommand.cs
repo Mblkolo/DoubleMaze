@@ -31,8 +31,14 @@ namespace DoubleMaze.Game
 
         public Wall[,] field { get; set; }
 
-        public string myName { get; set; }
-        public string enemyName { get; set; }
+        public MazeFieldCommandPlayer me { get; set; } 
+        public MazeFieldCommandPlayer enemy { get; set; }
+    }
+
+    public class MazeFieldCommandPlayer
+    {
+        public string name { get; set; }
+        public double rating { get; set; }
     }
 
     public class SetTokenCommand : IGameCommand

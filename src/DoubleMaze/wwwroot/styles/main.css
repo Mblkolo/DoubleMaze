@@ -119,4 +119,22 @@ html {
     font-size: 3rem;
     line-height: 3rem;
     color: #227F32;
+    overflow: hidden;
+}
+
+.game-canvas-vs-text, .game-canvas-name-with-rating
+{
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0 5px;
+    max-width: 45%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.game-canvas-my-rating, .game-canvas-enemy-rating
+{
+    display: block;
+    line-height: 3rem;
 }

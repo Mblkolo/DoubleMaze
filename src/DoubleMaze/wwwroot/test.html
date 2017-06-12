@@ -37,8 +37,17 @@
                 <img class="center-block" src="images/preloader.gif" />
             </div>
             <div class="hidden" id="game-canvas-screen">
-                <div class="game-canvas-vs-block"><span class="game-canvas-my-name"></span> vs <span class="game-canvas-enemy-name"></span></div>
-                <!--<h1 class="title">Пошла жара</h1>-->
+                <div class="game-canvas-vs-block">
+                    <span class="game-canvas-name-with-rating">
+                        <span class="game-canvas-my-name"></span>
+                        <span class="game-canvas-my-rating"></span>
+                    </span>
+                    <span class="game-canvas-vs-text">vs</span>
+                    <span class="game-canvas-name-with-rating">
+                        <span class="game-canvas-enemy-name"></span>
+                        <span class="game-canvas-enemy-rating"></span>
+                    </span>
+                </div>
                 <canvas width="640" height="440" id="game-canvas" class="center-block" tabindex="1"></canvas>
             </div>
             <div class="hidden" id="game-gameover-screen">
