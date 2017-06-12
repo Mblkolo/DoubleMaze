@@ -108,7 +108,8 @@ var GameArea = (function () {
         if (data.command === "mazeFeild") {
             this.state = "mazeFeild";
             this.mazeField = data.field;
-            $(".game-canvas-vs-block").text(data.myName + " vs " + data.enemyName);
+            $(".game-canvas-my-name").text(data.myName);
+            $(".game-canvas-enemy-name").text(data.enemyName);
             this.drawLoop();
         }
         if (data.command === "gameOver") {
@@ -143,9 +144,10 @@ var GameArea = (function () {
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.setTransform(1, 0, 0, 1, 10.5, 10.5);
         ctx.beginPath();
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 3;
         ctx.lineCap = "round";
-        ctx.strokeStyle = "#227F32";
+        //ctx.strokeStyle = "#227F32";
+        ctx.strokeStyle = "#333";
         for (var y = 0; y < this.mazeField.length; ++y) {
             for (var x = 0; x < this.mazeField[y].length; ++x) {
                 var topLeft = { x: x * scale, y: y * scale };

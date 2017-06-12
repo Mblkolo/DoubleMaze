@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DoubleMaze.Game.Maze;
+using System;
 using System.Threading;
 using System.Threading.Tasks.Dataflow;
 
@@ -56,7 +57,12 @@ namespace DoubleMaze.Game
 
             if (mazeField.WinZone.Contains(firstPlayer.GetCurrentCeil()) || mazeField.WinZone.Contains(secondPlayer.GetCurrentCeil()))
             {
+                firstPlayer.IsWin = mazeField.WinZone.Contains(firstPlayer.GetCurrentCeil());
+                secondPlayer.IsWin = mazeField.WinZone.Contains(secondPlayer.GetCurrentCeil());
+
                 FinishGame();
+
+                Rating.Update(firstPlayer.Rating, secondPlayer.Rating, firstPlayer.IsWin, secondPlayer.IsWin);
 
                 SendState(firstPlayer);
                 SendState(secondPlayer);
@@ -107,7 +113,7 @@ namespace DoubleMaze.Game
             {
                 player.Output.Post(new GameOverCommand
                 {
-                    status = mazeField.WinZone.Contains(player.GetCurrentCeil())
+                    status = player.IsWin
                         ? GameOverCommand.Statuses.Win
                         : GameOverCommand.Statuses.Lose
                 });
@@ -184,20 +190,21 @@ namespace DoubleMaze.Game
     public class MazePlayer
     {
         public InputCommand Сommand;
-        public readonly BufferBlock<IGameCommand> Output;
-        public readonly string Name;
+        public BufferBlock<IGameCommand> Output => playerContex.Output;
+        public string Name => playerContex.Name;
+        public Rating Rating =>  playerContex.Rating;
+        public bool IsLeft { get; internal set; }
+        public bool IsWin { get; internal set; }
 
         private Point pos = new Point();
         private Point nextpos = new Point();
         private float progress = 0;
         private InputCommand currentCommand;
+        private PlayerContex playerContex;
 
-        public bool IsLeft { get; internal set; }
-
-        public MazePlayer(BufferBlock<IGameCommand> output, string name)
+        public MazePlayer(PlayerContex playerContex)
         {
-            Output = output;
-            Name = name;
+            this.playerContex = playerContex;
         }
 
         public Pos GetPos() => new Pos { x = pos.X * (1 - progress) + nextpos.X * progress, y = pos.Y * (1 - progress) + nextpos.Y * progress };

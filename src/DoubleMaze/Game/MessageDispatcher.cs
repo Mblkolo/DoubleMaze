@@ -1,4 +1,5 @@
-﻿using DoubleMaze.Util;
+﻿using DoubleMaze.Game.Maze;
+using DoubleMaze.Util;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks.Dataflow;
@@ -19,6 +20,7 @@ namespace DoubleMaze.Game
         public IPlayerHandler PlayerHandler { get; private set; }
 
         public string Name { get; set; }
+        public Rating Rating { get; set; } = new Rating();
 
         public PlayerContex(BufferBlock<IGameCommand> output)
         {
