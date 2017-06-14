@@ -82,6 +82,7 @@ class WelcomeArea implements IArea {
 
 class GameArea implements IArea {
     private sendData: (data: any) => void;
+    private onKeyDownHandler = (arg: JQueryEventObject) => this.onKeyDown(arg);
 
     public constructor(sendData: (data: any) => void) {
         this.sendData = sendData;
@@ -89,15 +90,19 @@ class GameArea implements IArea {
 
     public enter() {
         $("#main-content").html($("#game-area-tempalte").html());
-        $("#game-canvas").on("keydown", (arg: JQueryEventObject) => this.onKeyDown(arg));
+        $(document).on("keydown", this.onKeyDownHandler);
         $(".game-gameover-screen-button").on("click", (arg: JQueryEventObject) => this.onPlayAgain(arg));
     }
 
     public leave() {
+        $(document).off("keydown", this.onKeyDownHandler);
+
         this.state = null;
     }
 
     private onKeyDown(e: JQueryEventObject) {
+        e.preventDefault();
+
         if (e.keyCode === KeyCode.DOWN_ARROW || e.keyCode === KeyCode.KEY_S) {
             this.sendKey("Down", e);
         }

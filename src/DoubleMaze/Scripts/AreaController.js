@@ -64,6 +64,8 @@ var WelcomeArea = (function () {
 }());
 var GameArea = (function () {
     function GameArea(sendData) {
+        var _this = this;
+        this.onKeyDownHandler = function (arg) { return _this.onKeyDown(arg); };
         this.currentPos = { x: 0, y: 0 };
         this.serverPos = { x: 0, y: 0 };
         this.serverTime = 0;
@@ -73,13 +75,15 @@ var GameArea = (function () {
     GameArea.prototype.enter = function () {
         var _this = this;
         $("#main-content").html($("#game-area-tempalte").html());
-        $("#game-canvas").on("keydown", function (arg) { return _this.onKeyDown(arg); });
+        $("document").on("keydown", this.onKeyDownHandler);
         $(".game-gameover-screen-button").on("click", function (arg) { return _this.onPlayAgain(arg); });
     };
     GameArea.prototype.leave = function () {
+        $("document").off("keydown", this.onKeyDownHandler);
         this.state = null;
     };
     GameArea.prototype.onKeyDown = function (e) {
+        e.preventDefault();
         if (e.keyCode === key_code_ts_1.KeyCode.DOWN_ARROW || e.keyCode === key_code_ts_1.KeyCode.KEY_S) {
             this.sendKey("Down", e);
         }
