@@ -2,13 +2,13 @@
 import {KeyCode} from "./key_code.ts";
 
 export class AreaController {
-    private areas: { [id: string]: IArea } = {};
+    private areas: { [id: string]: () => IArea } = {};
     private currentArea: IArea = null;
 
     public constructor(sendData: (data: any) => void) {
-        this.areas["loading"] = new LoadingArea(sendData);
-        this.areas["welcome"] = new WelcomeArea(sendData);
-        this.areas["game"] = new GameArea(sendData);
+        this.areas["loading"] = () => new LoadingArea(sendData);
+        this.areas["welcome"] = () => new WelcomeArea(sendData);
+        this.areas["game"] = () => new GameArea(sendData);
     }
 
     public gotoArea(area: string) {
@@ -16,7 +16,7 @@ export class AreaController {
             this.currentArea.leave();
         }
 
-        this.currentArea = this.areas[area];
+        this.currentArea = this.areas[area]();
         this.currentArea.enter();
     }
 
@@ -101,7 +101,13 @@ class GameArea implements IArea {
     }
 
     private onKeyDown(e: JQueryEventObject) {
-        e.preventDefault();
+        if (e.keyCode == KeyCode.DOWN_ARROW
+            || e.keyCode == KeyCode.UP_ARROW
+            || e.keyCode == KeyCode.LEFT_ARROW
+            || e.keyCode == KeyCode.RIGHT_ARROW) {
+
+            e.preventDefault();
+        }
 
         if (e.keyCode === KeyCode.DOWN_ARROW || e.keyCode === KeyCode.KEY_S) {
             this.sendKey("Down", e);
@@ -165,26 +171,27 @@ class GameArea implements IArea {
         }
     }
 
-    private currentPos = { x: 0, y: 0 };
-    private serverPos = { x: 0, y: 0 };
     private serverTime = 0;
-    private secondPlayerPos = { x: 0, y: 0 };
+    private playerPos: PlayerPosition;
+    private enemyPos: PlayerPosition;
 
     private moveTo(myPos, enemyPos) {
-        this.secondPlayerPos = enemyPos;
+        if (this.enemyPos == null)
+            this.enemyPos = new PlayerPosition(enemyPos.x, enemyPos.y);
+        this.enemyPos.SetPos(enemyPos.x, enemyPos.y);
 
-        this.currentPos.x = this.serverPos.x;
-        this.currentPos.y = this.serverPos.y;
+        if (this.playerPos == null)
+            this.playerPos = new PlayerPosition(myPos.x, myPos.y);
 
-        this.serverPos.x = myPos.x;
-        this.serverPos.y = myPos.y;
+        this.playerPos.SetPos(myPos.x, myPos.y);
 
         this.serverTime = Date.now();
     }
 
-    private drawOn(t) {
-        const scale = 20;
+    private scale = 20;
 
+    private drawOn(t) {
+        const scale = this.scale;
         var ctx = ($("#game-canvas")[0] as HTMLCanvasElement).getContext("2d");
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -195,8 +202,8 @@ class GameArea implements IArea {
         ctx.lineCap = "round";
         //ctx.strokeStyle = "#227F32";
         ctx.strokeStyle = "#333";
-        for (var y = 0; y < this.mazeField.length; ++y) {
-            for (var x = 0; x < this.mazeField[y].length; ++x) {
+        for (let y = 0; y < this.mazeField.length; ++y) {
+            for (let x = 0; x < this.mazeField[y].length; ++x) {
 
                 var topLeft = { x: x * scale, y: y * scale };
                 var topRight = { x: (x + 1) * scale, y: y * scale };
@@ -227,11 +234,22 @@ class GameArea implements IArea {
         ctx.stroke();
         
 
-        var x = (this.currentPos.x * (1 - t) + this.serverPos.x * t) * scale;
-        var y = (this.currentPos.y * (1 - t) + this.serverPos.y * t) * scale;
+        if (this.playerPos != null) {
+            this.DrawPlayer(this.playerPos, ctx, t, "#227F32", 4);
+        }
 
-        const center = { x: x + scale / 2, y: y + scale / 2 };
-        const delta = { x: this.serverPos.x - this.currentPos.x, y: this.serverPos.y - this.currentPos.y };
+        if (this.enemyPos != null) {
+            this.DrawPlayer(this.enemyPos, ctx, t, "#bf0d31", 3);
+        }
+    }
+
+    private DrawPlayer(playerPos: PlayerPosition, ctx: CanvasRenderingContext2D, progress: number, color: string, size: number) {
+        ctx.fillStyle = color;
+
+        const pos = playerPos.GetPostion(progress);
+
+        const center = { x: (pos.x + 0.5) * this.scale, y: (pos.y + 0.5) * this.scale };
+        const delta = playerPos.GetDelta();
         ctx.beginPath();
         ctx.moveTo(center.x - delta.x * 25, center.y - delta.y * 25);
         ctx.lineTo(center.x + (delta.y === 0 ? 0 : 3), center.y + (delta.x === 0 ? 0 : 3));
@@ -240,13 +258,9 @@ class GameArea implements IArea {
         ctx.fill();
 
         ctx.beginPath();
-        ctx.arc(center.x, center.y, 4, 0, 2 * Math.PI);
+        ctx.arc(center.x, center.y, size, 0, 2 * Math.PI);
         ctx.closePath();
         ctx.fill();
-        
-
-        ctx.beginPath();
-        ctx.fillRect(this.secondPlayerPos.x * scale + (scale - 5) / 2, this.secondPlayerPos.y * scale + (scale - 5) / 2, 5, 5);
     }
 
 
@@ -261,5 +275,38 @@ class GameArea implements IArea {
 
         requestAnimationFrame(() => this.drawLoop());
     }
+}
+
+class PlayerPosition {
+    public currentPos: { x: number, y: number };
+    public nextPos: { x: number, y: number };
+
+    public constructor(x: number, y: number) {
+        this.currentPos = { x: x, y: y }
+        this.nextPos = { x: x, y: y }
+    }
+
+    public SetPos(x: number, y: number) {
+        this.currentPos.x = this.nextPos.x;
+        this.currentPos.y = this.nextPos.y;
+
+        this.nextPos.x = x;
+        this.nextPos.y = y;
+    }
+    
+    public GetPostion(progress: number) {
+        return {
+            x: (this.currentPos.x * (1 - progress) + this.nextPos.x * progress),
+            y: (this.currentPos.y * (1 - progress) + this.nextPos.y * progress)
+        }
+    }
+
+    public GetDelta() {
+        return {
+            x: (this.nextPos.x - this.currentPos.x),
+            y: (this.nextPos.y - this.currentPos.y)
+        }
+    }
+
 }
 

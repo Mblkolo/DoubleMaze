@@ -118,8 +118,17 @@ html {
 {
     font-size: 3rem;
     line-height: 3rem;
-    color: #227F32;
     overflow: hidden;
+}
+
+.game-canvas-my-name
+{
+    color: #227F32;
+}
+
+.game-canvas-enemy-name
+{
+    color: #BF0D31;
 }
 
 .game-canvas-vs-text, .game-canvas-name-with-rating
@@ -132,6 +141,7 @@ html {
     overflow: hidden;
     white-space: nowrap;
 }
+
 
 .game-canvas-my-rating, .game-canvas-enemy-rating
 {
