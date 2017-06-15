@@ -1,5 +1,6 @@
 ﻿using DoubleMaze.Game.Maze;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks.Dataflow;
 
@@ -108,12 +109,12 @@ namespace DoubleMaze.Game
                     me = new MazeFieldCommandPlayer
                     {
                         name = player.Name,
-                        rating = Math.Round(player.Rating.Value, 1)
+                        rating = player.Rating.RoundValue
                     },
                     enemy = new MazeFieldCommandPlayer
                     {
                         name = enemy.Name,
-                        rating = Math.Round(enemy.Rating.Value, 1)
+                        rating = enemy.Rating.RoundValue
                     }
                 };
 
@@ -121,12 +122,28 @@ namespace DoubleMaze.Game
             }
             else
             {
+                state.Players.Values.Select(x => new GameOverCommandRating
+                {
+                    name = x.Name,
+                    rating = x.Rating.RoundValue
+                }).ToArray();
+
+
                 player.Output.Post(new GameOverCommand
                 {
                     status = player.IsWin
                         ? GameOverCommand.Statuses.Win
-                        : GameOverCommand.Statuses.Lose
-                });
+                        : GameOverCommand.Statuses.Lose,
+
+                    ratings = state.Players.Values.Select(x => new GameOverCommandRating
+                    {
+                        name = x.Name,
+                        rating = x.Rating.RoundValue
+                    })
+                    .OrderByDescending(x => x.rating)
+                    .ThenBy(x => x.name)
+                    .ToArray()
+            });
             }
         }
 

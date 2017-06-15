@@ -4,15 +4,15 @@ var AreaController = (function () {
     function AreaController(sendData) {
         this.areas = {};
         this.currentArea = null;
-        this.areas["loading"] = new LoadingArea(sendData);
-        this.areas["welcome"] = new WelcomeArea(sendData);
-        this.areas["game"] = new GameArea(sendData);
+        this.areas["loading"] = function () { return new LoadingArea(sendData); };
+        this.areas["welcome"] = function () { return new WelcomeArea(sendData); };
+        this.areas["game"] = function () { return new GameArea(sendData); };
     }
     AreaController.prototype.gotoArea = function (area) {
         if (this.currentArea != null) {
             this.currentArea.leave();
         }
-        this.currentArea = this.areas[area];
+        this.currentArea = this.areas[area]();
         this.currentArea.enter();
     };
     AreaController.prototype.process = function (data) {
@@ -66,24 +66,27 @@ var GameArea = (function () {
     function GameArea(sendData) {
         var _this = this;
         this.onKeyDownHandler = function (arg) { return _this.onKeyDown(arg); };
-        this.currentPos = { x: 0, y: 0 };
-        this.serverPos = { x: 0, y: 0 };
         this.serverTime = 0;
-        this.secondPlayerPos = { x: 0, y: 0 };
+        this.scale = 20;
         this.sendData = sendData;
     }
     GameArea.prototype.enter = function () {
         var _this = this;
         $("#main-content").html($("#game-area-tempalte").html());
-        $("document").on("keydown", this.onKeyDownHandler);
+        $(document).on("keydown", this.onKeyDownHandler);
         $(".game-gameover-screen-button").on("click", function (arg) { return _this.onPlayAgain(arg); });
     };
     GameArea.prototype.leave = function () {
-        $("document").off("keydown", this.onKeyDownHandler);
+        $(document).off("keydown", this.onKeyDownHandler);
         this.state = null;
     };
     GameArea.prototype.onKeyDown = function (e) {
-        e.preventDefault();
+        if (e.keyCode == key_code_ts_1.KeyCode.DOWN_ARROW
+            || e.keyCode == key_code_ts_1.KeyCode.UP_ARROW
+            || e.keyCode == key_code_ts_1.KeyCode.LEFT_ARROW
+            || e.keyCode == key_code_ts_1.KeyCode.RIGHT_ARROW) {
+            e.preventDefault();
+        }
         if (e.keyCode === key_code_ts_1.KeyCode.DOWN_ARROW || e.keyCode === key_code_ts_1.KeyCode.KEY_S) {
             this.sendKey("Down", e);
         }
@@ -112,15 +115,11 @@ var GameArea = (function () {
         if (data.command === "mazeFeild") {
             this.state = "mazeFeild";
             this.mazeField = data.field;
-            $(".game-canvas-my-name").text(data.me.name).prop("title", data.me.name);
-            $(".game-canvas-my-rating").text(data.me.rating);
-            $(".game-canvas-enemy-name").text(data.enemy.name).prop("title", data.enemy.name);
-            $(".game-canvas-enemy-rating").text(data.enemy.rating);
             this.drawLoop();
         }
         if (data.command === "gameOver") {
             this.state = "gameOver";
-            this.isWin = data.status === "win";
+            this.gameOver = data;
         }
         if (data.command === "playerState")
             this.moveTo(data.myPos, data.enemyPos);
@@ -130,21 +129,35 @@ var GameArea = (function () {
         $("#game-wait-screen").toggleClass("hidden", this.state !== "waitOpponent");
         $("#game-canvas-screen").toggleClass("hidden", this.state !== "mazeFeild");
         $("#game-gameover-screen").toggleClass("hidden", this.state !== "gameOver");
+        if (this.state === "mazeFeild") {
+            $(".game-canvas-my-name").text(this.mazeField.me.name).prop("title", this.mazeField.me.name);
+            $(".game-canvas-my-rating").text(this.mazeField.me.rating);
+            $(".game-canvas-enemy-name").text(this.mazeField.enemy.name).prop("title", this.mazeField.enemy.name);
+            $(".game-canvas-enemy-rating").text(this.mazeField.enemy.rating);
+        }
         if (this.state === "gameOver") {
-            $("#game-gameover-screen .winner").toggleClass("hidden", this.isWin == false);
-            $("#game-gameover-screen .looser").toggleClass("hidden", this.isWin);
+            $("#game-gameover-screen .winner").toggleClass("hidden", this.gameOver.status === "win");
+            $("#game-gameover-screen .looser").toggleClass("hidden", this.gameOver.status !== "win");
+            for (var i = 0; i < this.gameOver.ratings.length; ++i) {
+                var rating = this.gameOver.ratings[i];
+                $(".game-canvas-ratings").append("<tr><td>" + (i + 1) + "</td><td></td><td></td></tr>");
+                $(".game-canvas-ratings").last().children().eq(1).text(rating.name);
+                $(".game-canvas-ratings").last().children().eq(2).text(rating.rating);
+            }
         }
     };
     GameArea.prototype.moveTo = function (myPos, enemyPos) {
-        this.secondPlayerPos = enemyPos;
-        this.currentPos.x = this.serverPos.x;
-        this.currentPos.y = this.serverPos.y;
-        this.serverPos.x = myPos.x;
-        this.serverPos.y = myPos.y;
+        if (this.enemyPos == null)
+            this.enemyPos = new PlayerPosition(enemyPos.x, enemyPos.y);
+        this.enemyPos.SetPos(enemyPos.x, enemyPos.y);
+        if (this.playerPos == null)
+            this.playerPos = new PlayerPosition(myPos.x, myPos.y);
+        this.playerPos.SetPos(myPos.x, myPos.y);
         this.serverTime = Date.now();
     };
     GameArea.prototype.drawOn = function (t) {
-        var scale = 20;
+        var scale = this.scale;
+        var mazeField = this.mazeField.field;
         var ctx = $("#game-canvas")[0].getContext("2d");
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -154,35 +167,43 @@ var GameArea = (function () {
         ctx.lineCap = "round";
         //ctx.strokeStyle = "#227F32";
         ctx.strokeStyle = "#333";
-        for (var y = 0; y < this.mazeField.length; ++y) {
-            for (var x = 0; x < this.mazeField[y].length; ++x) {
+        for (var y = 0; y < mazeField.length; ++y) {
+            for (var x = 0; x < mazeField[y].length; ++x) {
                 var topLeft = { x: x * scale, y: y * scale };
                 var topRight = { x: (x + 1) * scale, y: y * scale };
                 var bottomRight = { x: (x + 1) * scale, y: (y + 1) * scale };
                 var bottomLeft = { x: x * scale, y: (y + 1) * scale };
-                if ((this.mazeField[y][x] & 1) !== 0) {
+                if ((mazeField[y][x] & 1) !== 0) {
                     ctx.moveTo(topLeft.x, topLeft.y);
                     ctx.lineTo(topRight.x, topRight.y);
                 }
-                if ((this.mazeField[y][x] & 2) !== 0) {
+                if ((mazeField[y][x] & 2) !== 0) {
                     ctx.moveTo(topRight.x, topRight.y);
                     ctx.lineTo(bottomRight.x, bottomRight.y);
                 }
-                if ((this.mazeField[y][x] & 4) !== 0) {
+                if ((mazeField[y][x] & 4) !== 0) {
                     ctx.moveTo(bottomRight.x, bottomRight.y);
                     ctx.lineTo(bottomLeft.x, bottomLeft.y);
                 }
-                if ((this.mazeField[y][x] & 8) !== 0) {
+                if ((mazeField[y][x] & 8) !== 0) {
                     ctx.moveTo(bottomLeft.x, bottomLeft.y);
                     ctx.lineTo(topLeft.x, topLeft.y);
                 }
             }
         }
         ctx.stroke();
-        var x = (this.currentPos.x * (1 - t) + this.serverPos.x * t) * scale;
-        var y = (this.currentPos.y * (1 - t) + this.serverPos.y * t) * scale;
-        var center = { x: x + scale / 2, y: y + scale / 2 };
-        var delta = { x: this.serverPos.x - this.currentPos.x, y: this.serverPos.y - this.currentPos.y };
+        if (this.playerPos != null) {
+            this.DrawPlayer(this.playerPos, ctx, t, "#227F32", 4);
+        }
+        if (this.enemyPos != null) {
+            this.DrawPlayer(this.enemyPos, ctx, t, "#bf0d31", 3);
+        }
+    };
+    GameArea.prototype.DrawPlayer = function (playerPos, ctx, progress, color, size) {
+        ctx.fillStyle = color;
+        var pos = playerPos.GetPostion(progress);
+        var center = { x: (pos.x + 0.5) * this.scale, y: (pos.y + 0.5) * this.scale };
+        var delta = playerPos.GetDelta();
         ctx.beginPath();
         ctx.moveTo(center.x - delta.x * 25, center.y - delta.y * 25);
         ctx.lineTo(center.x + (delta.y === 0 ? 0 : 3), center.y + (delta.x === 0 ? 0 : 3));
@@ -190,11 +211,9 @@ var GameArea = (function () {
         ctx.closePath();
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(center.x, center.y, 4, 0, 2 * Math.PI);
+        ctx.arc(center.x, center.y, size, 0, 2 * Math.PI);
         ctx.closePath();
         ctx.fill();
-        ctx.beginPath();
-        ctx.fillRect(this.secondPlayerPos.x * scale + (scale - 5) / 2, this.secondPlayerPos.y * scale + (scale - 5) / 2, 5, 5);
     };
     GameArea.prototype.drawLoop = function () {
         var _this = this;
@@ -207,5 +226,30 @@ var GameArea = (function () {
         requestAnimationFrame(function () { return _this.drawLoop(); });
     };
     return GameArea;
+}());
+var PlayerPosition = (function () {
+    function PlayerPosition(x, y) {
+        this.currentPos = { x: x, y: y };
+        this.nextPos = { x: x, y: y };
+    }
+    PlayerPosition.prototype.SetPos = function (x, y) {
+        this.currentPos.x = this.nextPos.x;
+        this.currentPos.y = this.nextPos.y;
+        this.nextPos.x = x;
+        this.nextPos.y = y;
+    };
+    PlayerPosition.prototype.GetPostion = function (progress) {
+        return {
+            x: (this.currentPos.x * (1 - progress) + this.nextPos.x * progress),
+            y: (this.currentPos.y * (1 - progress) + this.nextPos.y * progress)
+        };
+    };
+    PlayerPosition.prototype.GetDelta = function () {
+        return {
+            x: (this.nextPos.x - this.currentPos.x),
+            y: (this.nextPos.y - this.currentPos.y)
+        };
+    };
+    return PlayerPosition;
 }());
 //# sourceMappingURL=AreaController.js.map

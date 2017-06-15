@@ -1,7 +1,7 @@
 ﻿body {
     padding: 0;
     margin: 0;
-    background-color: #ccc;
+    /*background-color: #ccc;*/
     font-family: Verdana;
 }
 
@@ -147,4 +147,52 @@ html {
 {
     display: block;
     line-height: 3rem;
+}
+
+
+.game-canvas-ratings {
+    table-layout: fixed;
+    padding-top: 4rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    padding-bottom: 4rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.game-canvas-ratings tr td:nth-child(1) {
+    padding-right: 2rem;
+    text-align: right;
+    font-size: 3rem;
+}
+
+.game-canvas-ratings tr td:nth-child(2) {
+    max-width: 30rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+
+}
+
+.game-canvas-ratings tr td:nth-child(3) {
+    text-align: right;
+    padding-left: 1rem;
+}
+
+.game-canvas-ratings tr td {
+    height: 5rem;
+    font-size: 2rem;
+    border-bottom: #fff 1px solid;
+    border-top: #fff 1px solid;
+}
+
+.game-canvas-ratings tr:hover td {
+    border-bottom: #227F32 1px solid;
+    border-top: #227F32 1px solid;
+}
+
+.game-canvas-ratings tr td {
+    height: 6rem;
+    border-bottom: #fff 1px solid;
+    border-top: #fff 1px solid;
 }

@@ -59,6 +59,14 @@ namespace DoubleMaze.Game
 
         public GameCommand command => GameCommand.GameOver;
         public Statuses status { get; set; }
+
+        public GameOverCommandRating[] ratings {get; set;}
+    }
+
+    public class GameOverCommandRating
+    {
+        public string name { get; set; }
+        public double rating { get; set; }
     }
 
     public class GotoCommand : IGameCommand

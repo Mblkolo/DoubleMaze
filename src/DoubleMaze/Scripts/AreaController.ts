@@ -139,16 +139,13 @@ class GameArea implements IArea {
         }
         if (data.command === "mazeFeild") {
             this.state = "mazeFeild";
-            this.mazeField = data.field;
-            $(".game-canvas-my-name").text(data.me.name).prop("title", data.me.name);
-            $(".game-canvas-my-rating").text(data.me.rating);
-            $(".game-canvas-enemy-name").text(data.enemy.name).prop("title", data.enemy.name);
-            $(".game-canvas-enemy-rating").text(data.enemy.rating)
+            this.mazeField = data;
+
             this.drawLoop();
         }
         if (data.command === "gameOver") {
             this.state = "gameOver";
-            this.isWin = data.status === "win";
+            this.gameOver = data;
         }
 
         if (data.command === "playerState")
@@ -159,15 +156,35 @@ class GameArea implements IArea {
 
     private state: string;
     private mazeField: any;
-    private isWin: boolean;
+    private gameOver: any;
 
     private render() {
         $("#game-wait-screen").toggleClass("hidden", this.state !== "waitOpponent");
         $("#game-canvas-screen").toggleClass("hidden", this.state !== "mazeFeild");
         $("#game-gameover-screen").toggleClass("hidden", this.state !== "gameOver");
+
+        if (this.state === "mazeFeild") {
+            $(".game-canvas-my-name").text(this.mazeField.me.name).prop("title", this.mazeField.me.name);
+            $(".game-canvas-my-rating").text(this.mazeField.me.rating);
+            $(".game-canvas-enemy-name").text(this.mazeField.enemy.name).prop("title", this.mazeField.enemy.name);
+            $(".game-canvas-enemy-rating").text(this.mazeField.enemy.rating);
+        }
+
         if (this.state === "gameOver") {
-            $("#game-gameover-screen .winner").toggleClass("hidden", this.isWin == false);
-            $("#game-gameover-screen .looser").toggleClass("hidden", this.isWin);
+            $("#game-gameover-screen .winner").toggleClass("hidden", this.gameOver.status === "win");
+            $("#game-gameover-screen .looser").toggleClass("hidden", this.gameOver.status !== "win");
+
+            for (let i = 0; i < this.gameOver.ratings.length; ++i) {
+                const rating = this.gameOver.ratings[i];
+                $(".game-canvas-ratings").append(`<tr><td>${i + 1}</td><td></td><td></td></tr>`);
+
+                const cells = $(".game-canvas-ratings").children().last().children();
+                cells.eq(1).text(rating.name).prop("title", rating.name);
+                cells.eq(2).text(rating.rating);
+            }
+            
+
+
         }
     }
 
@@ -192,6 +209,8 @@ class GameArea implements IArea {
 
     private drawOn(t) {
         const scale = this.scale;
+        const mazeField = this.mazeField.field
+
         var ctx = ($("#game-canvas")[0] as HTMLCanvasElement).getContext("2d");
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -202,30 +221,30 @@ class GameArea implements IArea {
         ctx.lineCap = "round";
         //ctx.strokeStyle = "#227F32";
         ctx.strokeStyle = "#333";
-        for (let y = 0; y < this.mazeField.length; ++y) {
-            for (let x = 0; x < this.mazeField[y].length; ++x) {
+        for (let y = 0; y < mazeField.length; ++y) {
+            for (let x = 0; x < mazeField[y].length; ++x) {
 
                 var topLeft = { x: x * scale, y: y * scale };
                 var topRight = { x: (x + 1) * scale, y: y * scale };
                 var bottomRight = { x: (x + 1) * scale, y: (y + 1) * scale };
                 var bottomLeft = { x: x * scale, y: (y + 1) * scale };
 
-                if ((this.mazeField[y][x] & 1) !== 0) {
+                if ((mazeField[y][x] & 1) !== 0) {
                     ctx.moveTo(topLeft.x, topLeft.y);
                     ctx.lineTo(topRight.x, topRight.y);
                 }
 
-                if ((this.mazeField[y][x] & 2) !== 0) {
+                if ((mazeField[y][x] & 2) !== 0) {
                     ctx.moveTo(topRight.x, topRight.y);
                     ctx.lineTo(bottomRight.x, bottomRight.y);
                 }
 
-                if ((this.mazeField[y][x] & 4) !== 0) {
+                if ((mazeField[y][x] & 4) !== 0) {
                     ctx.moveTo(bottomRight.x, bottomRight.y);
                     ctx.lineTo(bottomLeft.x, bottomLeft.y);
                 }
 
-                if ((this.mazeField[y][x] & 8) !== 0) {
+                if ((mazeField[y][x] & 8) !== 0) {
                     ctx.moveTo(bottomLeft.x, bottomLeft.y);
                     ctx.lineTo(topLeft.x, topLeft.y);
                 }
