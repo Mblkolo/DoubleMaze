@@ -67,7 +67,7 @@ class WelcomeArea implements IArea {
     }
 
     public onClick(arg: JQueryEventObject) {
-        const name = $("welcome-player-name").val();
+        const name = $(".welcome-player-name").val();
         this.sendData(JSON.stringify({ Type: "PlayerName", Name: name }));
     }
 
@@ -171,8 +171,8 @@ class GameArea implements IArea {
         }
 
         if (this.state === "gameOver") {
-            $("#game-gameover-screen .winner").toggleClass("hidden", this.gameOver.status === "win");
-            $("#game-gameover-screen .looser").toggleClass("hidden", this.gameOver.status !== "win");
+            $("#game-gameover-screen .winner").toggleClass("hidden", this.gameOver.status !== "win");
+            $("#game-gameover-screen .looser").toggleClass("hidden", this.gameOver.status === "win");
 
             for (let i = 0; i < this.gameOver.ratings.length; ++i) {
                 const rating = this.gameOver.ratings[i];

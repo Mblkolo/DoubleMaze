@@ -53,7 +53,7 @@ var WelcomeArea = (function () {
         $(".welcome-play-button").on("click", function (arg) { return _this.onClick(arg); });
     };
     WelcomeArea.prototype.onClick = function (arg) {
-        var name = $("welcome-player-name").val();
+        var name = $(".welcome-player-name").val();
         this.sendData(JSON.stringify({ Type: "PlayerName", Name: name }));
     };
     WelcomeArea.prototype.leave = function () {
@@ -136,14 +136,18 @@ var GameArea = (function () {
             $(".game-canvas-enemy-rating").text(this.mazeField.enemy.rating);
         }
         if (this.state === "gameOver") {
-            $("#game-gameover-screen .winner").toggleClass("hidden", this.gameOver.status === "win");
-            $("#game-gameover-screen .looser").toggleClass("hidden", this.gameOver.status !== "win");
+            $("#game-gameover-screen .winner").toggleClass("hidden", this.gameOver.status !== "win");
+            $("#game-gameover-screen .looser").toggleClass("hidden", this.gameOver.status === "win");
             for (var i = 0; i < this.gameOver.ratings.length; ++i) {
                 var rating = this.gameOver.ratings[i];
                 $(".game-canvas-ratings").append("<tr><td>" + (i + 1) + "</td><td></td><td></td></tr>");
                 var cells = $(".game-canvas-ratings").children().last().children();
                 cells.eq(1).text(rating.name).prop("title", rating.name);
                 cells.eq(2).text(rating.rating);
+                if (rating.isMe)
+                    cells.eq(0).addClass("my-name");
+                if (rating.isEnemy)
+                    cells.eq(0).addClass("enemy-name");
             }
         }
     };
