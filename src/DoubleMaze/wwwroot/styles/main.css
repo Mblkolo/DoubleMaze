@@ -121,12 +121,12 @@ html {
     overflow: hidden;
 }
 
-.game-canvas-my-name
+.my-name
 {
     color: #227F32;
 }
 
-.game-canvas-enemy-name
+.enemy-name
 {
     color: #BF0D31;
 }

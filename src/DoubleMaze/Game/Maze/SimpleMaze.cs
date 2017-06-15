@@ -122,12 +122,7 @@ namespace DoubleMaze.Game
             }
             else
             {
-                state.Players.Values.Select(x => new GameOverCommandRating
-                {
-                    name = x.Name,
-                    rating = x.Rating.RoundValue
-                }).ToArray();
-
+                var enemy = GetEnemy(player);
 
                 player.Output.Post(new GameOverCommand
                 {
@@ -135,10 +130,12 @@ namespace DoubleMaze.Game
                         ? GameOverCommand.Statuses.Win
                         : GameOverCommand.Statuses.Lose,
 
-                    ratings = state.Players.Values.Select(x => new GameOverCommandRating
+                    ratings = state.Players.Select(x => new GameOverCommandRating
                     {
-                        name = x.Name,
-                        rating = x.Rating.RoundValue
+                        name = x.Value.Name,
+                        rating = x.Value.Rating.RoundValue,
+                        isMe = x.Key == player.Id,
+                        isEnemy = x.Key == enemy.Id
                     })
                     .OrderByDescending(x => x.rating)
                     .ThenBy(x => x.name)
@@ -220,6 +217,7 @@ namespace DoubleMaze.Game
         public BufferBlock<IGameCommand> Output => playerContex.Output;
         public string Name => playerContex.Name;
         public Rating Rating =>  playerContex.Rating;
+        public Guid Id => playerContex.Id;
         public bool IsLeft { get; internal set; }
         public bool IsWin { get; internal set; }
 

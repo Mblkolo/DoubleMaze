@@ -67,6 +67,8 @@ namespace DoubleMaze.Game
     {
         public string name { get; set; }
         public double rating { get; set; }
+        public bool isMe { get; set; }
+        public bool isEnemy { get; set; }
     }
 
     public class GotoCommand : IGameCommand

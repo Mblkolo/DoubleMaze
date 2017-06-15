@@ -114,7 +114,7 @@ var GameArea = (function () {
         }
         if (data.command === "mazeFeild") {
             this.state = "mazeFeild";
-            this.mazeField = data.field;
+            this.mazeField = data;
             this.drawLoop();
         }
         if (data.command === "gameOver") {
@@ -141,8 +141,9 @@ var GameArea = (function () {
             for (var i = 0; i < this.gameOver.ratings.length; ++i) {
                 var rating = this.gameOver.ratings[i];
                 $(".game-canvas-ratings").append("<tr><td>" + (i + 1) + "</td><td></td><td></td></tr>");
-                $(".game-canvas-ratings").last().children().eq(1).text(rating.name);
-                $(".game-canvas-ratings").last().children().eq(2).text(rating.rating);
+                var cells = $(".game-canvas-ratings").children().last().children();
+                cells.eq(1).text(rating.name).prop("title", rating.name);
+                cells.eq(2).text(rating.rating);
             }
         }
     };

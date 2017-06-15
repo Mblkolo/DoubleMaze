@@ -181,6 +181,12 @@ class GameArea implements IArea {
                 const cells = $(".game-canvas-ratings").children().last().children();
                 cells.eq(1).text(rating.name).prop("title", rating.name);
                 cells.eq(2).text(rating.rating);
+
+                if (rating.isMe)
+                    cells.eq(0).addClass("my-name");
+
+                if (rating.isEnemy)
+                    cells.eq(0).addClass("enemy-name");
             }
             
 

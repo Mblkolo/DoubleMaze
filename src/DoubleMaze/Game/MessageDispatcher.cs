@@ -16,15 +16,18 @@ namespace DoubleMaze.Game
 
     public class PlayerContex
     {
-        public BufferBlock<IGameCommand> Output { get; private set; }
+
+        public Guid Id { get; }
+        public BufferBlock<IGameCommand> Output { get; }
         public IPlayerHandler PlayerHandler { get; private set; }
 
         public string Name { get; set; }
         public Rating Rating { get; set; } = new Rating();
 
-        public PlayerContex(BufferBlock<IGameCommand> output)
+        public PlayerContex(Guid id, BufferBlock<IGameCommand> output)
         {
             Output = output;
+            Id = id;
         }
 
         public void SetHandler(IPlayerHandler handler)
@@ -52,7 +55,7 @@ namespace DoubleMaze.Game
         {
             if (state.Players.ContainsKey(connection.PlayerId) == false)
             {
-                var playerContext = new PlayerContex(connection.OutputQueue);
+                var playerContext = new PlayerContex(connection.PlayerId, connection.OutputQueue);
                 state.Players.Add(connection.PlayerId, playerContext);
 
                 playerContext.SetHandler(new WelcomeAreaHandler(connection.PlayerId, state));
