@@ -28,7 +28,7 @@ namespace DoubleMaze.Game
             var o = inputCommand as PlayerNameInput;
             if (o != null)
             {
-                state.Players[playerId].Name = o.Name ?? GenerateName(new Random());
+                state.Players[playerId].Name = string.IsNullOrWhiteSpace(o.Name) ? GenerateName(new Random()) : o.Name.Trim();
                 state.Players[playerId].SetHandler(new GameAreaHandler(playerId, state));
             }
         }
