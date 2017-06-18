@@ -18,7 +18,7 @@ namespace DoubleMaze.Game
     {
 
         public Guid Id { get; }
-        public BufferBlock<IGameCommand> Output { get; }
+        public BufferBlock<IGameCommand> Output { get; set; }
         public IPlayerHandler PlayerHandler { get; private set; }
 
         public string Name { get; set; }
@@ -61,7 +61,10 @@ namespace DoubleMaze.Game
                 playerContext.SetHandler(new WelcomeAreaHandler(connection.PlayerId, state));
             }
             else
+            {
+                state.Players[connection.PlayerId].Output = connection.OutputQueue;
                 state.Players[connection.PlayerId].PlayerHandler.PlayerJoin();
+            }
         }
 
         public void Process(PlayerDisconnected disconnected)
