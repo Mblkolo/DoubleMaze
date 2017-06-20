@@ -10,7 +10,7 @@ namespace DoubleMaze.Game.Maze
             Value = value;
         }
 
-        public double RoundValue => Math.Round(Value, 1);
+        public double RoundValue => Round(Value, 1);
 
         public double Value { get; private set; }
         public int Wins { get; private set; } = 0;
