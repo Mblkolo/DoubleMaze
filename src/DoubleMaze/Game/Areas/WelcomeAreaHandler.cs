@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks.Dataflow;
 
-namespace DoubleMaze.Game
+namespace DoubleMaze.Game.Areas
 {
-    public class WelcomeAreaHandler : IPlayerHandler
+    public class WelcomeAreaHandler : IAreaHandler
     {
         private readonly Guid playerId;
         private readonly WorldState state;

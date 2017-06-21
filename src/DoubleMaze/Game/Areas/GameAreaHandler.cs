@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks.Dataflow;
 
-namespace DoubleMaze.Game
+namespace DoubleMaze.Game.Areas
 {
-    public class GameAreaHandler : IPlayerHandler
+    public class GameAreaHandler : IAreaHandler
     {
         private readonly Guid playerId;
         private readonly WorldState state;

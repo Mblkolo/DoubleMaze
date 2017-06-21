@@ -1,4 +1,5 @@
-﻿using DoubleMaze.Game.Maze;
+﻿using DoubleMaze.Game.Areas;
+using DoubleMaze.Game.Maze;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks.Dataflow;
@@ -26,7 +27,7 @@ namespace DoubleMaze.Game
     {
         public Guid Id { get; }
         public BufferBlock<IGameCommand> Output { get; set; }
-        public IPlayerHandler PlayerHandler { get; private set; }
+        public IAreaHandler PlayerHandler { get; private set; }
 
         public string Name { get; set; }
         public Rating Rating { get; private set; }
@@ -61,7 +62,7 @@ namespace DoubleMaze.Game
             };
         }
 
-        public void SetHandler(IPlayerHandler handler)
+        public void SetHandler(IAreaHandler handler)
         {
             if (PlayerHandler != null)
                 PlayerHandler.PlayerLeft();

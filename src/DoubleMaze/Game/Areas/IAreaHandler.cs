@@ -1,6 +1,6 @@
-﻿namespace DoubleMaze.Game
+﻿namespace DoubleMaze.Game.Areas
 {
-    public interface IPlayerHandler
+    public interface IAreaHandler
     {
         void Process(IPlayerInput inputCommand);
         void PlayerJoin();
