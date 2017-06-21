@@ -269,12 +269,12 @@ var ReturnArea = (function () {
         $(".return-page__reset-button").on("click", function (arg) { return _this.onClick("resetPlayer"); });
     };
     ReturnArea.prototype.onClick = function (typeCommand) {
-        this.sendData(JSON.stringify({ Type: "playAgain" }));
+        this.sendData(JSON.stringify({ Type: typeCommand }));
     };
     ReturnArea.prototype.leave = function () {
     };
     ReturnArea.prototype.process = function (data) {
-        if (data.message === "playerInfo") {
+        if (data.command === "playerInfo") {
             this.playerInfo = data;
             this.render();
         }
