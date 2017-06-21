@@ -16,7 +16,7 @@ namespace DoubleMaze.Game
         GameOver,
         Goto,
         WaitOpponent,
-        WelcomePlayerInfo
+        PlayerInfo
     }
 
     public class PlayerPos : IGameCommand
@@ -85,11 +85,11 @@ namespace DoubleMaze.Game
         public Areas area { get; set; }
     }
 
-    public class ReturnPlayerInfo : IGameCommand
+    public class PlayerInfo : IGameCommand
     {
-        public GameCommand command => GameCommand.WelcomePlayerInfo;
-        public double Rating { get; set; }
-        public string Name { get; set; }
+        public GameCommand command => GameCommand.PlayerInfo;
+        public double rating { get; set; }
+        public string name { get; set; }
     }
 
     public class WaitOpponent : IGameCommand

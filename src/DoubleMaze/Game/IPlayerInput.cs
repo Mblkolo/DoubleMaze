@@ -77,7 +77,7 @@ namespace DoubleMaze.Game
         public InputType Type => InputType.PlayAgain;
     }
 
-    class ResetPlayer : IPlayerInput
+    class ResetPlayerInput : IPlayerInput
     {
         public InputType Type => InputType.ResetPlayer;
     }

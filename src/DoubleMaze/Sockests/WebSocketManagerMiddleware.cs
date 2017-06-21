@@ -259,6 +259,9 @@ namespace DoubleMaze.Sockests
             if (checker.Type == InputType.PlayAgain)
                 return JsonConvert.DeserializeObject<PlayAgainInput>(message);
 
+            if (checker.Type == InputType.ResetPlayer)
+                return JsonConvert.DeserializeObject<ResetPlayerInput>(message);
+
             throw new NotImplementedException();
         }
 

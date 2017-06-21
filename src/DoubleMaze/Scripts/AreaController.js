@@ -265,14 +265,25 @@ var ReturnArea = (function () {
     ReturnArea.prototype.enter = function () {
         var _this = this;
         $("#main-content").html($("#return-area-tempalte").html());
-        $(".return-play-button").on("click", function (arg) { return _this.onClick(arg); });
+        $(".return-page__play-again-button").on("click", function (arg) { return _this.onClick("playAgain"); });
+        $(".return-page__reset-button").on("click", function (arg) { return _this.onClick("resetPlayer"); });
     };
-    ReturnArea.prototype.onClick = function (arg) {
+    ReturnArea.prototype.onClick = function (typeCommand) {
         this.sendData(JSON.stringify({ Type: "playAgain" }));
     };
     ReturnArea.prototype.leave = function () {
     };
     ReturnArea.prototype.process = function (data) {
+        if (data.message === "playerInfo") {
+            this.playerInfo = data;
+            this.render();
+        }
+    };
+    ReturnArea.prototype.render = function () {
+        if (this.playerInfo != null) {
+            $(".return-page__my-name").text(this.playerInfo.name);
+            $(".return-page__my-rating").text(this.playerInfo.rating);
+        }
     };
     return ReturnArea;
 }());

@@ -346,18 +346,31 @@ class ReturnArea implements IArea {
 
     public enter() {
         $("#main-content").html($("#return-area-tempalte").html());
-        $(".return-play-button").on("click", (arg: JQueryEventObject) => this.onClick(arg));
+        $(".return-page__play-again-button").on("click", (arg: JQueryEventObject) => this.onClick("playAgain"));
+        $(".return-page__reset-button").on("click", (arg: JQueryEventObject) => this.onClick("resetPlayer"));
     }
 
-    public onClick(arg: JQueryEventObject) {
-        this.sendData(JSON.stringify({ Type: "playAgain" }));
+    public onClick(typeCommand: string) {
+        this.sendData(JSON.stringify({ Type: typeCommand }));
     }
 
     public leave() {
     }
 
+    private playerInfo;
     public process(data: any) {
+        if (data.command === "playerInfo") {
+            this.playerInfo = data;
+            this.render();
+        }
+    }
 
+    private render() {
+        if (this.playerInfo != null) {
+            $(".return-page__my-name").text(this.playerInfo.name)
+            $(".return-page__my-rating").text(this.playerInfo.rating)
+        }
+        
     }
 
 }

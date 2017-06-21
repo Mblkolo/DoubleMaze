@@ -22,10 +22,10 @@ namespace DoubleMaze.Game.Areas
             var context = state.Players[playerId];
 
             context.Output.Post(new GotoCommand { area = GotoCommand.Areas.Return });
-            context.Output.Post(new ReturnPlayerInfo
+            context.Output.Post(new PlayerInfo
             {
-                Name = context.Name,
-                Rating = context.Rating.Value
+                name = context.Name,
+                rating = context.Rating.Value
             });
         }
 
@@ -41,7 +41,7 @@ namespace DoubleMaze.Game.Areas
                 return;
             }
 
-            if(inputCommand is ResetPlayer)
+            if(inputCommand is ResetPlayerInput)
             {
                 var context = state.Players[playerId];
                 context.ResetPlayer();

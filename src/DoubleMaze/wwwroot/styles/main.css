@@ -201,11 +201,20 @@ html {
     font-size: 4rem;
     line-height: 8rem;
     width: 32rem;
-    margin-bottom: 10rem;
+    margin-bottom: 4rem;
+    margin-top: 6rem;
 }
 
 .return-page__reset-button {
     font-size: 2rem;
     line-height: 4rem;
     width: 32rem;
+}
+
+.return-page__intro {
+    font-size: 2rem;
+    width: 60rem;
+    margin-top: 9rem;
+    margin-bottom: 7rem;
+    text-align: center;
 }
