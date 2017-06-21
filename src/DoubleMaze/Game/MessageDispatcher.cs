@@ -44,6 +44,12 @@ namespace DoubleMaze.Game
             Name = storeData.Name;
         }
 
+        internal void ResetPlayer()
+        {
+            Rating = new Rating();
+            Name = null;
+        }
+
         private PlayerContex(Guid id, BufferBlock<IGameCommand> output, Rating rating)
         {
             Output = output;
@@ -91,7 +97,7 @@ namespace DoubleMaze.Game
                 state.OldPlayers.Remove(connection.PlayerId);
                 state.Players.Add(connection.PlayerId, playerContext);
 
-                playerContext.SetHandler(new WelcomeAreaHandler(connection.PlayerId, state));
+                playerContext.SetHandler(new ReturnAreaHandler(connection.PlayerId, state));
             }
             else if (state.Players.ContainsKey(connection.PlayerId))
             {

@@ -77,14 +77,15 @@ namespace DoubleMaze.Game
         public enum Areas
         {
             Welcome,
-            Game
+            Game,
+            Return
         }
 
         public GameCommand command => GameCommand.Goto;
         public Areas area { get; set; }
     }
 
-    public class WelcomePlayerInfo : IGameCommand
+    public class ReturnPlayerInfo : IGameCommand
     {
         public GameCommand command => GameCommand.WelcomePlayerInfo;
         public double Rating { get; set; }

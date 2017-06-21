@@ -196,3 +196,16 @@ html {
     border-bottom: #fff 1px solid;
     border-top: #fff 1px solid;
 }
+
+.return-page__play-again-button {
+    font-size: 4rem;
+    line-height: 8rem;
+    width: 32rem;
+    margin-bottom: 10rem;
+}
+
+.return-page__reset-button {
+    font-size: 2rem;
+    line-height: 4rem;
+    width: 32rem;
+}

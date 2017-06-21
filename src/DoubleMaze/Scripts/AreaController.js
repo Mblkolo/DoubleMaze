@@ -7,6 +7,7 @@ var AreaController = (function () {
         this.areas["loading"] = function () { return new LoadingArea(sendData); };
         this.areas["welcome"] = function () { return new WelcomeArea(sendData); };
         this.areas["game"] = function () { return new GameArea(sendData); };
+        this.areas["return"] = function () { return new ReturnArea(sendData); };
     }
     AreaController.prototype.gotoArea = function (area) {
         if (this.currentArea != null) {
@@ -256,5 +257,23 @@ var PlayerPosition = (function () {
         };
     };
     return PlayerPosition;
+}());
+var ReturnArea = (function () {
+    function ReturnArea(sendData) {
+        this.sendData = sendData;
+    }
+    ReturnArea.prototype.enter = function () {
+        var _this = this;
+        $("#main-content").html($("#return-area-tempalte").html());
+        $(".return-play-button").on("click", function (arg) { return _this.onClick(arg); });
+    };
+    ReturnArea.prototype.onClick = function (arg) {
+        this.sendData(JSON.stringify({ Type: "playAgain" }));
+    };
+    ReturnArea.prototype.leave = function () {
+    };
+    ReturnArea.prototype.process = function (data) {
+    };
+    return ReturnArea;
 }());
 //# sourceMappingURL=AreaController.js.map

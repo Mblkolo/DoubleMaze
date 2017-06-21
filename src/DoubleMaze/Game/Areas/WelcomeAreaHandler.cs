@@ -20,11 +20,6 @@ namespace DoubleMaze.Game.Areas
             var output = context.Output;
 
             output.Post(new GotoCommand { area = GotoCommand.Areas.Welcome });
-            output.Post(new WelcomePlayerInfo
-            {
-                Name = context.Name,
-                Rating = context.Rating.Value
-            });
         }
 
         public void PlayerLeft()

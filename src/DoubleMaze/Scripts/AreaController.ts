@@ -9,6 +9,7 @@ export class AreaController {
         this.areas["loading"] = () => new LoadingArea(sendData);
         this.areas["welcome"] = () => new WelcomeArea(sendData);
         this.areas["game"] = () => new GameArea(sendData);
+        this.areas["return"] = () => new ReturnArea(sendData);
     }
 
     public gotoArea(area: string) {
@@ -335,3 +336,28 @@ class PlayerPosition {
 
 }
 
+
+class ReturnArea implements IArea {
+    private sendData: (data: any) => void;
+
+    public constructor(sendData: (data: any) => void) {
+        this.sendData = sendData;
+    }
+
+    public enter() {
+        $("#main-content").html($("#return-area-tempalte").html());
+        $(".return-play-button").on("click", (arg: JQueryEventObject) => this.onClick(arg));
+    }
+
+    public onClick(arg: JQueryEventObject) {
+        this.sendData(JSON.stringify({ Type: "playAgain" }));
+    }
+
+    public leave() {
+    }
+
+    public process(data: any) {
+
+    }
+
+}
