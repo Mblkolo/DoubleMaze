@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -30,13 +31,23 @@ namespace DoubleMaze.Sockests
                 return;
 
             var socket = await context.WebSockets.AcceptWebSocketAsync();
-            await Receive(socket);
+            PlayerConnection playerConnection = null;
+            try
+            {
+                playerConnection = await LoginPlayer(socket);
+                await Receive(socket, playerConnection);
+            }
+            finally
+            {
+                if (playerConnection != null)
+                    _outConnectionManager.ConnectionClosed(playerConnection.ConnectionId);
+            }
 
             //TODO - investigate the Kestrel exception thrown when this is the last middleware
             //await _next.Invoke(context);
         }
 
-        private async Task Receive(WebSocket socket)
+        private async Task<PlayerConnection> LoginPlayer(WebSocket socket)
         {
             byte[] buffer = new byte[1024 * 4];
 
@@ -45,53 +56,119 @@ namespace DoubleMaze.Sockests
             if (loginInput == null)
                 throw new Exception($"Это не {nameof(TokenInput)}");
 
-            Guid playerId = _outConnectionManager.PlayerConnected(loginInput.Token, socket);
-            await socket.SendDataAsync(new SetTokenCommand { token = playerId.ToString("N") });
+            PlayerConnection playerConnection = _outConnectionManager.PlayerConnected(loginInput.Token, socket);
+            await socket.SendDataAsync(new SetTokenCommand { token = playerConnection.PlayerId.ToString("N") });
 
-            _world.InputQueue.Post(new PlayerConnected(playerId, _outConnectionManager.GetQueue(playerId)));
+            return playerConnection;
+        }
+
+        private async Task Receive(WebSocket socket, PlayerConnection playerConnection)
+        {
+            byte[] buffer = new byte[1024 * 4];
+
+            _world.InputQueue.Post(new PlayerConnected(playerConnection.PlayerId, playerConnection.OutputChanel.InputQueue));
             while (socket.State == WebSocketState.Open)
             {
-                input = await socket.ReadInputAsync(buffer);
-                _world.InputQueue.Post(new PlayerInput(playerId, input));
+                var input = await socket.ReadInputAsync(buffer);
+                _world.InputQueue.Post(new PlayerInput(playerConnection.PlayerId, input));
             }
         }
+    }
+
+    public class PlayerConnection
+    {
+        public Guid ConnectionId { get; }
+        public OutputChanel OutputChanel { get; }
+        public Guid PlayerId { get; }
+        public WebSocket WebSocket { get; }
+
+        public PlayerConnection(Guid playerId, WebSocket socket)
+        {
+            PlayerId = playerId;
+
+            ConnectionId = Guid.NewGuid();
+            OutputChanel = new OutputChanel(socket);
+            WebSocket = socket;
+        }
+
     }
 
     public class OutputConnectionManager
     {
         private object Locker = new object();
-        private Dictionary<Guid, OutputChanel> PlayerChanals = new Dictionary<Guid, OutputChanel>();
+        private List<PlayerConnection> PlayerConnections = new List<PlayerConnection>();
+        private Dictionary<Guid, Timer> TimeoutTimers = new Dictionary<Guid, Timer>();
 
+        private Action<Guid> playerDisconnected;
 
-        internal BufferBlock<IGameCommand> GetQueue(Guid playerId)
+        public OutputConnectionManager(Action<Guid> playerDisconnected)
         {
-            lock (Locker)
-            {
-                return PlayerChanals[playerId].InputQueue;
-            }
+            this.playerDisconnected = playerDisconnected;
         }
 
-        internal Guid PlayerConnected(string login, WebSocket socket)
+        internal PlayerConnection PlayerConnected(string tokenString, WebSocket socket)
         {
             lock(Locker)
             {
                 Guid playerId;
-                if (Guid.TryParse(login, out playerId) == false)
+                if (Guid.TryParse(tokenString, out playerId) == false)
                     playerId = Guid.NewGuid();
 
-                if (PlayerChanals.ContainsKey(playerId))
-                {
-                    PlayerChanals[playerId].SetSocket(socket);
-                }
-                else
-                {
-                    playerId = Guid.NewGuid();
-                    PlayerChanals[playerId] = new OutputChanel(socket);
-                }
+                foreach(var connection in PlayerConnections.Where(x => x.PlayerId == playerId).ToArray())
+                    RemoveConnection(connection);
 
-                return playerId;
+                var newConnection = new PlayerConnection(playerId, socket);
+                PlayerConnections.Add(newConnection);
+                
+                DisploseAndRemoveTimer(playerId);
+
+                return newConnection;
             }
         }
+        
+        private void RemoveConnection(PlayerConnection connection)
+        {
+            connection.OutputChanel.InputQueue.Complete();
+            PlayerConnections.Remove(connection);
+        }
+
+        internal void ConnectionClosed(Guid connectionId)
+        {
+            lock (Locker)
+            {
+                var connection = PlayerConnections.Where(x => x.ConnectionId == connectionId).SingleOrDefault();
+                if (connection == null)
+                    return;
+
+                RemoveConnection(connection);
+
+                var timer = new Timer(TimeoutPlayer, connection.PlayerId, TimeSpan.FromSeconds(10), Timeout.InfiniteTimeSpan);
+                TimeoutTimers.Add(connection.PlayerId, timer);
+            }
+        }
+
+        private void TimeoutPlayer(object playerIdObject)
+        {
+            Guid playerId = (Guid)playerIdObject;
+            lock (Locker)
+            {
+                if (TimeoutTimers.ContainsKey(playerId) == false)
+                    return;
+
+                DisploseAndRemoveTimer(playerId);
+                playerDisconnected(playerId);
+            }
+        }
+
+        private void DisploseAndRemoveTimer(Guid playerId)
+        {
+            if(TimeoutTimers.ContainsKey(playerId))
+            {
+                TimeoutTimers[playerId].Dispose();
+                TimeoutTimers.Remove(playerId);
+            }
+        }
+
     }
 
     public class OutputChanel
@@ -122,6 +199,8 @@ namespace DoubleMaze.Sockests
 
                     await socket.SendDataAsync(data);
                 }
+                Console.WriteLine("Игрок отключился");
+                await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Да нормально всё!", CancellationToken.None);
             }
             catch(Exception e)
             {
@@ -141,9 +220,10 @@ namespace DoubleMaze.Sockests
                 return;
 
             var message = JsonConvert.SerializeObject(data);
-            await socket.SendAsync(buffer: new ArraySegment<byte>(array: Encoding.UTF8.GetBytes(message),
+            byte[] bytes = Encoding.UTF8.GetBytes(message);
+            await socket.SendAsync(buffer: new ArraySegment<byte>(array: bytes,
                                                                   offset: 0,
-                                                                  count: message.Length),
+                                                                  count: bytes.Length),
                                    messageType: WebSocketMessageType.Text,
                                    endOfMessage: true,
                                    cancellationToken: CancellationToken.None);
@@ -178,6 +258,9 @@ namespace DoubleMaze.Sockests
 
             if (checker.Type == InputType.PlayAgain)
                 return JsonConvert.DeserializeObject<PlayAgainInput>(message);
+
+            if (checker.Type == InputType.ResetPlayer)
+                return JsonConvert.DeserializeObject<ResetPlayerInput>(message);
 
             throw new NotImplementedException();
         }

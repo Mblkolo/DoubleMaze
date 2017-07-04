@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DoubleMaze.Game.Maze;
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks.Dataflow;
 
@@ -17,12 +19,12 @@ namespace DoubleMaze.Game
         private MazePlayer firstPlayer;
         private MazePlayer secondPlayer;
         private WorldState state;
-        private Guid gameId;
+        public Guid gameId;
         private MazeField mazeField;
 
         public SimpleMaze(WorldState state, Guid gameId, MazePlayer firstPlayer)
         {
-            mazeField = mazeGenerator.Generate(21, 19);
+            mazeField = mazeGenerator.Generate(31, 21);
             this.firstPlayer = firstPlayer;
             this.state = state;
             this.gameId = gameId;
@@ -56,46 +58,107 @@ namespace DoubleMaze.Game
 
             if (mazeField.WinZone.Contains(firstPlayer.GetCurrentCeil()) || mazeField.WinZone.Contains(secondPlayer.GetCurrentCeil()))
             {
-                IsFinished = true;
-                timer.Dispose();
+                firstPlayer.IsWin = mazeField.WinZone.Contains(firstPlayer.GetCurrentCeil());
+                secondPlayer.IsWin = mazeField.WinZone.Contains(secondPlayer.GetCurrentCeil());
+
+                FinishGame();
+
+                Rating.Update(firstPlayer.Rating, secondPlayer.Rating, firstPlayer.IsWin, secondPlayer.IsWin);
 
                 SendState(firstPlayer);
                 SendState(secondPlayer);
                 return;
             }
-            
-            firstPlayer.Output.Post(new PlayerPos
-            {
-                myPos = firstPlayer.GetPos(),
-                enemyPos = secondPlayer.GetPos()
-            });
 
-            secondPlayer.Output.Post(new PlayerPos
+            SendPosition(firstPlayer, secondPlayer);
+            SendPosition(secondPlayer, firstPlayer);
+        }
+
+        internal bool AllPlayersLeft()
+        {
+            return firstPlayer.IsLeft && secondPlayer?.IsLeft != false;
+        }
+
+        private static void SendPosition(MazePlayer player, MazePlayer enemyPlayer)
+        {
+            if (player.IsLeft)
+                return;
+
+            player.Output.Post(new PlayerPos
             {
-                myPos = secondPlayer.GetPos(),
-                enemyPos = firstPlayer.GetPos()
+                myPos = player.GetPos(),
+                enemyPos = enemyPlayer.GetPos()
             });
         }
 
         public void SendState(MazePlayer player)
         {
+            if(player.IsLeft)
+                return;
+
             if(IsStarted == false)
             {
-                player.Output.SendAsync(new WaitOpponent());
+                player.Output.Post(new WaitOpponent());
             }
             else if (IsFinished == false)
             {
-                player.Output.SendAsync(new MazeFieldCommand { field = mazeField.Field });
+                var enemy = GetEnemy(player);
+                var command = new MazeFieldCommand
+                {
+                    field = mazeField.Field,
+                    me = new MazeFieldCommandPlayer
+                    {
+                        name = player.Name,
+                        rating = player.Rating.RoundValue
+                    },
+                    enemy = new MazeFieldCommandPlayer
+                    {
+                        name = enemy.Name,
+                        rating = enemy.Rating.RoundValue
+                    }
+                };
+
+                player.Output.Post(command);
             }
             else
             {
+                var enemy = GetEnemy(player);
+
                 player.Output.Post(new GameOverCommand
                 {
-                    status = mazeField.WinZone.Contains(player.GetCurrentCeil())
+                    status = player.IsWin
                         ? GameOverCommand.Statuses.Win
-                        : GameOverCommand.Statuses.Lose
-                });
+                        : GameOverCommand.Statuses.Lose,
+
+                    ratings = state.Players.Select(x => new GameOverCommandRating
+                    {
+                        name = x.Value.Name,
+                        rating = x.Value.Rating.RoundValue,
+                        isMe = x.Key == player.Id,
+                        isEnemy = x.Key == enemy.Id
+                    })
+                    .OrderByDescending(x => x.rating)
+                    .ThenBy(x => x.name)
+                    .ToArray()
+            });
             }
+        }
+
+        private MazePlayer GetEnemy(MazePlayer player)
+        {
+            if (player == firstPlayer)
+                return secondPlayer;
+
+            if (player == secondPlayer)
+                return firstPlayer;
+
+            throw new Exception("Это не наш игрок!");
+        }
+
+        public void FinishGame()
+        {
+            IsFinished = true;
+            timer?.Dispose();
         }
     }
 
@@ -151,17 +214,22 @@ namespace DoubleMaze.Game
     public class MazePlayer
     {
         public InputCommand Сommand;
-        public readonly BufferBlock<IGameCommand> Output;
-
+        public BufferBlock<IGameCommand> Output => playerContex.Output;
+        public string Name => playerContex.Name;
+        public Rating Rating =>  playerContex.Rating;
+        public Guid Id => playerContex.Id;
+        public bool IsLeft { get; internal set; }
+        public bool IsWin { get; internal set; }
 
         private Point pos = new Point();
         private Point nextpos = new Point();
         private float progress = 0;
         private InputCommand currentCommand;
+        private PlayerContex playerContex;
 
-        public MazePlayer(BufferBlock<IGameCommand> output)
+        public MazePlayer(PlayerContex playerContex)
         {
-            Output = output;
+            this.playerContex = playerContex;
         }
 
         public Pos GetPos() => new Pos { x = pos.X * (1 - progress) + nextpos.X * progress, y = pos.Y * (1 - progress) + nextpos.Y * progress };

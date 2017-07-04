@@ -2,30 +2,31 @@
 using System.Linq;
 using System.Threading.Tasks.Dataflow;
 
-namespace DoubleMaze.Game
+namespace DoubleMaze.Game.Areas
 {
-    public class GameAreaHandler : IPlayerHandler
+    public class GameAreaHandler : IAreaHandler
     {
         private readonly Guid playerId;
         private readonly WorldState state;
-        private readonly MazePlayer player;
+
+        private readonly MazePlayer mazePlayer;
         private readonly SimpleMaze game;
 
         public GameAreaHandler(Guid playerId, WorldState state)
         {
             this.playerId = playerId;
             this.state = state;
-            player = new MazePlayer(state.Players[playerId].Output);
+            mazePlayer = new MazePlayer(state.Players[playerId]);
 
             game = state.Games.Values.SingleOrDefault(x => x.IsStarted == false);
             if (game == null)
             {
                 Guid gameId = Guid.NewGuid();
-                game = new SimpleMaze(state, gameId, player);
+                game = new SimpleMaze(state, gameId, mazePlayer);
                 state.Games.Add(gameId, game);
             }
             else
-                game.Join(player);
+                game.Join(mazePlayer);
         }
 
         public void Process(IPlayerInput inputCommand)
@@ -35,8 +36,7 @@ namespace DoubleMaze.Game
             {
                 if(game.IsFinished)
                 {
-                    state.Players[playerId].PlayerHandler = new GameAreaHandler(playerId, state);
-                    state.Players[playerId].PlayerHandler.PlayerJoin();
+                    state.Players[playerId].SetHandler(new GameAreaHandler(playerId, state));
                 }
                 return;
             }
@@ -44,13 +44,24 @@ namespace DoubleMaze.Game
 
             var o = inputCommand as KeyDownInput;
             if (o != null)
-                player.Сommand = o.Command;
+                mazePlayer.Сommand = o.Command;
         }
 
         public void PlayerJoin()
         {
-            player.Output.Post(new GotoCommand { area = GotoCommand.Areas.Game });
-            game.SendState(player);
+            mazePlayer.Output.Post(new GotoCommand { area = GotoCommand.Areas.Game });
+            game.SendState(mazePlayer);
+        }
+
+        public void PlayerLeft()
+        {
+            mazePlayer.IsLeft = true;
+
+            if (game.AllPlayersLeft())
+            {
+                game.FinishGame();
+                state.Games.Remove(game.gameId);
+            }
         }
     }
 }

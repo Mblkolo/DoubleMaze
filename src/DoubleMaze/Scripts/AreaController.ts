@@ -2,13 +2,14 @@
 import {KeyCode} from "./key_code.ts";
 
 export class AreaController {
-    private areas: { [id: string]: IArea } = {};
+    private areas: { [id: string]: () => IArea } = {};
     private currentArea: IArea = null;
 
     public constructor(sendData: (data: any) => void) {
-        this.areas["loading"] = new LoadingArea(sendData);
-        this.areas["welcome"] = new WelcomeArea(sendData);
-        this.areas["game"] = new GameArea(sendData);
+        this.areas["loading"] = () => new LoadingArea(sendData);
+        this.areas["welcome"] = () => new WelcomeArea(sendData);
+        this.areas["game"] = () => new GameArea(sendData);
+        this.areas["return"] = () => new ReturnArea(sendData);
     }
 
     public gotoArea(area: string) {
@@ -16,7 +17,7 @@ export class AreaController {
             this.currentArea.leave();
         }
 
-        this.currentArea = this.areas[area];
+        this.currentArea = this.areas[area]();
         this.currentArea.enter();
     }
 
@@ -67,7 +68,7 @@ class WelcomeArea implements IArea {
     }
 
     public onClick(arg: JQueryEventObject) {
-        const name = $("welcome-player-name").val();
+        const name = $(".welcome-player-name").val();
         this.sendData(JSON.stringify({ Type: "PlayerName", Name: name }));
     }
 
@@ -82,6 +83,7 @@ class WelcomeArea implements IArea {
 
 class GameArea implements IArea {
     private sendData: (data: any) => void;
+    private onKeyDownHandler = (arg: JQueryEventObject) => this.onKeyDown(arg);
 
     public constructor(sendData: (data: any) => void) {
         this.sendData = sendData;
@@ -89,15 +91,25 @@ class GameArea implements IArea {
 
     public enter() {
         $("#main-content").html($("#game-area-tempalte").html());
-        $("#game-canvas").on("keydown", (arg: JQueryEventObject) => this.onKeyDown(arg));
+        $(document).on("keydown", this.onKeyDownHandler);
         $(".game-gameover-screen-button").on("click", (arg: JQueryEventObject) => this.onPlayAgain(arg));
     }
 
     public leave() {
+        $(document).off("keydown", this.onKeyDownHandler);
+
         this.state = null;
     }
 
     private onKeyDown(e: JQueryEventObject) {
+        if (e.keyCode == KeyCode.DOWN_ARROW
+            || e.keyCode == KeyCode.UP_ARROW
+            || e.keyCode == KeyCode.LEFT_ARROW
+            || e.keyCode == KeyCode.RIGHT_ARROW) {
+
+            e.preventDefault();
+        }
+
         if (e.keyCode === KeyCode.DOWN_ARROW || e.keyCode === KeyCode.KEY_S) {
             this.sendKey("Down", e);
         }
@@ -128,12 +140,13 @@ class GameArea implements IArea {
         }
         if (data.command === "mazeFeild") {
             this.state = "mazeFeild";
-            this.mazeField = data.field;
+            this.mazeField = data;
+
             this.drawLoop();
         }
         if (data.command === "gameOver") {
             this.state = "gameOver";
-            this.isWin = data.status === "win";
+            this.gameOver = data;
         }
 
         if (data.command === "playerState")
@@ -144,79 +157,136 @@ class GameArea implements IArea {
 
     private state: string;
     private mazeField: any;
-    private isWin: boolean;
+    private gameOver: any;
 
     private render() {
         $("#game-wait-screen").toggleClass("hidden", this.state !== "waitOpponent");
         $("#game-canvas-screen").toggleClass("hidden", this.state !== "mazeFeild");
         $("#game-gameover-screen").toggleClass("hidden", this.state !== "gameOver");
+
+        if (this.state === "mazeFeild") {
+            $(".game-canvas-my-name").text(this.mazeField.me.name).prop("title", this.mazeField.me.name);
+            $(".game-canvas-my-rating").text(this.mazeField.me.rating);
+            $(".game-canvas-enemy-name").text(this.mazeField.enemy.name).prop("title", this.mazeField.enemy.name);
+            $(".game-canvas-enemy-rating").text(this.mazeField.enemy.rating);
+        }
+
         if (this.state === "gameOver") {
-            $("#game-gameover-screen .winner").toggleClass("hidden", this.isWin == false);
-            $("#game-gameover-screen .looser").toggleClass("hidden", this.isWin);
+            $("#game-gameover-screen .winner").toggleClass("hidden", this.gameOver.status !== "win");
+            $("#game-gameover-screen .looser").toggleClass("hidden", this.gameOver.status === "win");
+
+            for (let i = 0; i < this.gameOver.ratings.length; ++i) {
+                const rating = this.gameOver.ratings[i];
+                $(".game-canvas-ratings").append(`<tr><td>${i + 1}</td><td></td><td></td></tr>`);
+
+                const cells = $(".game-canvas-ratings").children().last().children();
+                cells.eq(1).text(rating.name).prop("title", rating.name);
+                cells.eq(2).text(rating.rating);
+
+                if (rating.isMe)
+                    cells.eq(0).addClass("my-name");
+
+                if (rating.isEnemy)
+                    cells.eq(0).addClass("enemy-name");
+            }
+            
+
+
         }
     }
 
-    private currentPos = { x: 0, y: 0 };
-    private serverPos = { x: 0, y: 0 };
     private serverTime = 0;
-    private secondPlayerPos = { x: 0, y: 0 };
+    private playerPos: PlayerPosition;
+    private enemyPos: PlayerPosition;
 
     private moveTo(myPos, enemyPos) {
-        this.secondPlayerPos = enemyPos;
+        if (this.enemyPos == null)
+            this.enemyPos = new PlayerPosition(enemyPos.x, enemyPos.y);
+        this.enemyPos.SetPos(enemyPos.x, enemyPos.y);
 
-        this.currentPos.x = this.serverPos.x;
-        this.currentPos.y = this.serverPos.y;
+        if (this.playerPos == null)
+            this.playerPos = new PlayerPosition(myPos.x, myPos.y);
 
-        this.serverPos.x = myPos.x;
-        this.serverPos.y = myPos.y;
+        this.playerPos.SetPos(myPos.x, myPos.y);
 
         this.serverTime = Date.now();
     }
 
+    private scale = 20;
+
     private drawOn(t) {
-        const scale = 20;
+        const scale = this.scale;
+        const mazeField = this.mazeField.field
 
         var ctx = ($("#game-canvas")[0] as HTMLCanvasElement).getContext("2d");
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
+        ctx.setTransform(1, 0, 0, 1, 10.5, 10.5);
         ctx.beginPath();
-        for (var y = 0; y < this.mazeField.length; ++y) {
-            for (var x = 0; x < this.mazeField[y].length; ++x) {
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+        //ctx.strokeStyle = "#227F32";
+        ctx.strokeStyle = "#333";
+        for (let y = 0; y < mazeField.length; ++y) {
+            for (let x = 0; x < mazeField[y].length; ++x) {
 
                 var topLeft = { x: x * scale, y: y * scale };
                 var topRight = { x: (x + 1) * scale, y: y * scale };
                 var bottomRight = { x: (x + 1) * scale, y: (y + 1) * scale };
                 var bottomLeft = { x: x * scale, y: (y + 1) * scale };
 
-                if ((this.mazeField[y][x] & 1) !== 0) {
+                if ((mazeField[y][x] & 1) !== 0) {
                     ctx.moveTo(topLeft.x, topLeft.y);
                     ctx.lineTo(topRight.x, topRight.y);
                 }
 
-                if ((this.mazeField[y][x] & 2) !== 0) {
+                if ((mazeField[y][x] & 2) !== 0) {
                     ctx.moveTo(topRight.x, topRight.y);
                     ctx.lineTo(bottomRight.x, bottomRight.y);
                 }
 
-                if ((this.mazeField[y][x] & 4) !== 0) {
+                if ((mazeField[y][x] & 4) !== 0) {
                     ctx.moveTo(bottomRight.x, bottomRight.y);
                     ctx.lineTo(bottomLeft.x, bottomLeft.y);
                 }
 
-                if ((this.mazeField[y][x] & 8) !== 0) {
+                if ((mazeField[y][x] & 8) !== 0) {
                     ctx.moveTo(bottomLeft.x, bottomLeft.y);
                     ctx.lineTo(topLeft.x, topLeft.y);
                 }
             }
         }
         ctx.stroke();
+        
 
+        if (this.playerPos != null) {
+            this.DrawPlayer(this.playerPos, ctx, t, "#227F32", 4);
+        }
 
-        var x = (this.currentPos.x * (1 - t) + this.serverPos.x * t) * scale;
-        var y = (this.currentPos.y * (1 - t) + this.serverPos.y * t) * scale;
-        ctx.fillRect(x + (scale - 5) / 2, y + (scale - 5) / 2, 5, 5);
+        if (this.enemyPos != null) {
+            this.DrawPlayer(this.enemyPos, ctx, t, "#bf0d31", 3);
+        }
+    }
 
-        ctx.fillRect(this.secondPlayerPos.x * scale + (scale - 5) / 2, this.secondPlayerPos.y * scale + (scale - 5) / 2, 5, 5);
+    private DrawPlayer(playerPos: PlayerPosition, ctx: CanvasRenderingContext2D, progress: number, color: string, size: number) {
+        ctx.fillStyle = color;
+
+        const pos = playerPos.GetPostion(progress);
+
+        const center = { x: (pos.x + 0.5) * this.scale, y: (pos.y + 0.5) * this.scale };
+        const delta = playerPos.GetDelta();
+        ctx.beginPath();
+        ctx.moveTo(center.x - delta.x * 25, center.y - delta.y * 25);
+        ctx.lineTo(center.x + (delta.y === 0 ? 0 : 3), center.y + (delta.x === 0 ? 0 : 3));
+        ctx.lineTo(center.x + (delta.y === 0 ? 0 : -3), center.y + (delta.x === 0 ? 0 : -3));
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(center.x, center.y, size, 0, 2 * Math.PI);
+        ctx.closePath();
+        ctx.fill();
     }
 
 
@@ -233,3 +303,74 @@ class GameArea implements IArea {
     }
 }
 
+class PlayerPosition {
+    public currentPos: { x: number, y: number };
+    public nextPos: { x: number, y: number };
+
+    public constructor(x: number, y: number) {
+        this.currentPos = { x: x, y: y }
+        this.nextPos = { x: x, y: y }
+    }
+
+    public SetPos(x: number, y: number) {
+        this.currentPos.x = this.nextPos.x;
+        this.currentPos.y = this.nextPos.y;
+
+        this.nextPos.x = x;
+        this.nextPos.y = y;
+    }
+    
+    public GetPostion(progress: number) {
+        return {
+            x: (this.currentPos.x * (1 - progress) + this.nextPos.x * progress),
+            y: (this.currentPos.y * (1 - progress) + this.nextPos.y * progress)
+        }
+    }
+
+    public GetDelta() {
+        return {
+            x: (this.nextPos.x - this.currentPos.x),
+            y: (this.nextPos.y - this.currentPos.y)
+        }
+    }
+
+}
+
+
+class ReturnArea implements IArea {
+    private sendData: (data: any) => void;
+
+    public constructor(sendData: (data: any) => void) {
+        this.sendData = sendData;
+    }
+
+    public enter() {
+        $("#main-content").html($("#return-area-tempalte").html());
+        $(".return-page__play-again-button").on("click", (arg: JQueryEventObject) => this.onClick("playAgain"));
+        $(".return-page__reset-button").on("click", (arg: JQueryEventObject) => this.onClick("resetPlayer"));
+    }
+
+    public onClick(typeCommand: string) {
+        this.sendData(JSON.stringify({ Type: typeCommand }));
+    }
+
+    public leave() {
+    }
+
+    private playerInfo;
+    public process(data: any) {
+        if (data.command === "playerInfo") {
+            this.playerInfo = data;
+            this.render();
+        }
+    }
+
+    private render() {
+        if (this.playerInfo != null) {
+            $(".return-page__my-name").text(this.playerInfo.name)
+            $(".return-page__my-rating").text(this.playerInfo.rating)
+        }
+        
+    }
+
+}
