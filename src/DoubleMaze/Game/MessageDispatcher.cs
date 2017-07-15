@@ -1,8 +1,8 @@
 ﻿using DoubleMaze.Game.Areas;
 using DoubleMaze.Game.Maze;
+using DoubleMaze.Infrastructure;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game
 {
@@ -13,7 +13,7 @@ namespace DoubleMaze.Game
 
         public Dictionary<Guid, PlayerStoreData> OldPlayers = new Dictionary<Guid, PlayerStoreData>();
 
-        public BufferBlock<IMessage> InputQueue;
+        public Pipe<IMessage> InputQueue;
     }
 
     public class PlayerStoreData
@@ -26,19 +26,19 @@ namespace DoubleMaze.Game
     public class PlayerContex
     {
         public Guid Id { get; }
-        public BufferBlock<IGameCommand> Output { get; set; }
+        public Pipe<IGameCommand> Output { get; set; }
         public IAreaHandler PlayerHandler { get; private set; }
 
         public string Name { get; set; }
         public Rating Rating { get; private set; }
 
-        public PlayerContex(Guid id, BufferBlock<IGameCommand> output)
+        public PlayerContex(Guid id, Pipe<IGameCommand> output)
             : this(id, output, new Rating())
         {
 
         }
 
-        public PlayerContex(PlayerStoreData storeData, BufferBlock<IGameCommand> output)
+        public PlayerContex(PlayerStoreData storeData, Pipe<IGameCommand> output)
             : this(storeData.Id, output, storeData.Rating)
         {
             Name = storeData.Name;
@@ -50,7 +50,7 @@ namespace DoubleMaze.Game
             Name = null;
         }
 
-        private PlayerContex(Guid id, BufferBlock<IGameCommand> output, Rating rating)
+        private PlayerContex(Guid id, Pipe<IGameCommand> output, Rating rating)
         {
             Output = output;
             Id = id;
@@ -83,7 +83,7 @@ namespace DoubleMaze.Game
         //private BufferBlock<IMessage> inputQueue;
         private WorldState state;
 
-        public MessageDispatcher(BufferBlock<IMessage> inputQueue)
+        public MessageDispatcher(Pipe<IMessage> inputQueue)
         {
             state = new WorldState();
             state.InputQueue = inputQueue;

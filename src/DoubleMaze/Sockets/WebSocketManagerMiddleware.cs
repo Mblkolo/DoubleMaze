@@ -171,47 +171,6 @@ namespace DoubleMaze.Sockets
 
     }
 
-    public class OutputChanel
-    {
-        public readonly BufferBlock<IGameCommand> InputQueue;
-        private readonly Task mainLoop;
-        private volatile WebSocket socket;
-
-        public OutputChanel(WebSocket socket)
-        {
-            this.socket = socket;
-            InputQueue = new BufferBlock<IGameCommand>();
-            mainLoop = MainLoop(InputQueue);
-        }
-
-        internal void SetSocket(WebSocket socket)
-        {
-            this.socket = socket;
-        }
-
-        private async Task MainLoop(BufferBlock<IGameCommand> messages)
-        {
-            try
-            {
-                while (await messages.OutputAvailableAsync())
-                {
-                    IGameCommand data = await messages.ReceiveAsync();
-
-                    await socket.SendDataAsync(data);
-                }
-                Console.WriteLine("Игрок отключился");
-                await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Да нормально всё!", CancellationToken.None);
-            }
-            catch(Exception e)
-            {
-                throw;
-            }
-        }
-
-
-
-    }
-
     public static class WebSocketIoExtensions
     {
         public static async Task SendDataAsync(this WebSocket socket, IGameCommand data)

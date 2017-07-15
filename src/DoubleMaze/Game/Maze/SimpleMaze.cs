@@ -1,8 +1,8 @@
 ﻿using DoubleMaze.Game.Maze;
+using DoubleMaze.Infrastructure;
 using System;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game
 {
@@ -214,7 +214,7 @@ namespace DoubleMaze.Game
     public class MazePlayer
     {
         public InputCommand Сommand;
-        public BufferBlock<IGameCommand> Output => playerContex.Output;
+        public Pipe<IGameCommand> Output => playerContex.Output;
         public string Name => playerContex.Name;
         public Rating Rating =>  playerContex.Rating;
         public Guid Id => playerContex.Id;
