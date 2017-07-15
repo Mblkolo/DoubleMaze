@@ -8,6 +8,7 @@ export class AreaController {
     public constructor(sendData: (data: any) => void) {
         this.areas["loading"] = () => new LoadingArea(sendData);
         this.areas["welcome"] = () => new WelcomeArea(sendData);
+        this.areas["wait"] = () => new WaitArea(sendData);
         this.areas["game"] = () => new GameArea(sendData);
         this.areas["return"] = () => new ReturnArea(sendData);
     }
@@ -63,7 +64,7 @@ class WelcomeArea implements IArea {
     }
 
     public enter() {
-        $("#main-content").html($("#welcome-area-tempalte").html());
+        $("#main-content").html($("#welcome-area-template").html());
         $(".welcome-play-button").on("click", (arg: JQueryEventObject) => this.onClick(arg));
     }
 
@@ -81,6 +82,24 @@ class WelcomeArea implements IArea {
 
 }
 
+class WaitArea implements IArea {
+    private sendData: (data: any) => void;
+
+    public constructor(sendData: (data: any) => void) {
+        this.sendData = sendData;
+    }
+
+    public enter() {
+        $("#main-content").html($("#wait-area-template").html());
+    }
+
+    public leave() {
+    }
+
+    public process(data: any) {
+
+    }
+}
 class GameArea implements IArea {
     private sendData: (data: any) => void;
     private onKeyDownHandler = (arg: JQueryEventObject) => this.onKeyDown(arg);
@@ -90,7 +109,7 @@ class GameArea implements IArea {
     }
 
     public enter() {
-        $("#main-content").html($("#game-area-tempalte").html());
+        $("#main-content").html($("#game-area-template").html());
         $(document).on("keydown", this.onKeyDownHandler);
         $(".game-gameover-screen-button").on("click", (arg: JQueryEventObject) => this.onPlayAgain(arg));
     }
@@ -345,7 +364,7 @@ class ReturnArea implements IArea {
     }
 
     public enter() {
-        $("#main-content").html($("#return-area-tempalte").html());
+        $("#main-content").html($("#return-area-template").html());
         $(".return-page__play-again-button").on("click", (arg: JQueryEventObject) => this.onClick("playAgain"));
         $(".return-page__reset-button").on("click", (arg: JQueryEventObject) => this.onClick("resetPlayer"));
     }
