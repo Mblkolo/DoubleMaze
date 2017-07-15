@@ -1,4 +1,5 @@
 ﻿using DoubleMaze.Game.Areas;
+using DoubleMaze.Game.Bots;
 using DoubleMaze.Game.Maze;
 using DoubleMaze.Infrastructure;
 using System;
@@ -14,6 +15,8 @@ namespace DoubleMaze.Game
         public Dictionary<Guid, PlayerStoreData> OldPlayers = new Dictionary<Guid, PlayerStoreData>();
 
         public Pipe<IMessage> InputQueue;
+
+        public Dictionary<Guid, Bot> Bots = new Dictionary<Guid, Bot>();
     }
 
     public class PlayerStoreData
@@ -87,6 +90,9 @@ namespace DoubleMaze.Game
         {
             state = new WorldState();
             state.InputQueue = inputQueue;
+
+            var bot = new Bot(inputQueue, "Crazy");
+            state.Bots.Add(bot.BotId, bot);
         }
 
         public void Process(PlayerConnected connection)

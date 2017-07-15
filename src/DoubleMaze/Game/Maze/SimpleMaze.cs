@@ -84,7 +84,7 @@ namespace DoubleMaze.Game
             if (player.IsLeft)
                 return;
 
-            player.Output.Post(new PlayerPos
+            player.Output.Post(new PlayerPosCommand
             {
                 myPos = player.GetPos(),
                 enemyPos = enemyPlayer.GetPos()

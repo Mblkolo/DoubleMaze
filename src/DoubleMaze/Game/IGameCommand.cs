@@ -19,7 +19,7 @@ namespace DoubleMaze.Game
         PlayerInfo
     }
 
-    public class PlayerPos : IGameCommand
+    public class PlayerPosCommand : IGameCommand
     {
         public GameCommand command => GameCommand.PlayerState;
         public Pos myPos { get; set; }
