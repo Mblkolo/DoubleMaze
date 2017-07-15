@@ -22,8 +22,14 @@ namespace DoubleMaze.Game.Areas
             }
             else
             {
-                state.Players[state.WaitPlayer.Value].SetHandler(new GameAreaHandler(state.WaitPlayer.Value, state));
-                state.Players[playerId].SetHandler(new GameAreaHandler(playerId, state));
+                var secondPlayer = new MazePlayer(state.Players[playerId]);
+                var firstPlayer = new MazePlayer(state.Players[state.WaitPlayer.Value]);
+
+                var game = new SimpleMaze(state, Guid.NewGuid(), firstPlayer, secondPlayer);
+                state.Games.Add(game.GameId, game);
+
+                state.Players[firstPlayer.Id].SetHandler(new GameAreaHandler(firstPlayer.Id, state, game, firstPlayer));
+                state.Players[secondPlayer.Id].SetHandler(new GameAreaHandler(secondPlayer.Id, state, game, secondPlayer));
             }
         }
 

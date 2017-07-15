@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game.Areas 
 {
@@ -37,7 +33,7 @@ namespace DoubleMaze.Game.Areas
         {
             if(inputCommand is PlayAgainInput)
             {
-                state.Players[playerId].SetHandler(new GameAreaHandler(playerId, state));
+                state.Players[playerId].SetHandler(new WaitGameHandler(playerId, state));
                 return;
             }
 

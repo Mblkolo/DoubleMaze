@@ -19,33 +19,21 @@ namespace DoubleMaze.Game
         private MazePlayer firstPlayer;
         private MazePlayer secondPlayer;
         private WorldState state;
-        public Guid gameId;
+        public Guid GameId;
         private MazeField mazeField;
 
-        public SimpleMaze(WorldState state, Guid gameId, MazePlayer firstPlayer)
+        public SimpleMaze(WorldState state, Guid gameId, MazePlayer firstPlayer, MazePlayer secondPlayer)
         {
             mazeField = mazeGenerator.Generate(31, 21);
-            this.firstPlayer = firstPlayer;
             this.state = state;
-            this.gameId = gameId;
-        }
-
-
-        public void Join(MazePlayer secondPlayer)
-        {
-            if (this.secondPlayer != null)
-                throw new ArgumentException(nameof(secondPlayer));
-
+            GameId = gameId;
+            this.firstPlayer = firstPlayer;
             this.secondPlayer = secondPlayer;
-            secondPlayer.SetStart(mazeField.Field.GetLength(1)-1, mazeField.Field.GetLength(0)-1);
 
-            timer = new Timer(x => state.InputQueue.Post(new GameUpdate(gameId)), new object(), 100, 100);
-
-            SendState(firstPlayer);
-            SendState(secondPlayer);
+            secondPlayer.SetStart(mazeField.Field.GetLength(1) - 1, mazeField.Field.GetLength(0) - 1);
+            timer = new Timer(x => state.InputQueue.Post(new GameUpdate(GameId)), new object(), 100, 100);
         }
 
-        public bool IsStarted => secondPlayer != null;
         public bool IsFinished { get; private set; } = false;
 
         public void Update()
@@ -96,11 +84,7 @@ namespace DoubleMaze.Game
             if(player.IsLeft)
                 return;
 
-            if(IsStarted == false)
-            {
-                player.Output.Post(new WaitOpponent());
-            }
-            else if (IsFinished == false)
+            if (IsFinished == false)
             {
                 var enemy = GetEnemy(player);
                 var command = new MazeFieldCommand

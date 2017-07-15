@@ -6,6 +6,7 @@ var AreaController = (function () {
         this.currentArea = null;
         this.areas["loading"] = function () { return new LoadingArea(sendData); };
         this.areas["welcome"] = function () { return new WelcomeArea(sendData); };
+        this.areas["wait"] = function () { return new WaitArea(sendData); };
         this.areas["game"] = function () { return new GameArea(sendData); };
         this.areas["return"] = function () { return new ReturnArea(sendData); };
     }
@@ -50,7 +51,7 @@ var WelcomeArea = (function () {
     }
     WelcomeArea.prototype.enter = function () {
         var _this = this;
-        $("#main-content").html($("#welcome-area-tempalte").html());
+        $("#main-content").html($("#welcome-area-template").html());
         $(".welcome-play-button").on("click", function (arg) { return _this.onClick(arg); });
     };
     WelcomeArea.prototype.onClick = function (arg) {
@@ -63,6 +64,19 @@ var WelcomeArea = (function () {
     };
     return WelcomeArea;
 }());
+var WaitArea = (function () {
+    function WaitArea(sendData) {
+        this.sendData = sendData;
+    }
+    WaitArea.prototype.enter = function () {
+        $("#main-content").html($("#wait-area-template").html());
+    };
+    WaitArea.prototype.leave = function () {
+    };
+    WaitArea.prototype.process = function (data) {
+    };
+    return WaitArea;
+}());
 var GameArea = (function () {
     function GameArea(sendData) {
         var _this = this;
@@ -73,7 +87,7 @@ var GameArea = (function () {
     }
     GameArea.prototype.enter = function () {
         var _this = this;
-        $("#main-content").html($("#game-area-tempalte").html());
+        $("#main-content").html($("#game-area-template").html());
         $(document).on("keydown", this.onKeyDownHandler);
         $(".game-gameover-screen-button").on("click", function (arg) { return _this.onPlayAgain(arg); });
     };
@@ -264,7 +278,7 @@ var ReturnArea = (function () {
     }
     ReturnArea.prototype.enter = function () {
         var _this = this;
-        $("#main-content").html($("#return-area-tempalte").html());
+        $("#main-content").html($("#return-area-template").html());
         $(".return-page__play-again-button").on("click", function (arg) { return _this.onClick("playAgain"); });
         $(".return-page__reset-button").on("click", function (arg) { return _this.onClick("resetPlayer"); });
     };

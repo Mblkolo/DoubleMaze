@@ -15,7 +15,6 @@ namespace DoubleMaze.Game
         SetToken,
         GameOver,
         Goto,
-        WaitOpponent,
         PlayerInfo
     }
 
@@ -92,10 +91,5 @@ namespace DoubleMaze.Game
         public GameCommand command => GameCommand.PlayerInfo;
         public double rating { get; set; }
         public string name { get; set; }
-    }
-
-    public class WaitOpponent : IGameCommand
-    {
-        public GameCommand command => GameCommand.WaitOpponent;
     }
 }
