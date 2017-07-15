@@ -15,12 +15,12 @@ namespace DoubleMaze.Game.Areas
 
         public void PlayerJoin()
         {
-            throw new NotImplementedException();
+            state.Players[playerId].Output.Post(new GotoCommand { area = GotoCommand.Areas.Stasis });
         }
 
         public void PlayerLeft()
         {
-            throw new NotImplementedException();
+            
         }
 
         public void Process(IPlayerInput inputCommand)

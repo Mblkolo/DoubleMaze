@@ -78,7 +78,9 @@ namespace DoubleMaze.Game
         {
             Welcome,
             Game,
-            Return
+            Return,
+            Wait,
+            Stasis
         }
 
         public GameCommand command => GameCommand.Goto;

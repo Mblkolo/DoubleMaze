@@ -11,6 +11,7 @@ namespace DoubleMaze.Game
     {
         public Dictionary<Guid, PlayerContex> Players = new Dictionary<Guid, PlayerContex>();
         public Dictionary<Guid, SimpleMaze> Games = new Dictionary<Guid, SimpleMaze>();
+        public Guid? WaitPlayer;
 
         public Dictionary<Guid, PlayerStoreData> OldPlayers = new Dictionary<Guid, PlayerStoreData>();
 
@@ -119,8 +120,8 @@ namespace DoubleMaze.Game
                 state.Players.Add(connection.PlayerId, playerContext);
 
                 IAreaHandler handler = playerContext.PlayerType == PlayerType.Bot
-                    ? (IAreaHandler) new WelcomeAreaHandler(connection.PlayerId, state)
-                    : new StasisAreaHandler(connection.PlayerId, state);
+                    ? (IAreaHandler)new StasisAreaHandler(connection.PlayerId, state)
+                    : new WelcomeAreaHandler(connection.PlayerId, state);
 
                 playerContext.SetHandler(handler);
             }

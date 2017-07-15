@@ -27,8 +27,9 @@ namespace DoubleMaze.Game
                     (dispatcher).Process((dynamic)message);
                 }
             }
-            catch(Exception)
+            catch(Exception e)
             {
+                Console.WriteLine(e);
                 throw;
             }
         }
