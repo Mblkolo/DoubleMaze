@@ -22,7 +22,7 @@ namespace DoubleMaze.Game.Bots
 
         private async Task Process()
         {
-            Output.Post(new PlayerConnected(BotId, Input));
+            Output.Post(new PlayerConnected(BotId, Input, PlayerType.Bot));
 
             while(await Input.OutputAvailableAsync())
             {

@@ -29,16 +29,18 @@ namespace DoubleMaze.Game
     public class PlayerContex
     {
         public Guid Id { get; }
+        public PlayerType PlayerType { get; }
+
         public Pipe<IGameCommand> Output { get; set; }
         public IAreaHandler PlayerHandler { get; private set; }
 
         public string Name { get; set; }
         public Rating Rating { get; private set; }
 
-        public PlayerContex(Guid id, Pipe<IGameCommand> output)
+        public PlayerContex(Guid id, Pipe<IGameCommand> output, PlayerType type)
             : this(id, output, new Rating())
         {
-
+            PlayerType = type;
         }
 
         public PlayerContex(PlayerStoreData storeData, Pipe<IGameCommand> output)
@@ -112,11 +114,15 @@ namespace DoubleMaze.Game
             }
             else
             {
-                var playerContext = new PlayerContex(connection.PlayerId, connection.OutputQueue);
+                var playerContext = new PlayerContex(connection.PlayerId, connection.OutputQueue, connection.PlayerType);
                 playerContext.Name = NameGenerator.GenerateName();
                 state.Players.Add(connection.PlayerId, playerContext);
 
-                playerContext.SetHandler(new WelcomeAreaHandler(connection.PlayerId, state));
+                IAreaHandler handler = playerContext.PlayerType == PlayerType.Bot
+                    ? (IAreaHandler) new WelcomeAreaHandler(connection.PlayerId, state)
+                    : new StasisAreaHandler(connection.PlayerId, state);
+
+                playerContext.SetHandler(handler);
             }
         }
 
