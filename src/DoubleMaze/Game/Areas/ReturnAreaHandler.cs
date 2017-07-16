@@ -21,7 +21,7 @@ namespace DoubleMaze.Game.Areas
             context.Output.Post(new PlayerInfo
             {
                 name = context.Name,
-                rating = context.Rating.Value
+                rating = context.Rating.RoundValue
             });
         }
 

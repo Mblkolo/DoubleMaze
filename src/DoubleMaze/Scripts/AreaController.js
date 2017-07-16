@@ -74,6 +74,21 @@ var WaitArea = (function () {
     WaitArea.prototype.leave = function () {
     };
     WaitArea.prototype.process = function (data) {
+        if (data.command === "showBots") {
+            for (var i = 0; i < data.bots.length; ++i) {
+                var bot = data.bots[i];
+                $(".wait-game-bots").append("<tr><td>" + (i + 1) + "</td><td></td><td></td><td></td></tr>");
+                var cells = $(".wait-game-bots").children().last().children();
+                cells.eq(1).text(bot.name).prop("title", bot.name);
+                cells.eq(2).text(bot.rating);
+                if (bot.isAwaible) {
+                    cells.eq(3).append("<a href=\"#play\" class=\"link-button\">Играть</a>");
+                }
+                else {
+                    cells.eq(3).text("В игре");
+                }
+            }
+        }
     };
     return WaitArea;
 }());
@@ -141,7 +156,7 @@ var GameArea = (function () {
         this.render();
     };
     GameArea.prototype.render = function () {
-        $("#game-wait-screen").toggleClass("hidden", this.state !== "waitOpponent");
+        $("#wait-game-screen").toggleClass("hidden", this.state !== "waitOpponent");
         $("#game-canvas-screen").toggleClass("hidden", this.state !== "mazeFeild");
         $("#game-gameover-screen").toggleClass("hidden", this.state !== "gameOver");
         if (this.state === "mazeFeild") {

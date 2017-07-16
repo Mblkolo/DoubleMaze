@@ -29,7 +29,8 @@ namespace DoubleMaze.Game.Areas
                     {
                         botId = i,
                         isAwaible = state.BotInGame.Contains(x) == false,
-                        name = x.Name
+                        name = x.Name,
+                        rating = state.Players[x.BotId].Rating.RoundValue
                     }
                     ).ToArray()
                 });

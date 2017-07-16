@@ -106,5 +106,6 @@ namespace DoubleMaze.Game
         public int botId { get; set; }
         public bool isAwaible { get; set; }
         public string name { get; set; }
+        public double rating { get; set; }
     }
 }
