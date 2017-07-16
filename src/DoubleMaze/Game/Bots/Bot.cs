@@ -8,8 +8,8 @@ namespace DoubleMaze.Game.Bots
     {
         public readonly Pipe<IGameCommand> Input = new Pipe<IGameCommand>();
         public readonly string Name;
-        public readonly Guid BotId = Guid.NewGuid();
 
+        private readonly Guid BotId = Guid.NewGuid();
         private readonly Pipe<IMessage> Output;
         private readonly Task ProcessTask;
 

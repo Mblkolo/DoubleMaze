@@ -15,7 +15,8 @@ namespace DoubleMaze.Game
         SetToken,
         GameOver,
         Goto,
-        PlayerInfo
+        PlayerInfo, 
+        ShowBots
     }
 
     public class PlayerPosCommand : IGameCommand
@@ -90,6 +91,20 @@ namespace DoubleMaze.Game
     {
         public GameCommand command => GameCommand.PlayerInfo;
         public double rating { get; set; }
+        public string name { get; set; }
+    }
+
+    public class ShowBotsCommand : IGameCommand
+    {
+        public GameCommand command => GameCommand.ShowBots;
+
+        public ShowBotsBot[] bots { get; set; }
+    }
+
+    public class ShowBotsBot
+    {
+        public int botId { get; set; }
+        public bool isAwaible { get; set; }
         public string name { get; set; }
     }
 }

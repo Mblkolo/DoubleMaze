@@ -17,7 +17,8 @@ namespace DoubleMaze.Game
 
         public Pipe<IMessage> InputQueue;
 
-        public Dictionary<Guid, Bot> Bots = new Dictionary<Guid, Bot>();
+        public List<Bot> Bots = new List<Bot>();
+        public List<Bot> BotInGame = new List<Bot>();
     }
 
     public class PlayerStoreData
@@ -94,8 +95,10 @@ namespace DoubleMaze.Game
             state = new WorldState();
             state.InputQueue = inputQueue;
 
-            var bot = new Bot(inputQueue, "Crazy");
-            state.Bots.Add(bot.BotId, bot);
+            var bot1 = new Bot(inputQueue, "Crazy 1");
+            var bot2 = new Bot(inputQueue, "Crazy 2");
+            state.Bots.Add(bot1);
+            state.Bots.Add(bot2);
         }
 
         public void Process(PlayerConnected connection)

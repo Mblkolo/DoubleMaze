@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace DoubleMaze.Game.Areas
 {
@@ -18,7 +19,20 @@ namespace DoubleMaze.Game.Areas
             if (state.WaitPlayer == null || state.WaitPlayer == playerId)
             {
                 state.WaitPlayer = playerId;
-                state.Players[playerId].Output.Post(new GotoCommand { area = GotoCommand.Areas.Wait });
+
+                var outPipe = state.Players[playerId].Output;
+
+                outPipe.Post(new GotoCommand { area = GotoCommand.Areas.Wait });
+                outPipe.Post(new ShowBotsCommand
+                {
+                    bots = state.Bots.Select((x, i) => new ShowBotsBot
+                    {
+                        botId = i,
+                        isAwaible = state.BotInGame.Contains(x) == false,
+                        name = x.Name
+                    }
+                    ).ToArray()
+                });
             }
             else
             {
