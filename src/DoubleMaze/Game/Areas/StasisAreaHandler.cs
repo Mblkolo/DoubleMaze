@@ -25,7 +25,11 @@ namespace DoubleMaze.Game.Areas
 
         public void Process(IPlayerInput inputCommand)
         {
-            throw new NotImplementedException();
+            var o = inputCommand as PlayerNameInput;
+            if(o != null)
+            {
+                state.Players[playerId].Name = o.Name;
+            }
         }
     }
 }

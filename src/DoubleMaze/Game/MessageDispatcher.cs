@@ -116,7 +116,6 @@ namespace DoubleMaze.Game
             else
             {
                 var playerContext = new PlayerContex(connection.PlayerId, connection.OutputQueue, connection.PlayerType);
-                playerContext.Name = NameGenerator.GenerateName();
                 state.Players.Add(connection.PlayerId, playerContext);
 
                 IAreaHandler handler = playerContext.PlayerType == PlayerType.Bot

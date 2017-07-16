@@ -16,13 +16,14 @@ namespace DoubleMaze.Game.Bots
         public Bot(Pipe<IMessage> output, string name)
         {
             Output = output;
-            ProcessTask = Process();
             Name = name;
+            ProcessTask = Process();
         }
 
         private async Task Process()
         {
             Output.Post(new PlayerConnected(BotId, Input, PlayerType.Bot));
+            Output.Post(new PlayerInput(BotId, new PlayerNameInput(Name)));
 
             while(await Input.OutputAvailableAsync())
             {
