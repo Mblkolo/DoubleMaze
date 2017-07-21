@@ -18,7 +18,7 @@ namespace DoubleMaze.Game
         public Pipe<IMessage> InputQueue;
 
         public List<Bot> Bots = new List<Bot>();
-        public List<Bot> BotInGame = new List<Bot>();
+        public HashSet<Guid> BotInGame = new HashSet<Guid>();
     }
 
     public class PlayerStoreData

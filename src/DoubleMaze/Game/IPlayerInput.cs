@@ -10,6 +10,7 @@ namespace DoubleMaze.Game
         Token,
         PlayAgain,
         ResetPlayer,
+        PlayWithBot,
     }
 
     public interface IPlayerInput
@@ -80,5 +81,12 @@ namespace DoubleMaze.Game
     class ResetPlayerInput : IPlayerInput
     {
         public InputType Type => InputType.ResetPlayer;
+    }
+
+    public class PlayWithBotInput : IPlayerInput
+    {
+        public InputType Type => InputType.PlayWithBot;
+
+        public string BotId { get; set; }
     }
 }

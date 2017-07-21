@@ -221,6 +221,9 @@ namespace DoubleMaze.Sockets
             if (checker.Type == InputType.ResetPlayer)
                 return JsonConvert.DeserializeObject<ResetPlayerInput>(message);
 
+            if (checker.Type == InputType.PlayWithBot)
+                return JsonConvert.DeserializeObject<PlayWithBotInput>(message);
+
             throw new NotImplementedException();
         }
 

@@ -26,7 +26,11 @@ namespace DoubleMaze.Game.Areas
             {
                 if(game.IsFinished)
                 {
-                    state.Players[playerId].SetHandler(new WaitGameHandler(playerId, state));
+                    var handler = state.Players[playerId].PlayerType == PlayerType.Bot
+                            ? (IAreaHandler)new StasisAreaHandler(playerId, state)
+                            : new WaitGameHandler(playerId, state);
+
+                    state.Players[playerId].SetHandler(handler);
                 }
                 return;
             }
@@ -38,12 +42,18 @@ namespace DoubleMaze.Game.Areas
 
         public void PlayerJoin()
         {
+            if(state.Players[playerId].PlayerType == PlayerType.Bot)
+                state.BotInGame.Add(playerId);
+
             mazePlayer.Output.Post(new GotoCommand { area = GotoCommand.Areas.Game });
             game.SendState(mazePlayer);
         }
 
         public void PlayerLeft()
         {
+            if (state.Players[playerId].PlayerType == PlayerType.Bot)
+                state.BotInGame.Remove(playerId);
+
             mazePlayer.IsLeft = true;
 
             if (game.AllPlayersLeft())

@@ -25,26 +25,21 @@ namespace DoubleMaze.Game.Areas
                 outPipe.Post(new GotoCommand { area = GotoCommand.Areas.Wait });
                 outPipe.Post(new ShowBotsCommand
                 {
-                    bots = state.Bots.Select((x, i) => new ShowBotsBot
-                    {
-                        botId = i,
-                        isAwaible = state.BotInGame.Contains(x) == false,
-                        name = x.Name,
-                        rating = state.Players[x.BotId].Rating.RoundValue
-                    }
-                    ).ToArray()
+                    bots = state.Players.Values
+                        .Where(x => x.PlayerType == PlayerType.Bot)
+                        .Select((x, i) => new ShowBotsBot
+                        {
+                            id = x.Id.ToString("N"),
+                            isAwaible = state.BotInGame.Contains(x.Id) == false,
+                            name = x.Name,
+                            rating = x.Rating.RoundValue
+                        }
+                      ).ToArray()
                 });
             }
             else
             {
-                var secondPlayer = new MazePlayer(state.Players[playerId]);
-                var firstPlayer = new MazePlayer(state.Players[state.WaitPlayer.Value]);
-
-                var game = new SimpleMaze(state, Guid.NewGuid(), firstPlayer, secondPlayer);
-                state.Games.Add(game.GameId, game);
-
-                state.Players[firstPlayer.Id].SetHandler(new GameAreaHandler(firstPlayer.Id, state, game, firstPlayer));
-                state.Players[secondPlayer.Id].SetHandler(new GameAreaHandler(secondPlayer.Id, state, game, secondPlayer));
+                StartGame(state.WaitPlayer.Value, playerId);
             }
         }
 
@@ -57,6 +52,32 @@ namespace DoubleMaze.Game.Areas
         public void Process(IPlayerInput inputCommand)
         {
             //Тут можно сыграть с ботом
+            var c = inputCommand as PlayWithBotInput;
+            if(c != null)
+            {
+                Guid botId;
+                if (Guid.TryParse(c.BotId, out botId) == false)
+                    return;
+
+                PlayerContex bot;
+                if (state.Players.TryGetValue(botId, out bot) == false || bot.PlayerType != PlayerType.Bot)
+                    return;
+
+                StartGame(playerId, bot.Id);
+                return;
+            }
+        }
+
+        private void StartGame(Guid firstPlayerId, Guid secondPlayerId)
+        {
+            var firstPlayer = new MazePlayer(state.Players[firstPlayerId]);
+            var secondPlayer = new MazePlayer(state.Players[secondPlayerId]);
+
+            var game = new SimpleMaze(state, Guid.NewGuid(), firstPlayer, secondPlayer);
+            state.Games.Add(game.GameId, game);
+
+            state.Players[firstPlayer.Id].SetHandler(new GameAreaHandler(firstPlayer.Id, state, game, firstPlayer));
+            state.Players[secondPlayer.Id].SetHandler(new GameAreaHandler(secondPlayer.Id, state, game, secondPlayer));
         }
     }
 }

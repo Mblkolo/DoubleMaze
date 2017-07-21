@@ -74,6 +74,7 @@ var WaitArea = (function () {
     WaitArea.prototype.leave = function () {
     };
     WaitArea.prototype.process = function (data) {
+        var _this = this;
         if (data.command === "showBots") {
             for (var i = 0; i < data.bots.length; ++i) {
                 var bot = data.bots[i];
@@ -83,12 +84,16 @@ var WaitArea = (function () {
                 cells.eq(2).text(bot.rating);
                 if (bot.isAwaible) {
                     cells.eq(3).append("<a href=\"#play\" class=\"link-button\">Играть</a>");
+                    cells.eq(3).on("click", "a", bot.id, function (arg) { return _this.playWithBot(arg.data); });
                 }
                 else {
                     cells.eq(3).text("В игре");
                 }
             }
         }
+    };
+    WaitArea.prototype.playWithBot = function (botId) {
+        this.sendData(JSON.stringify({ type: "playWithBot", botId: botId }));
     };
     return WaitArea;
 }());

@@ -103,7 +103,7 @@ namespace DoubleMaze.Game
 
     public class ShowBotsBot
     {
-        public int botId { get; set; }
+        public string id { get; set; }
         public bool isAwaible { get; set; }
         public string name { get; set; }
         public double rating { get; set; }

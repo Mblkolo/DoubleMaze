@@ -109,12 +109,17 @@ class WaitArea implements IArea {
 
                 if (bot.isAwaible) {
                     cells.eq(3).append("<a href=\"#play\" class=\"link-button\">Играть</a>");
+                    cells.eq(3).on("click", "a", bot.id, (arg: JQueryEventObject) => this.playWithBot(arg.data));
                 }
                 else {
                     cells.eq(3).text("В игре");
                 }
             }
         }
+    }
+
+    public playWithBot(botId: string) {
+        this.sendData(JSON.stringify({ type: "playWithBot", botId: botId }));
     }
 }
 
