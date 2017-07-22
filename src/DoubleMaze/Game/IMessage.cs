@@ -1,9 +1,6 @@
-﻿using DoubleMaze.Util;
+﻿using DoubleMaze.Infrastructure;
+using DoubleMaze.Util;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game
 {
@@ -11,15 +8,23 @@ namespace DoubleMaze.Game
     {
     }
 
+    public enum PlayerType
+    {
+        Human,
+        Bot
+    }
+
     public class PlayerConnected : IMessage
     {
         public readonly Guid PlayerId;
-        public readonly BufferBlock<IGameCommand> OutputQueue;
+        public readonly Pipe<IGameCommand> OutputQueue;
+        public readonly PlayerType PlayerType;
 
-        public PlayerConnected(Guid playerId, BufferBlock<IGameCommand> outputQueue)
+        public PlayerConnected(Guid playerId, Pipe<IGameCommand> outputQueue, PlayerType playerType)
         {
             PlayerId = playerId;
             OutputQueue = outputQueue;
+            PlayerType = playerType;
         }
     }
 

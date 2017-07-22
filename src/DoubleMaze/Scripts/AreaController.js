@@ -6,6 +6,7 @@ var AreaController = (function () {
         this.currentArea = null;
         this.areas["loading"] = function () { return new LoadingArea(sendData); };
         this.areas["welcome"] = function () { return new WelcomeArea(sendData); };
+        this.areas["wait"] = function () { return new WaitArea(sendData); };
         this.areas["game"] = function () { return new GameArea(sendData); };
         this.areas["return"] = function () { return new ReturnArea(sendData); };
     }
@@ -50,7 +51,7 @@ var WelcomeArea = (function () {
     }
     WelcomeArea.prototype.enter = function () {
         var _this = this;
-        $("#main-content").html($("#welcome-area-tempalte").html());
+        $("#main-content").html($("#welcome-area-template").html());
         $(".welcome-play-button").on("click", function (arg) { return _this.onClick(arg); });
     };
     WelcomeArea.prototype.onClick = function (arg) {
@@ -63,6 +64,39 @@ var WelcomeArea = (function () {
     };
     return WelcomeArea;
 }());
+var WaitArea = (function () {
+    function WaitArea(sendData) {
+        this.sendData = sendData;
+    }
+    WaitArea.prototype.enter = function () {
+        $("#main-content").html($("#wait-area-template").html());
+    };
+    WaitArea.prototype.leave = function () {
+    };
+    WaitArea.prototype.process = function (data) {
+        var _this = this;
+        if (data.command === "showBots") {
+            for (var i = 0; i < data.bots.length; ++i) {
+                var bot = data.bots[i];
+                $(".wait-game-bots").append("<tr><td>" + (i + 1) + "</td><td></td><td></td><td></td></tr>");
+                var cells = $(".wait-game-bots").children().last().children();
+                cells.eq(1).text(bot.name).prop("title", bot.name);
+                cells.eq(2).text(bot.rating);
+                if (bot.isAwaible) {
+                    cells.eq(3).append("<a href=\"#play\" class=\"link-button\">Играть</a>");
+                    cells.eq(3).on("click", "a", bot.id, function (arg) { return _this.playWithBot(arg.data); });
+                }
+                else {
+                    cells.eq(3).text("В игре");
+                }
+            }
+        }
+    };
+    WaitArea.prototype.playWithBot = function (botId) {
+        this.sendData(JSON.stringify({ type: "playWithBot", botId: botId }));
+    };
+    return WaitArea;
+}());
 var GameArea = (function () {
     function GameArea(sendData) {
         var _this = this;
@@ -73,7 +107,7 @@ var GameArea = (function () {
     }
     GameArea.prototype.enter = function () {
         var _this = this;
-        $("#main-content").html($("#game-area-tempalte").html());
+        $("#main-content").html($("#game-area-template").html());
         $(document).on("keydown", this.onKeyDownHandler);
         $(".game-gameover-screen-button").on("click", function (arg) { return _this.onPlayAgain(arg); });
     };
@@ -127,7 +161,7 @@ var GameArea = (function () {
         this.render();
     };
     GameArea.prototype.render = function () {
-        $("#game-wait-screen").toggleClass("hidden", this.state !== "waitOpponent");
+        $("#wait-game-screen").toggleClass("hidden", this.state !== "waitOpponent");
         $("#game-canvas-screen").toggleClass("hidden", this.state !== "mazeFeild");
         $("#game-gameover-screen").toggleClass("hidden", this.state !== "gameOver");
         if (this.state === "mazeFeild") {
@@ -264,7 +298,7 @@ var ReturnArea = (function () {
     }
     ReturnArea.prototype.enter = function () {
         var _this = this;
-        $("#main-content").html($("#return-area-tempalte").html());
+        $("#main-content").html($("#return-area-template").html());
         $(".return-page__play-again-button").on("click", function (arg) { return _this.onClick("playAgain"); });
         $(".return-page__reset-button").on("click", function (arg) { return _this.onClick("resetPlayer"); });
     };

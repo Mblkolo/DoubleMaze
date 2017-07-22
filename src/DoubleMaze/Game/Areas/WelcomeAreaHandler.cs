@@ -16,8 +16,7 @@ namespace DoubleMaze.Game.Areas
 
         public void PlayerJoin()
         {
-            var context = state.Players[playerId];
-            var output = context.Output;
+            var output = state.Players[playerId].Output;
 
             output.Post(new GotoCommand { area = GotoCommand.Areas.Welcome });
         }
@@ -32,7 +31,7 @@ namespace DoubleMaze.Game.Areas
             if (o != null)
             {
                 state.Players[playerId].Name = string.IsNullOrWhiteSpace(o.Name) ? NameGenerator.GenerateName() : o.Name.Trim();
-                state.Players[playerId].SetHandler(new GameAreaHandler(playerId, state));
+                state.Players[playerId].SetHandler(new WaitGameHandler(playerId, state));
             }
         }
 

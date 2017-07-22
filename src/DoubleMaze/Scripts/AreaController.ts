@@ -8,6 +8,7 @@ export class AreaController {
     public constructor(sendData: (data: any) => void) {
         this.areas["loading"] = () => new LoadingArea(sendData);
         this.areas["welcome"] = () => new WelcomeArea(sendData);
+        this.areas["wait"] = () => new WaitArea(sendData);
         this.areas["game"] = () => new GameArea(sendData);
         this.areas["return"] = () => new ReturnArea(sendData);
     }
@@ -63,7 +64,7 @@ class WelcomeArea implements IArea {
     }
 
     public enter() {
-        $("#main-content").html($("#welcome-area-tempalte").html());
+        $("#main-content").html($("#welcome-area-template").html());
         $(".welcome-play-button").on("click", (arg: JQueryEventObject) => this.onClick(arg));
     }
 
@@ -81,6 +82,47 @@ class WelcomeArea implements IArea {
 
 }
 
+class WaitArea implements IArea {
+    private sendData: (data: any) => void;
+
+    public constructor(sendData: (data: any) => void) {
+        this.sendData = sendData;
+    }
+
+    public enter() {
+        $("#main-content").html($("#wait-area-template").html());
+    }
+
+    public leave() {
+    }
+
+    public process(data: any) {
+        if (data.command === "showBots") {
+            for (let i = 0; i < data.bots.length; ++i) {
+                const bot = data.bots[i];
+
+                $(".wait-game-bots").append(`<tr><td>${i + 1}</td><td></td><td></td><td></td></tr>`);
+
+                const cells = $(".wait-game-bots").children().last().children();
+                cells.eq(1).text(bot.name).prop("title", bot.name);
+                cells.eq(2).text(bot.rating);
+
+                if (bot.isAwaible) {
+                    cells.eq(3).append("<a href=\"#play\" class=\"link-button\">Играть</a>");
+                    cells.eq(3).on("click", "a", bot.id, (arg: JQueryEventObject) => this.playWithBot(arg.data));
+                }
+                else {
+                    cells.eq(3).text("В игре");
+                }
+            }
+        }
+    }
+
+    public playWithBot(botId: string) {
+        this.sendData(JSON.stringify({ type: "playWithBot", botId: botId }));
+    }
+}
+
 class GameArea implements IArea {
     private sendData: (data: any) => void;
     private onKeyDownHandler = (arg: JQueryEventObject) => this.onKeyDown(arg);
@@ -90,7 +132,7 @@ class GameArea implements IArea {
     }
 
     public enter() {
-        $("#main-content").html($("#game-area-tempalte").html());
+        $("#main-content").html($("#game-area-template").html());
         $(document).on("keydown", this.onKeyDownHandler);
         $(".game-gameover-screen-button").on("click", (arg: JQueryEventObject) => this.onPlayAgain(arg));
     }
@@ -160,7 +202,7 @@ class GameArea implements IArea {
     private gameOver: any;
 
     private render() {
-        $("#game-wait-screen").toggleClass("hidden", this.state !== "waitOpponent");
+        $("#wait-game-screen").toggleClass("hidden", this.state !== "waitOpponent");
         $("#game-canvas-screen").toggleClass("hidden", this.state !== "mazeFeild");
         $("#game-gameover-screen").toggleClass("hidden", this.state !== "gameOver");
 
@@ -345,7 +387,7 @@ class ReturnArea implements IArea {
     }
 
     public enter() {
-        $("#main-content").html($("#return-area-tempalte").html());
+        $("#main-content").html($("#return-area-template").html());
         $(".return-page__play-again-button").on("click", (arg: JQueryEventObject) => this.onClick("playAgain"));
         $(".return-page__reset-button").on("click", (arg: JQueryEventObject) => this.onClick("resetPlayer"));
     }

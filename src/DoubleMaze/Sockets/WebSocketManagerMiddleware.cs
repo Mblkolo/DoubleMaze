@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
-namespace DoubleMaze.Sockests
+namespace DoubleMaze.Sockets
 {
     public class WebSocketManagerMiddleware
     {
@@ -66,7 +66,7 @@ namespace DoubleMaze.Sockests
         {
             byte[] buffer = new byte[1024 * 4];
 
-            _world.InputQueue.Post(new PlayerConnected(playerConnection.PlayerId, playerConnection.OutputChanel.InputQueue));
+            _world.InputQueue.Post(new PlayerConnected(playerConnection.PlayerId, playerConnection.OutputChanel.InputQueue, PlayerType.Human));
             while (socket.State == WebSocketState.Open)
             {
                 var input = await socket.ReadInputAsync(buffer);
@@ -171,47 +171,6 @@ namespace DoubleMaze.Sockests
 
     }
 
-    public class OutputChanel
-    {
-        public readonly BufferBlock<IGameCommand> InputQueue;
-        private readonly Task mainLoop;
-        private volatile WebSocket socket;
-
-        public OutputChanel(WebSocket socket)
-        {
-            this.socket = socket;
-            InputQueue = new BufferBlock<IGameCommand>();
-            mainLoop = MainLoop(InputQueue);
-        }
-
-        internal void SetSocket(WebSocket socket)
-        {
-            this.socket = socket;
-        }
-
-        private async Task MainLoop(BufferBlock<IGameCommand> messages)
-        {
-            try
-            {
-                while (await messages.OutputAvailableAsync())
-                {
-                    IGameCommand data = await messages.ReceiveAsync();
-
-                    await socket.SendDataAsync(data);
-                }
-                Console.WriteLine("Игрок отключился");
-                await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Да нормально всё!", CancellationToken.None);
-            }
-            catch(Exception e)
-            {
-                throw;
-            }
-        }
-
-
-
-    }
-
     public static class WebSocketIoExtensions
     {
         public static async Task SendDataAsync(this WebSocket socket, IGameCommand data)
@@ -261,6 +220,9 @@ namespace DoubleMaze.Sockests
 
             if (checker.Type == InputType.ResetPlayer)
                 return JsonConvert.DeserializeObject<ResetPlayerInput>(message);
+
+            if (checker.Type == InputType.PlayWithBot)
+                return JsonConvert.DeserializeObject<PlayWithBotInput>(message);
 
             throw new NotImplementedException();
         }

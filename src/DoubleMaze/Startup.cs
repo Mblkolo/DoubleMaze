@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using DoubleMaze.Sockests;
+using DoubleMaze.Sockets;
 using System.Threading.Tasks.Dataflow;
 using DoubleMaze.Game;
 

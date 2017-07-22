@@ -1,8 +1,8 @@
 ﻿using DoubleMaze.Game.Maze;
+using DoubleMaze.Infrastructure;
 using System;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game
 {
@@ -19,33 +19,21 @@ namespace DoubleMaze.Game
         private MazePlayer firstPlayer;
         private MazePlayer secondPlayer;
         private WorldState state;
-        public Guid gameId;
+        public Guid GameId;
         private MazeField mazeField;
 
-        public SimpleMaze(WorldState state, Guid gameId, MazePlayer firstPlayer)
+        public SimpleMaze(WorldState state, Guid gameId, MazePlayer firstPlayer, MazePlayer secondPlayer)
         {
             mazeField = mazeGenerator.Generate(31, 21);
-            this.firstPlayer = firstPlayer;
             this.state = state;
-            this.gameId = gameId;
-        }
-
-
-        public void Join(MazePlayer secondPlayer)
-        {
-            if (this.secondPlayer != null)
-                throw new ArgumentException(nameof(secondPlayer));
-
+            GameId = gameId;
+            this.firstPlayer = firstPlayer;
             this.secondPlayer = secondPlayer;
-            secondPlayer.SetStart(mazeField.Field.GetLength(1)-1, mazeField.Field.GetLength(0)-1);
 
-            timer = new Timer(x => state.InputQueue.Post(new GameUpdate(gameId)), new object(), 100, 100);
-
-            SendState(firstPlayer);
-            SendState(secondPlayer);
+            secondPlayer.SetStart(mazeField.Field.GetLength(1) - 1, mazeField.Field.GetLength(0) - 1);
+            timer = new Timer(x => state.InputQueue.Post(new GameUpdate(GameId)), new object(), 100, 100);
         }
 
-        public bool IsStarted => secondPlayer != null;
         public bool IsFinished { get; private set; } = false;
 
         public void Update()
@@ -84,7 +72,7 @@ namespace DoubleMaze.Game
             if (player.IsLeft)
                 return;
 
-            player.Output.Post(new PlayerPos
+            player.Output.Post(new PlayerPosCommand
             {
                 myPos = player.GetPos(),
                 enemyPos = enemyPlayer.GetPos()
@@ -96,11 +84,7 @@ namespace DoubleMaze.Game
             if(player.IsLeft)
                 return;
 
-            if(IsStarted == false)
-            {
-                player.Output.Post(new WaitOpponent());
-            }
-            else if (IsFinished == false)
+            if (IsFinished == false)
             {
                 var enemy = GetEnemy(player);
                 var command = new MazeFieldCommand
@@ -205,6 +189,26 @@ namespace DoubleMaze.Game
             return new Point(X + dx, Y + dy);
         }
 
+        public static bool operator !=(Point obj1, Point obj2)
+        {
+            return !(obj1 == obj2);
+        }
+
+        public static bool operator ==(Point obj1, Point obj2)
+        {
+            return obj1.X == obj2.X && obj1.Y == obj2.Y;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public override string ToString()
         {
             return $"X:{X}, Y:{Y}";
@@ -214,7 +218,7 @@ namespace DoubleMaze.Game
     public class MazePlayer
     {
         public InputCommand Сommand;
-        public BufferBlock<IGameCommand> Output => playerContex.Output;
+        public Pipe<IGameCommand> Output => playerContex.Output;
         public string Name => playerContex.Name;
         public Rating Rating =>  playerContex.Rating;
         public Guid Id => playerContex.Id;

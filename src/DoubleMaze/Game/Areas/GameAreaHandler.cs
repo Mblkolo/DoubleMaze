@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game.Areas
 {
@@ -12,21 +10,13 @@ namespace DoubleMaze.Game.Areas
         private readonly MazePlayer mazePlayer;
         private readonly SimpleMaze game;
 
-        public GameAreaHandler(Guid playerId, WorldState state)
+        public GameAreaHandler(Guid playerId, WorldState state, SimpleMaze game, MazePlayer mazePlayer)
         {
             this.playerId = playerId;
             this.state = state;
-            mazePlayer = new MazePlayer(state.Players[playerId]);
+            this.game = game;
 
-            game = state.Games.Values.SingleOrDefault(x => x.IsStarted == false);
-            if (game == null)
-            {
-                Guid gameId = Guid.NewGuid();
-                game = new SimpleMaze(state, gameId, mazePlayer);
-                state.Games.Add(gameId, game);
-            }
-            else
-                game.Join(mazePlayer);
+            this.mazePlayer = mazePlayer;;
         }
 
         public void Process(IPlayerInput inputCommand)
@@ -36,11 +26,14 @@ namespace DoubleMaze.Game.Areas
             {
                 if(game.IsFinished)
                 {
-                    state.Players[playerId].SetHandler(new GameAreaHandler(playerId, state));
+                    var handler = state.Players[playerId].PlayerType == PlayerType.Bot
+                            ? (IAreaHandler)new StasisAreaHandler(playerId, state)
+                            : new WaitGameHandler(playerId, state);
+
+                    state.Players[playerId].SetHandler(handler);
                 }
                 return;
             }
-
 
             var o = inputCommand as KeyDownInput;
             if (o != null)
@@ -49,18 +42,24 @@ namespace DoubleMaze.Game.Areas
 
         public void PlayerJoin()
         {
+            if(state.Players[playerId].PlayerType == PlayerType.Bot)
+                state.BotInGame.Add(playerId);
+
             mazePlayer.Output.Post(new GotoCommand { area = GotoCommand.Areas.Game });
             game.SendState(mazePlayer);
         }
 
         public void PlayerLeft()
         {
+            if (state.Players[playerId].PlayerType == PlayerType.Bot)
+                state.BotInGame.Remove(playerId);
+
             mazePlayer.IsLeft = true;
 
             if (game.AllPlayersLeft())
             {
                 game.FinishGame();
-                state.Games.Remove(game.gameId);
+                state.Games.Remove(game.GameId);
             }
         }
     }

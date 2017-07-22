@@ -15,11 +15,11 @@ namespace DoubleMaze.Game
         SetToken,
         GameOver,
         Goto,
-        WaitOpponent,
-        PlayerInfo
+        PlayerInfo, 
+        ShowBots
     }
 
-    public class PlayerPos : IGameCommand
+    public class PlayerPosCommand : IGameCommand
     {
         public GameCommand command => GameCommand.PlayerState;
         public Pos myPos { get; set; }
@@ -78,7 +78,9 @@ namespace DoubleMaze.Game
         {
             Welcome,
             Game,
-            Return
+            Return,
+            Wait,
+            Stasis
         }
 
         public GameCommand command => GameCommand.Goto;
@@ -92,8 +94,18 @@ namespace DoubleMaze.Game
         public string name { get; set; }
     }
 
-    public class WaitOpponent : IGameCommand
+    public class ShowBotsCommand : IGameCommand
     {
-        public GameCommand command => GameCommand.WaitOpponent;
+        public GameCommand command => GameCommand.ShowBots;
+
+        public ShowBotsBot[] bots { get; set; }
+    }
+
+    public class ShowBotsBot
+    {
+        public string id { get; set; }
+        public bool isAwaible { get; set; }
+        public string name { get; set; }
+        public double rating { get; set; }
     }
 }

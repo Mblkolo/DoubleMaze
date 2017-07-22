@@ -1,8 +1,9 @@
 ﻿using DoubleMaze.Game.Areas;
+using DoubleMaze.Game.Bots;
 using DoubleMaze.Game.Maze;
+using DoubleMaze.Infrastructure;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Game
 {
@@ -10,10 +11,14 @@ namespace DoubleMaze.Game
     {
         public Dictionary<Guid, PlayerContex> Players = new Dictionary<Guid, PlayerContex>();
         public Dictionary<Guid, SimpleMaze> Games = new Dictionary<Guid, SimpleMaze>();
+        public Guid? WaitPlayer;
 
         public Dictionary<Guid, PlayerStoreData> OldPlayers = new Dictionary<Guid, PlayerStoreData>();
 
-        public BufferBlock<IMessage> InputQueue;
+        public Pipe<IMessage> InputQueue;
+
+        public List<Bot> Bots = new List<Bot>();
+        public HashSet<Guid> BotInGame = new HashSet<Guid>();
     }
 
     public class PlayerStoreData
@@ -26,19 +31,21 @@ namespace DoubleMaze.Game
     public class PlayerContex
     {
         public Guid Id { get; }
-        public BufferBlock<IGameCommand> Output { get; set; }
+        public PlayerType PlayerType { get; }
+
+        public Pipe<IGameCommand> Output { get; set; }
         public IAreaHandler PlayerHandler { get; private set; }
 
         public string Name { get; set; }
         public Rating Rating { get; private set; }
 
-        public PlayerContex(Guid id, BufferBlock<IGameCommand> output)
+        public PlayerContex(Guid id, Pipe<IGameCommand> output, PlayerType type)
             : this(id, output, new Rating())
         {
-
+            PlayerType = type;
         }
 
-        public PlayerContex(PlayerStoreData storeData, BufferBlock<IGameCommand> output)
+        public PlayerContex(PlayerStoreData storeData, Pipe<IGameCommand> output)
             : this(storeData.Id, output, storeData.Rating)
         {
             Name = storeData.Name;
@@ -50,7 +57,7 @@ namespace DoubleMaze.Game
             Name = null;
         }
 
-        private PlayerContex(Guid id, BufferBlock<IGameCommand> output, Rating rating)
+        private PlayerContex(Guid id, Pipe<IGameCommand> output, Rating rating)
         {
             Output = output;
             Id = id;
@@ -83,10 +90,16 @@ namespace DoubleMaze.Game
         //private BufferBlock<IMessage> inputQueue;
         private WorldState state;
 
-        public MessageDispatcher(BufferBlock<IMessage> inputQueue)
+        public MessageDispatcher(Pipe<IMessage> inputQueue)
         {
             state = new WorldState();
             state.InputQueue = inputQueue;
+
+            state.Bots.Add(new Bot(inputQueue, 5));
+            state.Bots.Add(new Bot(inputQueue, 9));
+            state.Bots.Add(new Bot(inputQueue, 13));
+            state.Bots.Add(new Bot(inputQueue, 17));
+            state.Bots.Add(new Bot(inputQueue, 21));
         }
 
         public void Process(PlayerConnected connection)
@@ -106,11 +119,14 @@ namespace DoubleMaze.Game
             }
             else
             {
-                var playerContext = new PlayerContex(connection.PlayerId, connection.OutputQueue);
-                playerContext.Name = NameGenerator.GenerateName();
+                var playerContext = new PlayerContex(connection.PlayerId, connection.OutputQueue, connection.PlayerType);
                 state.Players.Add(connection.PlayerId, playerContext);
 
-                playerContext.SetHandler(new WelcomeAreaHandler(connection.PlayerId, state));
+                IAreaHandler handler = playerContext.PlayerType == PlayerType.Bot
+                    ? (IAreaHandler)new StasisAreaHandler(connection.PlayerId, state)
+                    : new WelcomeAreaHandler(connection.PlayerId, state);
+
+                playerContext.SetHandler(handler);
             }
         }
 
