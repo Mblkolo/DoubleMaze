@@ -12,13 +12,15 @@ namespace DoubleMaze.Game.Bots
         public readonly string Name;
         public readonly Guid BotId = Guid.NewGuid();
 
+        private readonly int depth;
         private readonly Pipe<IMessage> Output;
         private readonly Task ProcessTask;
 
-        public Bot(Pipe<IMessage> output, string name)
+        public Bot(Pipe<IMessage> output, int depth)
         {
             Output = output;
-            Name = name;
+            this.depth = depth;
+            Name = $"Бот {depth}";
             ProcessTask = Process();
         }
 
@@ -62,7 +64,7 @@ namespace DoubleMaze.Game.Bots
 
         private void Process(MazeFieldCommand command)
         {
-            solver = new MazeSolver(command.field);
+            solver = new MazeSolver(command.field, depth);
         }
     }
 
@@ -71,10 +73,12 @@ namespace DoubleMaze.Game.Bots
         private readonly int width;
         private readonly int height;
         private readonly Wall[,] field;
+        private readonly int depth;
 
-        public MazeSolver(Wall[,] field)
+        public MazeSolver(Wall[,] field, int depth)
         {
             this.field = field;
+            this.depth = depth;
             width = field.GetLength(1);
             height = field.GetLength(0);
         }
@@ -90,6 +94,17 @@ namespace DoubleMaze.Game.Bots
             if (colors == null)
             {
                 colors = new CellColor[height, width];
+
+                for(int i=0; i < 5; ++i)
+                {
+                    for (int y = 0; y < height; ++y)
+                        for (int x = 0; x < width; x++)
+                        {
+                            var cutPus = new Point(x, y);
+                            if (cutPus != p && isDeadEnd(cutPus))
+                                colors[cutPus.Y, cutPus.X] = CellColor.Black;
+                        }
+                }
 
                 latestPoint = p;
                 return GetPossibleDirection(latestPoint);
