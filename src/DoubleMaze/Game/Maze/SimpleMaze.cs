@@ -189,6 +189,16 @@ namespace DoubleMaze.Game
             return new Point(X + dx, Y + dy);
         }
 
+        public static bool operator !=(Point obj1, Point obj2)
+        {
+            return !(obj1 == obj2);
+        }
+
+        public static bool operator ==(Point obj1, Point obj2)
+        {
+            return obj1.X == obj2.X && obj1.Y == obj2.Y;
+        }
+
         public override string ToString()
         {
             return $"X:{X}, Y:{Y}";
