@@ -2,6 +2,7 @@
 using DoubleMaze.Game.Bots;
 using DoubleMaze.Game.Maze;
 using DoubleMaze.Infrastructure;
+using DoubleMaze.Storage;
 using System;
 using System.Collections.Generic;
 
@@ -13,8 +14,6 @@ namespace DoubleMaze.Game
         public Dictionary<Guid, SimpleMaze> Games = new Dictionary<Guid, SimpleMaze>();
         public Guid? WaitPlayer;
 
-        public Dictionary<Guid, PlayerStoreData> OldPlayers = new Dictionary<Guid, PlayerStoreData>();
-
         public Pipe<IMessage> InputQueue;
 
         public List<Bot> Bots = new List<Bot>();
@@ -23,9 +22,12 @@ namespace DoubleMaze.Game
 
     public class PlayerStoreData
     {
+        public PlayerType PlayerType { get; set; }
+
         public Guid Id { get; set; }
         public string Name { get; set; }
         public Rating Rating { get; set; }
+        public bool IsActivated { get; internal set; }
     }
 
     public class PlayerContex
@@ -37,18 +39,18 @@ namespace DoubleMaze.Game
         public IAreaHandler PlayerHandler { get; private set; }
 
         public string Name { get; set; }
+        public bool IsActivated { get; set; }
         public Rating Rating { get; private set; }
 
-        public PlayerContex(Guid id, Pipe<IGameCommand> output, PlayerType type)
-            : this(id, output, new Rating())
-        {
-            PlayerType = type;
-        }
-
         public PlayerContex(PlayerStoreData storeData, Pipe<IGameCommand> output)
-            : this(storeData.Id, output, storeData.Rating)
         {
+            Output = output;
+
+            Id = storeData.Id;
+            Rating = storeData.Rating;
             Name = storeData.Name;
+            IsActivated = storeData.IsActivated;
+            PlayerType = storeData.PlayerType;
         }
 
         internal void ResetPlayer()
@@ -56,14 +58,6 @@ namespace DoubleMaze.Game
             Rating = new Rating();
             Name = null;
         }
-
-        private PlayerContex(Guid id, Pipe<IGameCommand> output, Rating rating)
-        {
-            Output = output;
-            Id = id;
-            Rating = rating;
-        }
-
 
         public PlayerStoreData GetStoreData()
         {
@@ -87,8 +81,11 @@ namespace DoubleMaze.Game
 
     public class MessageDispatcher
     {
-        //private BufferBlock<IMessage> inputQueue;
         private WorldState state;
+        private IStorage storage;
+
+        //TODO избавиться от этой переменной, протаскивать Pipe<IGameCommand> через стородж
+        public Dictionary<Guid, Pipe<IGameCommand>> LoadedPlayers = new Dictionary<Guid, Pipe<IGameCommand>>();
 
         public MessageDispatcher(Pipe<IMessage> inputQueue)
         {
@@ -100,34 +97,39 @@ namespace DoubleMaze.Game
             state.Bots.Add(new Bot(inputQueue, 13));
             state.Bots.Add(new Bot(inputQueue, 17));
             state.Bots.Add(new Bot(inputQueue, 21));
+
+            //TODO заменить иньекцией
+            storage = new InMemoryStorage();
         }
 
         public void Process(PlayerConnected connection)
         {
-            if (state.OldPlayers.ContainsKey(connection.PlayerId))
-            {
-                var playerContext = new PlayerContex(state.OldPlayers[connection.PlayerId], connection.OutputQueue);
-                state.OldPlayers.Remove(connection.PlayerId);
-                state.Players.Add(connection.PlayerId, playerContext);
-
-                playerContext.SetHandler(new ReturnAreaHandler(connection.PlayerId, state));
-            }
-            else if (state.Players.ContainsKey(connection.PlayerId))
+            if (state.Players.ContainsKey(connection.PlayerId))
             {
                 state.Players[connection.PlayerId].Output = connection.OutputQueue;
                 state.Players[connection.PlayerId].PlayerHandler.PlayerJoin();
             }
             else
             {
-                var playerContext = new PlayerContex(connection.PlayerId, connection.OutputQueue, connection.PlayerType);
-                state.Players.Add(connection.PlayerId, playerContext);
-
-                IAreaHandler handler = playerContext.PlayerType == PlayerType.Bot
-                    ? (IAreaHandler)new StasisAreaHandler(connection.PlayerId, state)
-                    : new WelcomeAreaHandler(connection.PlayerId, state);
-
-                playerContext.SetHandler(handler);
+                LoadedPlayers.Add(connection.PlayerId, connection.OutputQueue);
+                storage.LoadPlayer(connection.PlayerId, state.InputQueue);
             }
+        }
+
+        public void Process(PlayerLoaded playerLoaded)
+        {
+            var playerContext = new PlayerContex(playerLoaded.StoreData, LoadedPlayers[playerLoaded.StoreData.Id]);
+            LoadedPlayers.Remove(playerLoaded.StoreData.Id);
+
+            state.Players.Add(playerContext.Id, playerContext);
+
+            IAreaHandler handler = playerContext.PlayerType == PlayerType.Bot
+                ? new StasisAreaHandler(playerContext.Id, state)
+                : (playerLoaded.StoreData.IsActivated 
+                        ? (IAreaHandler)new WelcomeAreaHandler(playerContext.Id, state) 
+                        : new ReturnAreaHandler(playerContext.Id, state));
+
+            playerContext.SetHandler(handler);
         }
 
         public void Process(PlayerDisconnected disconnected)
@@ -135,7 +137,10 @@ namespace DoubleMaze.Game
             if (state.Players.ContainsKey(disconnected.PlayerId) == false)
                 return;
 
-            state.OldPlayers[disconnected.PlayerId] = state.Players[disconnected.PlayerId].GetStoreData();
+            storage.SavePlayer(state.Players[disconnected.PlayerId].GetStoreData());
+
+            //state.OldPlayers[disconnected.PlayerId] = state.Players[disconnected.PlayerId].GetStoreData();
+
             state.Players[disconnected.PlayerId].PlayerHandler.PlayerLeft();
             state.Players.Remove(disconnected.PlayerId);
         }

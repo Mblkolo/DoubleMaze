@@ -38,6 +38,16 @@ namespace DoubleMaze.Game
         }
     }
 
+    public class PlayerLoaded : IMessage
+    {
+        public readonly PlayerStoreData StoreData;
+
+        public PlayerLoaded(PlayerStoreData storeData)
+        {
+            StoreData = storeData;
+        }
+    }
+
     public class PlayerInput : IMessage
     {
         public readonly Guid PlayerId;
