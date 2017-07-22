@@ -135,21 +135,40 @@ namespace DoubleMaze.Game.Bots
 
         InputCommand GetPossibleDirection(Point pos)
         {
-            InputCommand[] whiteDirections = getPosibleWhiteDirections(pos);
-            if (whiteDirections.Length > 0)
+            InputCommand whiteDirection = getPosibleWhiteDirections(pos);
+            if (whiteDirection != InputCommand.None)
             {
-                //выбруть случайное направление
-                return whiteDirections[r.Next(whiteDirections.Length)];
+                return whiteDirection;
             }
 
             return getGrayDirection(pos);
         }
 
-        private InputCommand[] getPosibleWhiteDirections(Point point)
+        private InputCommand getPosibleWhiteDirections(Point point)
         {
-            return getNearbyCells(point, color => color == CellColor.White)
-                .Select(x => x.inputCommand)
-                .ToArray();
+            var possibleDirections = getNearbyCells(point, color => color == CellColor.White);
+
+            if (possibleDirections.Length == 0)
+                return InputCommand.None;
+
+            Direction min = null;
+            var nearbyPoint = new Point(int.MaxValue, int.MaxValue);
+            double minLength = double.MaxValue;
+
+            for (int i=0; i<possibleDirections.Length; ++i)
+            {
+                nearbyPoint = point.Move(possibleDirections[i].offset.X, possibleDirections[i].offset.Y);
+                double newMinLength = Math.Pow(Math.Abs(width / 2 - nearbyPoint.X), 2) 
+                                    + Math.Pow(Math.Abs(height / 2 - nearbyPoint.Y), 2);
+
+                if (newMinLength < minLength)
+                {
+                    minLength = newMinLength;
+                    min = possibleDirections[i];
+                }
+            }
+
+            return min.inputCommand;
         }
 
         private InputCommand getGrayDirection(Point point)
