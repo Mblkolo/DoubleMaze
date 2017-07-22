@@ -96,10 +96,10 @@ namespace DoubleMaze.Game
             state.InputQueue = inputQueue;
 
             state.Bots.Add(new Bot(inputQueue, 5));
-            state.Bots.Add(new Bot(inputQueue, 7));
             state.Bots.Add(new Bot(inputQueue, 9));
-            state.Bots.Add(new Bot(inputQueue, 11));
             state.Bots.Add(new Bot(inputQueue, 13));
+            state.Bots.Add(new Bot(inputQueue, 17));
+            state.Bots.Add(new Bot(inputQueue, 21));
         }
 
         public void Process(PlayerConnected connection)

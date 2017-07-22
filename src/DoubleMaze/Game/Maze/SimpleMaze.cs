@@ -199,6 +199,16 @@ namespace DoubleMaze.Game
             return obj1.X == obj2.X && obj1.Y == obj2.Y;
         }
 
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public override string ToString()
         {
             return $"X:{X}, Y:{Y}";
