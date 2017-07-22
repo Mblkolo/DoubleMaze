@@ -95,15 +95,20 @@ namespace DoubleMaze.Game.Bots
             {
                 colors = new CellColor[height, width];
 
-                for(int i=0; i < 5; ++i)
+                for(int i=0; i < depth; ++i)
                 {
+                    var tmpColor = new CellColor[height, width];
+                    Array.Copy(colors, tmpColor, colors.Length);
+
                     for (int y = 0; y < height; ++y)
                         for (int x = 0; x < width; x++)
                         {
                             var cutPus = new Point(x, y);
                             if (cutPus != p && isDeadEnd(cutPus))
-                                colors[cutPus.Y, cutPus.X] = CellColor.Black;
+                                tmpColor[cutPus.Y, cutPus.X] = CellColor.Black;
                         }
+
+                    colors = tmpColor;
                 }
 
                 latestPoint = p;
