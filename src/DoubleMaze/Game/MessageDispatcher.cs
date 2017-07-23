@@ -118,7 +118,8 @@ namespace DoubleMaze.Game
             else
             {
                 var source = new CancellationTokenSource();
-                LoadingsPlayers.Add(playerId, source);
+
+                LoadingsPlayers.Replace(playerId, source, old => old.Cancel());
 
                 storage.LoadPlayer(playerId, connection.PlayerType, x =>
                 {

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DoubleMaze.Game;
-using DoubleMaze.Infrastructure;
-using System.Threading;
 
 namespace DoubleMaze.Storage
 {

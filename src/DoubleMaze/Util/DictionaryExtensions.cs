@@ -15,6 +15,17 @@ namespace DoubleMaze.Util
             }
         }
 
+        public static void Replace<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue newValue, Action<TValue> action)
+        {
+            TValue oldValue;
+            var hasOldValue = dictionary.TryGetValue(key, out oldValue);
+
+            dictionary[key] = newValue;
+
+            if(hasOldValue)
+                action(oldValue);
+        }
+
         public static void RemoveOrThrow<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, Action<TValue> action)
         {
             TValue value = dictionary[key];
