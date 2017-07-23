@@ -3,8 +3,10 @@ using DoubleMaze.Game.Bots;
 using DoubleMaze.Game.Maze;
 using DoubleMaze.Infrastructure;
 using DoubleMaze.Storage;
+using DoubleMaze.Util;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace DoubleMaze.Game
 {
@@ -84,8 +86,7 @@ namespace DoubleMaze.Game
         private WorldState state;
         private IStorage storage;
 
-        //TODO избавиться от этой переменной, протаскивать Pipe<IGameCommand> через стородж
-        private Dictionary<Guid, Pipe<IGameCommand>> LoadedPlayers = new Dictionary<Guid, Pipe<IGameCommand>>();
+        private Dictionary<Guid, CancellationTokenSource> LoadingsPlayers = new Dictionary<Guid, CancellationTokenSource>();
 
         public MessageDispatcher(Pipe<IMessage> inputQueue)
         {
@@ -106,22 +107,32 @@ namespace DoubleMaze.Game
 
         public void Process(PlayerConnected connection)
         {
-            if (state.Players.ContainsKey(connection.PlayerId))
+            var playerId = connection.PlayerId;
+
+            PlayerContex context;
+            if (state.Players.TryGetValue(playerId, out context))
             {
-                state.Players[connection.PlayerId].Output = connection.OutputQueue;
-                state.Players[connection.PlayerId].PlayerHandler.PlayerJoin();
+                context.Output = connection.OutputQueue;
+                context.PlayerHandler.PlayerJoin();
             }
             else
             {
-                LoadedPlayers.Add(connection.PlayerId, connection.OutputQueue);
-                storage.LoadPlayer(connection.PlayerId, connection.PlayerType, x => state.InputQueue.Post(x));
+                var source = new CancellationTokenSource();
+                LoadingsPlayers.Add(playerId, source);
+
+                storage.LoadPlayer(playerId, connection.PlayerType, x =>
+                {
+                    state.InputQueue.Post(new PlayerLoaded(x, source.Token, connection.OutputQueue));
+                });
             }
         }
 
         public void Process(PlayerLoaded playerLoaded)
         {
-            var playerContext = new PlayerContex(playerLoaded.StoreData, LoadedPlayers[playerLoaded.StoreData.Id]);
-            LoadedPlayers.Remove(playerLoaded.StoreData.Id);
+            if (playerLoaded.Token.IsCancellationRequested)
+                return;
+
+            var playerContext = new PlayerContex(playerLoaded.StoreData, playerLoaded.Output);
 
             state.Players.Add(playerContext.Id, playerContext);
 
@@ -136,15 +147,17 @@ namespace DoubleMaze.Game
 
         public void Process(PlayerDisconnected disconnected)
         {
-            if (canProcess(disconnected.PlayerId) == false)
+            var playerId = disconnected.PlayerId;
+            if (canProcess(playerId) == false)
                 return;
 
-            storage.SavePlayer(state.Players[disconnected.PlayerId].GetStoreData());
+            LoadingsPlayers.Remove(playerId, x => x.Cancel());
 
-            //state.OldPlayers[disconnected.PlayerId] = state.Players[disconnected.PlayerId].GetStoreData();
-
-            state.Players[disconnected.PlayerId].PlayerHandler.PlayerLeft();
-            state.Players.Remove(disconnected.PlayerId);
+            state.Players.RemoveOrThrow(playerId, x =>
+            {
+                storage.SavePlayer(state.Players[playerId].GetStoreData());
+                x.PlayerHandler.PlayerLeft();
+            });
         }
 
         public void Process(PlayerInput input)

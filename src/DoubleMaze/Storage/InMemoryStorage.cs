@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DoubleMaze.Game;
 using DoubleMaze.Infrastructure;
+using System.Threading;
 
 namespace DoubleMaze.Storage
 {
@@ -24,9 +25,9 @@ namespace DoubleMaze.Storage
             players.Add(playerStoreData);
         }
 
-        public void LoadPlayer(Guid playerId, PlayerType playerType, Action<PlayerLoaded> callback)
+        public void LoadPlayer(Guid playerId, PlayerType playerType, Action<PlayerStoreData> callback)
         {
-            var storedPlayer = SingleOrDefault(playerId, playerType);
+            PlayerStoreData storedPlayer = SingleOrDefault(playerId, playerType);
             if (storedPlayer == null)
                 storedPlayer = new PlayerStoreData
                 {
@@ -37,7 +38,13 @@ namespace DoubleMaze.Storage
                     Rating = new Game.Maze.Rating()
                 };
 
-            callback(new PlayerLoaded(storedPlayer));
+            ExecuteWithDelay(() => callback(storedPlayer));
+        }
+
+        private static async void ExecuteWithDelay(Action action)
+        {
+            await Task.Delay(10000);
+            action();
         }
        
     }

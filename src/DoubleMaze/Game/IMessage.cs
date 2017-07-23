@@ -1,6 +1,7 @@
 ﻿using DoubleMaze.Infrastructure;
 using DoubleMaze.Util;
 using System;
+using System.Threading;
 
 namespace DoubleMaze.Game
 {
@@ -41,10 +42,14 @@ namespace DoubleMaze.Game
     public class PlayerLoaded : IMessage
     {
         public readonly PlayerStoreData StoreData;
+        public readonly CancellationToken Token;
+        public readonly Pipe<IGameCommand> Output;
 
-        public PlayerLoaded(PlayerStoreData storeData)
+        public PlayerLoaded(PlayerStoreData storeData, CancellationToken token, Pipe<IGameCommand> output)
         {
             StoreData = storeData;
+            Token = token;
+            Output = output;
         }
     }
 
