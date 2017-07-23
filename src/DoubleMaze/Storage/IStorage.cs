@@ -10,6 +10,6 @@ namespace DoubleMaze.Storage
     interface IStorage
     {
         void SavePlayer(PlayerStoreData playerStoreData);
-        void LoadPlayer(Guid playerId, Pipe<IMessage> inputQueue);
+        void LoadPlayer(Guid playerId, PlayerType playerType, Action<PlayerLoaded> callback);
     }
 }

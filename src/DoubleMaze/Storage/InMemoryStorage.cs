@@ -9,14 +9,36 @@ namespace DoubleMaze.Storage
 {
     public class InMemoryStorage : IStorage
     {
-        public void LoadPlayer(Guid playerId, Pipe<IMessage> inputQueue)
+        private List<PlayerStoreData> players = new List<PlayerStoreData>();
+
+        private PlayerStoreData SingleOrDefault(Guid id, PlayerType playerType)
         {
-            throw new NotImplementedException();
+            return players.SingleOrDefault(x => x.Id == id && x.PlayerType == playerType);
         }
 
         public void SavePlayer(PlayerStoreData playerStoreData)
         {
-            throw new NotImplementedException();
+            var storedPlayer = SingleOrDefault(playerStoreData.Id, playerStoreData.PlayerType);
+            players.Remove(storedPlayer);
+
+            players.Add(playerStoreData);
         }
+
+        public void LoadPlayer(Guid playerId, PlayerType playerType, Action<PlayerLoaded> callback)
+        {
+            var storedPlayer = SingleOrDefault(playerId, playerType);
+            if (storedPlayer == null)
+                storedPlayer = new PlayerStoreData
+                {
+                    Id = playerId,
+                    IsActivated = false,
+                    Name = null,
+                    PlayerType = playerType,
+                    Rating = new Game.Maze.Rating()
+                };
+
+            callback(new PlayerLoaded(storedPlayer));
+        }
+       
     }
 }

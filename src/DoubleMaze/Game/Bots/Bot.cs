@@ -27,7 +27,6 @@ namespace DoubleMaze.Game.Bots
         private async Task Process()
         {
             Output.Post(new PlayerConnected(BotId, Input, PlayerType.Bot));
-            Output.Post(new PlayerInput(BotId, new PlayerNameInput(Name)));
 
             while (await Input.OutputAvailableAsync())
             {
@@ -53,6 +52,9 @@ namespace DoubleMaze.Game.Bots
         {
             if (command.area != GotoCommand.Areas.Game)
                 solver = null;
+
+            if(command.area == GotoCommand.Areas.Stasis)
+                Output.Post(new PlayerInput(BotId, new PlayerNameInput(Name)));
         }
 
         private void Process(PlayerPosCommand command)

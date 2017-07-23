@@ -85,7 +85,7 @@ namespace DoubleMaze.Game
         private IStorage storage;
 
         //TODO избавиться от этой переменной, протаскивать Pipe<IGameCommand> через стородж
-        public Dictionary<Guid, Pipe<IGameCommand>> LoadedPlayers = new Dictionary<Guid, Pipe<IGameCommand>>();
+        private Dictionary<Guid, Pipe<IGameCommand>> LoadedPlayers = new Dictionary<Guid, Pipe<IGameCommand>>();
 
         public MessageDispatcher(Pipe<IMessage> inputQueue)
         {
@@ -102,6 +102,8 @@ namespace DoubleMaze.Game
             storage = new InMemoryStorage();
         }
 
+        private bool canProcess(Guid playerId) => state.Players.ContainsKey(playerId);
+
         public void Process(PlayerConnected connection)
         {
             if (state.Players.ContainsKey(connection.PlayerId))
@@ -112,7 +114,7 @@ namespace DoubleMaze.Game
             else
             {
                 LoadedPlayers.Add(connection.PlayerId, connection.OutputQueue);
-                storage.LoadPlayer(connection.PlayerId, state.InputQueue);
+                storage.LoadPlayer(connection.PlayerId, connection.PlayerType, x => state.InputQueue.Post(x));
             }
         }
 
@@ -126,15 +128,15 @@ namespace DoubleMaze.Game
             IAreaHandler handler = playerContext.PlayerType == PlayerType.Bot
                 ? new StasisAreaHandler(playerContext.Id, state)
                 : (playerLoaded.StoreData.IsActivated 
-                        ? (IAreaHandler)new WelcomeAreaHandler(playerContext.Id, state) 
-                        : new ReturnAreaHandler(playerContext.Id, state));
+                        ? (IAreaHandler)new ReturnAreaHandler(playerContext.Id, state)
+                        : new WelcomeAreaHandler(playerContext.Id, state));
 
             playerContext.SetHandler(handler);
         }
 
         public void Process(PlayerDisconnected disconnected)
         {
-            if (state.Players.ContainsKey(disconnected.PlayerId) == false)
+            if (canProcess(disconnected.PlayerId) == false)
                 return;
 
             storage.SavePlayer(state.Players[disconnected.PlayerId].GetStoreData());
@@ -148,7 +150,11 @@ namespace DoubleMaze.Game
         public void Process(PlayerInput input)
         {
             Console.WriteLine(input.playerInput);
-            state.Players[input.PlayerId].PlayerHandler.Process(input.playerInput);
+
+            if (canProcess(input.PlayerId))
+            {
+                state.Players[input.PlayerId].PlayerHandler.Process(input.playerInput);
+            }
         }
 
         public void Process(GameUpdate input)

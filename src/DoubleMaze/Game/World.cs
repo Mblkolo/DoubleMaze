@@ -24,7 +24,7 @@ namespace DoubleMaze.Game
                 while (await messages.OutputAvailableAsync())
                 {
                     var message = await messages.ReceiveAsync();
-                    (dispatcher).Process((dynamic)message);
+                    dispatcher.Process((dynamic)message);
                 }
             }
             catch(Exception e)
