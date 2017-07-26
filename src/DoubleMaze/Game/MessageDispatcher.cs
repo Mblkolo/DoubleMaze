@@ -88,7 +88,7 @@ namespace DoubleMaze.Game
 
         private Dictionary<Guid, CancellationTokenSource> LoadingsPlayers = new Dictionary<Guid, CancellationTokenSource>();
 
-        public MessageDispatcher(Pipe<IMessage> inputQueue)
+        public MessageDispatcher(Pipe<IMessage> inputQueue, IStorage storage)
         {
             state = new WorldState();
             state.InputQueue = inputQueue;
@@ -100,7 +100,7 @@ namespace DoubleMaze.Game
             state.Bots.Add(new Bot(inputQueue, 21));
 
             //TODO заменить иньекцией
-            storage = new InMemoryStorage();
+            this.storage = storage;
         }
 
         private bool canProcess(Guid playerId) => state.Players.ContainsKey(playerId);

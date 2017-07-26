@@ -65,6 +65,7 @@ namespace DoubleMaze.Game
     {
         public InputType Type => InputType.Token;
 
+        public Guid? PlayerId { get; set; }
         public string Token { get; set; }
 
         public override string ToString()

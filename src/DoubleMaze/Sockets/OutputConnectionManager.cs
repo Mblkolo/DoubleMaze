@@ -37,15 +37,11 @@ namespace DoubleMaze.Sockets
             this.playerDisconnected = playerDisconnected;
         }
 
-        internal PlayerConnection PlayerConnected(string tokenString, WebSocket socket)
+        internal PlayerConnection PlayerConnected(Guid playerId, WebSocket socket)
         {
             lock (Locker)
             {
-                Guid playerId;
-                if (Guid.TryParse(tokenString, out playerId) == false)
-                    playerId = Guid.NewGuid();
-
-                foreach (var connection in PlayerConnections.Where(x => x.PlayerId == playerId).ToArray())
+                 foreach (var connection in PlayerConnections.Where(x => x.PlayerId == playerId).ToArray())
                     RemoveConnection(connection);
 
                 var newConnection = new PlayerConnection(playerId, socket);

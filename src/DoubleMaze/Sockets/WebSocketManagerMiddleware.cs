@@ -1,4 +1,5 @@
 ﻿using DoubleMaze.Game;
+using DoubleMaze.Storage;
 using DoubleMaze.Util;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -10,14 +11,16 @@ namespace DoubleMaze.Sockets
     public class WebSocketManagerMiddleware
     {
         private readonly RequestDelegate _next;
-        private OutputConnectionManager _outConnectionManager { get; set; }
-        private World _world{ get; set; }
+        private readonly OutputConnectionManager _outConnectionManager;
+        private readonly World _world;
+        private readonly IStorage _storage;
 
-        public WebSocketManagerMiddleware(RequestDelegate next, OutputConnectionManager outConnectionManager, World world)
+        public WebSocketManagerMiddleware(RequestDelegate next, OutputConnectionManager outConnectionManager, World world, IStorage storage)
         {
             _next = next;
             _outConnectionManager = outConnectionManager;
             _world = world;
+            _storage = storage;
         }
 
         public async Task Invoke(HttpContext context)
@@ -51,8 +54,19 @@ namespace DoubleMaze.Sockets
             if (loginInput == null)
                 throw new Exception($"Это не {nameof(TokenInput)}");
 
-            PlayerConnection playerConnection = _outConnectionManager.PlayerConnected(loginInput.Token, socket);
-            await socket.SendDataAsync(new SetTokenCommand { token = playerConnection.PlayerId.ToString("N") });
+            var playerId = loginInput.PlayerId;
+            var token = loginInput.Token;
+
+            if (playerId == null || await _storage.CheckHumanPlayerAsync(playerId.Value, token) == false) {
+                playerId = Guid.NewGuid();
+                token = Guid.NewGuid().ToString("N");
+
+                await _storage.CreateHumanPlayerAsync(playerId.Value, token);
+            }
+
+            PlayerConnection playerConnection = _outConnectionManager.PlayerConnected(playerId.Value, socket);
+
+            await socket.SendDataAsync(new SetTokenCommand { playerId = playerId.Value.ToString("N"), token = token });
 
             return playerConnection;
         }

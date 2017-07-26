@@ -45,6 +45,7 @@ namespace DoubleMaze.Game
     public class SetTokenCommand : IGameCommand
     {
         public GameCommand command => GameCommand.SetToken;
+        public string playerId { get; set; }
         public string token { get; set; }
     }
 

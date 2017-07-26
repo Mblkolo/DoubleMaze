@@ -10,14 +10,14 @@ namespace DoubleMaze.Storage
     {
         private List<PlayerStoreData> players = new List<PlayerStoreData>();
 
-        private PlayerStoreData SingleOrDefault(Guid id, PlayerType playerType)
+        private PlayerStoreData GetPlayerOrNull(Guid playerId, PlayerType playerType)
         {
-            return players.SingleOrDefault(x => x.Id == id && x.PlayerType == playerType);
+            return players.SingleOrDefault(x => x.Id == playerId && x.PlayerType == playerType);
         }
 
         public void SavePlayer(PlayerStoreData playerStoreData)
         {
-            var storedPlayer = SingleOrDefault(playerStoreData.Id, playerStoreData.PlayerType);
+            var storedPlayer = GetPlayerOrNull(playerStoreData.Id, playerStoreData.PlayerType);
             players.Remove(storedPlayer);
 
             players.Add(playerStoreData);
@@ -25,25 +25,47 @@ namespace DoubleMaze.Storage
 
         public void LoadPlayer(Guid playerId, PlayerType playerType, Action<PlayerStoreData> callback)
         {
-            PlayerStoreData storedPlayer = SingleOrDefault(playerId, playerType);
+            PlayerStoreData storedPlayer = GetPlayerOrNull(playerId, playerType);
             if (storedPlayer == null)
-                storedPlayer = new PlayerStoreData
-                {
-                    Id = playerId,
-                    IsActivated = false,
-                    Name = null,
-                    PlayerType = playerType,
-                    Rating = new Game.Maze.Rating()
-                };
+                throw new Exception("Игрок не найден");
 
             ExecuteWithDelay(() => callback(storedPlayer));
         }
 
         private static async void ExecuteWithDelay(Action action)
         {
-            await Task.Delay(10000);
+            await Task.Delay(1000);
             action();
         }
-       
+
+        private Dictionary<Guid, string> playerTokens = new Dictionary<Guid, string>();
+
+
+        public async Task<bool> CheckHumanPlayerAsync(Guid playerId, string token)
+        {
+            await Task.Delay(1000);
+
+            return playerTokens.ContainsKey(playerId) && playerTokens[playerId] == token;
+        }
+
+        public async Task CreateHumanPlayerAsync(Guid playerId, string token)
+        {
+            await Task.Delay(1000);
+
+            playerTokens[playerId] = token;
+            if (GetPlayerOrNull(playerId, PlayerType.Human) != null)
+                throw new Exception("А такой игрок уже есть!");
+
+            var palyerStoreData = new PlayerStoreData
+            {
+                Id = playerId,
+                IsActivated = false,
+                Name = null,
+                PlayerType = PlayerType.Human,
+                Rating = new Game.Maze.Rating()
+            };
+
+            players.Add(palyerStoreData);
+        }
     }
 }
