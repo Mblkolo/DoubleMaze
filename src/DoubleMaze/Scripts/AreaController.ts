@@ -42,7 +42,11 @@ class LoadingArea implements IArea {
     }
 
     public enter() {
-        this.sendData(JSON.stringify({ Type: "token", Token: localStorage.getItem("token") }));
+        this.sendData(JSON.stringify({
+            Type: "token",
+            PlayerId: localStorage.getItem("playerId"),
+            Token: localStorage.getItem("token")
+        }));
     }
 
     public leave() {
@@ -51,6 +55,7 @@ class LoadingArea implements IArea {
     public process(data: any) {
         if (data.command === "setToken") {
             localStorage.setItem("token", data.token);
+            localStorage.setItem("playerId", data.playerId);
         }
     }
 
