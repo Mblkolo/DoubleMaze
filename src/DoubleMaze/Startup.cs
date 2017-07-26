@@ -8,8 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using DoubleMaze.Sockets;
-using System.Threading.Tasks.Dataflow;
 using DoubleMaze.Game;
+using DoubleMaze.Storage;
 
 namespace DoubleMaze
 {
@@ -42,9 +42,10 @@ namespace DoubleMaze
 
             app.UseWebSockets();
 
-            var world = new World();
+            var storage = new InMemoryStorage();
+            var world = new World(storage);
             var outConnection = new OutputConnectionManager(x => world.InputQueue.Post(new PlayerDisconnected(x)));
-            app.Map("/test", (_app) => _app.UseMiddleware<WebSocketManagerMiddleware>(outConnection, world));
+            app.Map("/test", (_app) => _app.UseMiddleware<WebSocketManagerMiddleware>(outConnection, world, storage));
 
             app.UseStaticFiles();
             app.UseMvc();

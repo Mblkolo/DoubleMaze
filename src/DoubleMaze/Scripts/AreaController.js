@@ -34,13 +34,18 @@ var LoadingArea = (function () {
         this.sendData = sendData;
     }
     LoadingArea.prototype.enter = function () {
-        this.sendData(JSON.stringify({ Type: "token", Token: localStorage.getItem("token") }));
+        this.sendData(JSON.stringify({
+            Type: "token",
+            PlayerId: localStorage.getItem("playerId"),
+            Token: localStorage.getItem("token")
+        }));
     };
     LoadingArea.prototype.leave = function () {
     };
     LoadingArea.prototype.process = function (data) {
         if (data.command === "setToken") {
             localStorage.setItem("token", data.token);
+            localStorage.setItem("playerId", data.playerId);
         }
     };
     return LoadingArea;

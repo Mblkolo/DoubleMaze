@@ -34,7 +34,11 @@ namespace DoubleMaze.Game.Areas
                             name = x.Name,
                             rating = x.Rating.RoundValue
                         }
-                      ).ToArray()
+                      )
+                      .OrderBy(x => x.rating)
+                      .ThenBy(x => x.name.Length)
+                      .ThenBy(x => x.name)
+                      .ToArray()
                 });
             }
             else

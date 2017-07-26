@@ -1,28 +1,26 @@
 ﻿using DoubleMaze.Game;
+using DoubleMaze.Storage;
+using DoubleMaze.Util;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 
 namespace DoubleMaze.Sockets
 {
     public class WebSocketManagerMiddleware
     {
         private readonly RequestDelegate _next;
-        private OutputConnectionManager _outConnectionManager { get; set; }
-        private World _world{ get; set; }
+        private readonly OutputConnectionManager _outConnectionManager;
+        private readonly World _world;
+        private readonly IStorage _storage;
 
-        public WebSocketManagerMiddleware(RequestDelegate next, OutputConnectionManager outConnectionManager, World world)
+        public WebSocketManagerMiddleware(RequestDelegate next, OutputConnectionManager outConnectionManager, World world, IStorage storage)
         {
             _next = next;
             _outConnectionManager = outConnectionManager;
             _world = world;
+            _storage = storage;
         }
 
         public async Task Invoke(HttpContext context)
@@ -56,8 +54,19 @@ namespace DoubleMaze.Sockets
             if (loginInput == null)
                 throw new Exception($"Это не {nameof(TokenInput)}");
 
-            PlayerConnection playerConnection = _outConnectionManager.PlayerConnected(loginInput.Token, socket);
-            await socket.SendDataAsync(new SetTokenCommand { token = playerConnection.PlayerId.ToString("N") });
+            var playerId = loginInput.PlayerId;
+            var token = loginInput.Token;
+
+            if (playerId == null || await _storage.CheckHumanPlayerAsync(playerId.Value, token) == false) {
+                playerId = Guid.NewGuid();
+                token = Guid.NewGuid().ToString("N");
+
+                await _storage.CreateHumanPlayerAsync(playerId.Value, token);
+            }
+
+            PlayerConnection playerConnection = _outConnectionManager.PlayerConnected(playerId.Value, socket);
+
+            await socket.SendDataAsync(new SetTokenCommand { playerId = playerId.Value.ToString("N"), token = token });
 
             return playerConnection;
         }
@@ -72,164 +81,6 @@ namespace DoubleMaze.Sockets
                 var input = await socket.ReadInputAsync(buffer);
                 _world.InputQueue.Post(new PlayerInput(playerConnection.PlayerId, input));
             }
-        }
-    }
-
-    public class PlayerConnection
-    {
-        public Guid ConnectionId { get; }
-        public OutputChanel OutputChanel { get; }
-        public Guid PlayerId { get; }
-        public WebSocket WebSocket { get; }
-
-        public PlayerConnection(Guid playerId, WebSocket socket)
-        {
-            PlayerId = playerId;
-
-            ConnectionId = Guid.NewGuid();
-            OutputChanel = new OutputChanel(socket);
-            WebSocket = socket;
-        }
-
-    }
-
-    public class OutputConnectionManager
-    {
-        private object Locker = new object();
-        private List<PlayerConnection> PlayerConnections = new List<PlayerConnection>();
-        private Dictionary<Guid, Timer> TimeoutTimers = new Dictionary<Guid, Timer>();
-
-        private Action<Guid> playerDisconnected;
-
-        public OutputConnectionManager(Action<Guid> playerDisconnected)
-        {
-            this.playerDisconnected = playerDisconnected;
-        }
-
-        internal PlayerConnection PlayerConnected(string tokenString, WebSocket socket)
-        {
-            lock(Locker)
-            {
-                Guid playerId;
-                if (Guid.TryParse(tokenString, out playerId) == false)
-                    playerId = Guid.NewGuid();
-
-                foreach(var connection in PlayerConnections.Where(x => x.PlayerId == playerId).ToArray())
-                    RemoveConnection(connection);
-
-                var newConnection = new PlayerConnection(playerId, socket);
-                PlayerConnections.Add(newConnection);
-                
-                DisploseAndRemoveTimer(playerId);
-
-                return newConnection;
-            }
-        }
-        
-        private void RemoveConnection(PlayerConnection connection)
-        {
-            connection.OutputChanel.InputQueue.Complete();
-            PlayerConnections.Remove(connection);
-        }
-
-        internal void ConnectionClosed(Guid connectionId)
-        {
-            lock (Locker)
-            {
-                var connection = PlayerConnections.Where(x => x.ConnectionId == connectionId).SingleOrDefault();
-                if (connection == null)
-                    return;
-
-                RemoveConnection(connection);
-
-                var timer = new Timer(TimeoutPlayer, connection.PlayerId, TimeSpan.FromSeconds(10), Timeout.InfiniteTimeSpan);
-                TimeoutTimers.Add(connection.PlayerId, timer);
-            }
-        }
-
-        private void TimeoutPlayer(object playerIdObject)
-        {
-            Guid playerId = (Guid)playerIdObject;
-            lock (Locker)
-            {
-                if (TimeoutTimers.ContainsKey(playerId) == false)
-                    return;
-
-                DisploseAndRemoveTimer(playerId);
-                playerDisconnected(playerId);
-            }
-        }
-
-        private void DisploseAndRemoveTimer(Guid playerId)
-        {
-            if(TimeoutTimers.ContainsKey(playerId))
-            {
-                TimeoutTimers[playerId].Dispose();
-                TimeoutTimers.Remove(playerId);
-            }
-        }
-
-    }
-
-    public static class WebSocketIoExtensions
-    {
-        public static async Task SendDataAsync(this WebSocket socket, IGameCommand data)
-        {
-            if (socket.State != WebSocketState.Open)
-                return;
-
-            var message = JsonConvert.SerializeObject(data);
-            byte[] bytes = Encoding.UTF8.GetBytes(message);
-            await socket.SendAsync(buffer: new ArraySegment<byte>(array: bytes,
-                                                                  offset: 0,
-                                                                  count: bytes.Length),
-                                   messageType: WebSocketMessageType.Text,
-                                   endOfMessage: true,
-                                   cancellationToken: CancellationToken.None);
-        }
-
-
-        public static async Task<IPlayerInput> ReadInputAsync(this WebSocket socket, byte[] buffer)
-        {
-            var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            if (result.EndOfMessage == false)
-                throw new Exception("Слишком длинное сообщение");
-
-            if (result.MessageType != WebSocketMessageType.Text)
-                throw new Exception("Это сообщение не текст");
-
-            return DecodeMessage(Encoding.UTF8.GetString(buffer, 0, result.Count));
-        }
-
-        private static IPlayerInput DecodeMessage(string message)
-        {
-            //Быстро и грязно
-            //TODO переписать по человечески
-            var checker = JsonConvert.DeserializeObject<CheckType>(message);
-            if (checker.Type == InputType.PlayerName)
-                return JsonConvert.DeserializeObject<PlayerNameInput>(message);
-
-            if (checker.Type == InputType.KeyDown)
-                return JsonConvert.DeserializeObject<KeyDownInput>(message);
-
-            if (checker.Type == InputType.Token)
-                return JsonConvert.DeserializeObject<TokenInput>(message);
-
-            if (checker.Type == InputType.PlayAgain)
-                return JsonConvert.DeserializeObject<PlayAgainInput>(message);
-
-            if (checker.Type == InputType.ResetPlayer)
-                return JsonConvert.DeserializeObject<ResetPlayerInput>(message);
-
-            if (checker.Type == InputType.PlayWithBot)
-                return JsonConvert.DeserializeObject<PlayWithBotInput>(message);
-
-            throw new NotImplementedException();
-        }
-
-        private class CheckType : IPlayerInput
-        {
-            public InputType Type { get; set; }
         }
     }
 }

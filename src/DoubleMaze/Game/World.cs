@@ -1,4 +1,5 @@
 ﻿using DoubleMaze.Infrastructure;
+using DoubleMaze.Storage;
 using System;
 using System.Threading.Tasks;
 
@@ -10,11 +11,11 @@ namespace DoubleMaze.Game
         private readonly Task mainLoop;
         private readonly MessageDispatcher dispatcher;
 
-        public World()
+        public World(IStorage storage)
         {
             InputQueue = new Pipe<IMessage>();
             mainLoop = MainLoop(InputQueue);
-            dispatcher = new MessageDispatcher(InputQueue);
+            dispatcher = new MessageDispatcher(InputQueue, storage);
         }
 
         private async Task MainLoop(Pipe<IMessage> messages)
@@ -24,7 +25,7 @@ namespace DoubleMaze.Game
                 while (await messages.OutputAvailableAsync())
                 {
                     var message = await messages.ReceiveAsync();
-                    (dispatcher).Process((dynamic)message);
+                    dispatcher.Process((dynamic)message);
                 }
             }
             catch(Exception e)

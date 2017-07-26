@@ -10,16 +10,18 @@ namespace DoubleMaze.Game.Bots
     {
         public readonly Pipe<IGameCommand> Input = new Pipe<IGameCommand>();
         public readonly string Name;
-        public readonly Guid BotId = Guid.NewGuid();
+        public readonly Guid BotId;
 
         private readonly int depth;
         private readonly Pipe<IMessage> Output;
         private readonly Task ProcessTask;
 
-        public Bot(Pipe<IMessage> output, int depth)
+        public Bot(Pipe<IMessage> output, int depth, Guid botId)
         {
             Output = output;
             this.depth = depth;
+            BotId = botId;
+
             Name = $"Бот {depth}";
             ProcessTask = Process();
         }
@@ -27,7 +29,6 @@ namespace DoubleMaze.Game.Bots
         private async Task Process()
         {
             Output.Post(new PlayerConnected(BotId, Input, PlayerType.Bot));
-            Output.Post(new PlayerInput(BotId, new PlayerNameInput(Name)));
 
             while (await Input.OutputAvailableAsync())
             {
@@ -53,6 +54,9 @@ namespace DoubleMaze.Game.Bots
         {
             if (command.area != GotoCommand.Areas.Game)
                 solver = null;
+
+            if(command.area == GotoCommand.Areas.Stasis)
+                Output.Post(new PlayerInput(BotId, new PlayerNameInput(Name)));
         }
 
         private void Process(PlayerPosCommand command)
