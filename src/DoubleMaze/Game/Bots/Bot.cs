@@ -10,16 +10,18 @@ namespace DoubleMaze.Game.Bots
     {
         public readonly Pipe<IGameCommand> Input = new Pipe<IGameCommand>();
         public readonly string Name;
-        public readonly Guid BotId = Guid.NewGuid();
+        public readonly Guid BotId;
 
         private readonly int depth;
         private readonly Pipe<IMessage> Output;
         private readonly Task ProcessTask;
 
-        public Bot(Pipe<IMessage> output, int depth)
+        public Bot(Pipe<IMessage> output, int depth, Guid botId)
         {
             Output = output;
             this.depth = depth;
+            BotId = botId;
+
             Name = $"Бот {depth}";
             ProcessTask = Process();
         }

@@ -3,12 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DoubleMaze.Game;
+using DoubleMaze.Game.Bots;
 
 namespace DoubleMaze.Storage
 {
     public class InMemoryStorage : IStorage
     {
-        private List<PlayerStoreData> players = new List<PlayerStoreData>();
+        private readonly List<PlayerStoreData> players;
+
+        public InMemoryStorage()
+        {
+            players = BotDatas.Data.Select(x => CreatePlayer(x.Id, PlayerType.Bot)).ToList();
+        }
+
 
         private PlayerStoreData GetPlayerOrNull(Guid playerId, PlayerType playerType)
         {
@@ -56,16 +63,19 @@ namespace DoubleMaze.Storage
             if (GetPlayerOrNull(playerId, PlayerType.Human) != null)
                 throw new Exception("А такой игрок уже есть!");
 
-            var palyerStoreData = new PlayerStoreData
+            players.Add(CreatePlayer(playerId, PlayerType.Human));
+        }
+
+        private static PlayerStoreData CreatePlayer(Guid playerId, PlayerType playerType)
+        {
+            return new PlayerStoreData
             {
                 Id = playerId,
                 IsActivated = false,
                 Name = null,
-                PlayerType = PlayerType.Human,
+                PlayerType = playerType,
                 Rating = new Game.Maze.Rating()
             };
-
-            players.Add(palyerStoreData);
         }
     }
 }

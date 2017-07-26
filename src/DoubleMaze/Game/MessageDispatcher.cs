@@ -6,6 +6,7 @@ using DoubleMaze.Storage;
 using DoubleMaze.Util;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace DoubleMaze.Game
@@ -93,11 +94,7 @@ namespace DoubleMaze.Game
             state = new WorldState();
             state.InputQueue = inputQueue;
 
-            state.Bots.Add(new Bot(inputQueue, 5));
-            state.Bots.Add(new Bot(inputQueue, 9));
-            state.Bots.Add(new Bot(inputQueue, 13));
-            state.Bots.Add(new Bot(inputQueue, 17));
-            state.Bots.Add(new Bot(inputQueue, 21));
+            state.Bots.AddRange(BotDatas.Data.Select(x => new Bot(inputQueue, x.Depth, x.Id)));
 
             //TODO заменить иньекцией
             this.storage = storage;
