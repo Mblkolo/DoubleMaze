@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Npgsql;
+using SimpleMigrations;
+using SimpleMigrations.DatabaseProvider;
+using System.Reflection;
 
 namespace DoubleMaze.Migrations
 {
@@ -9,6 +9,16 @@ namespace DoubleMaze.Migrations
     {
         public static void Main(string[] args)
         {
+            var migrationsAssembly = Assembly.GetEntryAssembly();
+
+            using (var connection = new NpgsqlConnection("Host=127.0.0.1;Username=doublemazeuser;Password=mycoolpass;Database=doublemaze"))
+            {
+                var databaseProvider = new PostgresqlDatabaseProvider(connection);
+                var migrator = new SimpleMigrator(migrationsAssembly, databaseProvider);
+                migrator.Load();
+
+                    migrator.MigrateToLatest();
+            }
         }
     }
 }

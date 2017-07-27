@@ -9,7 +9,8 @@
         "type": "platform",
         "version": "1.0.1"
     },
-    "Npgsql": "3.2.5"
+    "Npgsql": "3.2.5",
+    "Simple.Migrations": "0.9.14"
   },
 
   "frameworks": {
