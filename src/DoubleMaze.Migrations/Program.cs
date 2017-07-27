@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace DoubleMaze.Migrations
 {
-    public class Class1
+    public class Program
     {
-        public Class1()
+        public static void Main(string[] args)
         {
         }
     }
