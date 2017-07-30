@@ -30,8 +30,8 @@ namespace DoubleMaze.Game
 
         public Guid PlayerId { get; set; }
         public string Name { get; set; }
-        public Rating Rating { get; set; }
-        public bool IsActivated { get; internal set; }
+        public decimal Rating { get; set; }
+        public bool IsActivated { get; set; }
     }
 
     public class PlayerContex
@@ -51,7 +51,7 @@ namespace DoubleMaze.Game
             Output = output;
 
             Id = storeData.PlayerId;
-            Rating = storeData.Rating;
+            Rating = new Rating(storeData.Rating);
             Name = storeData.Name;
             IsActivated = storeData.IsActivated;
             PlayerType = storeData.PlayerType;
@@ -68,7 +68,7 @@ namespace DoubleMaze.Game
             return new PlayerStoreData
             {
                 PlayerId = Id,
-                Rating = Rating,
+                Rating = Rating.Value,
                 Name = Name
             };
         }
@@ -154,7 +154,7 @@ namespace DoubleMaze.Game
 
             state.Players.RemoveOrThrow(playerId, x =>
             {
-                storage.SavePlayer(state.Players[playerId].GetStoreData());
+                storage.SavePlayer(x.GetStoreData());
                 x.PlayerHandler.PlayerLeft();
             });
         }

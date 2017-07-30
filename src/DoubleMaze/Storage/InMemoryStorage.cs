@@ -74,7 +74,7 @@ namespace DoubleMaze.Storage
                 IsActivated = false,
                 Name = null,
                 PlayerType = playerType,
-                Rating = new Game.Maze.Rating()
+                Rating = 1000
             };
         }
     }

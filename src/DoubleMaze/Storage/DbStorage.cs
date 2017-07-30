@@ -30,12 +30,13 @@ namespace DoubleMaze.Storage
             using (IDbConnection con = new Npgsql.NpgsqlConnection(connectionString))
             {
                 await con.ExecuteScalarAsync<bool>(
-                    @"INSERT INTO users(is_activated, player_id, player_type, payload)
-                        VALUES (false, @playerId, @playerType, @payload::jsonb)",
+                    @"INSERT INTO users(is_activated, player_id, player_type, rating, payload)
+                        VALUES (false, @playerId, @playerType, @rating, @payload::jsonb)",
                     new
                     {
                         playerId,
                         token,
+                        rating = 1000,
                         playerType = PlayerType.Human.ToString(),
                         payload = $@"{{""token"": ""{token}""}}"
                     });
@@ -52,10 +53,7 @@ namespace DoubleMaze.Storage
                         "SELECT * FROM users WHERE player_id=@playerId AND player_type=@playerType",
                         new { playerId, playerType = playerType.ToString() });
 
-                    var playerData = playerDatas.Single();
-                    playerData.Rating = new Game.Maze.Rating();
-
-                    callback(playerData);
+                    callback(playerDatas.Single());
                 }
             });
         }
@@ -67,7 +65,7 @@ namespace DoubleMaze.Storage
                 using (IDbConnection con = new Npgsql.NpgsqlConnection(connectionString))
                 {
                     var playerData = con.ExecuteScalar<PlayerStoreData>(
-                        @"UPDATE users SET name=@Name, is_activated = @isActivated
+                        @"UPDATE users SET name=@Name, is_activated = @isActivated, rating=@rating
                             WHERE playerId=@playerId AND player_type=@playerTypeString", playerStoreData);
                 }
             });
