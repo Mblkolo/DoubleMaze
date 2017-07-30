@@ -26,8 +26,9 @@ namespace DoubleMaze.Game
     public class PlayerStoreData
     {
         public PlayerType PlayerType { get; set; }
+        public string PlayerTypeString => PlayerType.ToString();
 
-        public Guid Id { get; set; }
+        public Guid PlayerId { get; set; }
         public string Name { get; set; }
         public Rating Rating { get; set; }
         public bool IsActivated { get; internal set; }
@@ -49,7 +50,7 @@ namespace DoubleMaze.Game
         {
             Output = output;
 
-            Id = storeData.Id;
+            Id = storeData.PlayerId;
             Rating = storeData.Rating;
             Name = storeData.Name;
             IsActivated = storeData.IsActivated;
@@ -66,7 +67,7 @@ namespace DoubleMaze.Game
         {
             return new PlayerStoreData
             {
-                Id = Id,
+                PlayerId = Id,
                 Rating = Rating,
                 Name = Name
             };

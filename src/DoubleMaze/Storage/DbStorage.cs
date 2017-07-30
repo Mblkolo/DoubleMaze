@@ -31,25 +31,46 @@ namespace DoubleMaze.Storage
             {
                 await con.ExecuteScalarAsync<bool>(
                     @"INSERT INTO users(is_activated, player_id, player_type, payload)
-                        VALUES (false, @playerId, @playerType, @payload::jsonb)", 
+                        VALUES (false, @playerId, @playerType, @payload::jsonb)",
                     new
                     {
                         playerId,
                         token,
-                        playerType = PlayerType.Human,
+                        playerType = PlayerType.Human.ToString(),
                         payload = $@"{{""token"": ""{token}""}}"
-                    } );
+                    });
             }
         }
 
         public void LoadPlayer(Guid playerId, PlayerType playerType, Action<PlayerStoreData> callback)
         {
-            throw new NotImplementedException();
+            Task.Run(() =>
+            {
+                using (IDbConnection con = new Npgsql.NpgsqlConnection(connectionString))
+                {
+                    var playerDatas = con.Query<PlayerStoreData>(
+                        "SELECT * FROM users WHERE player_id=@playerId AND player_type=@playerType",
+                        new { playerId, playerType = playerType.ToString() });
+
+                    var playerData = playerDatas.Single();
+                    playerData.Rating = new Game.Maze.Rating();
+
+                    callback(playerData);
+                }
+            });
         }
 
         public void SavePlayer(PlayerStoreData playerStoreData)
         {
-            throw new NotImplementedException();
+            Task.Run(() =>
+            {
+                using (IDbConnection con = new Npgsql.NpgsqlConnection(connectionString))
+                {
+                    var playerData = con.ExecuteScalar<PlayerStoreData>(
+                        @"UPDATE users SET name=@Name, is_activated = @isActivated
+                            WHERE playerId=@playerId AND player_type=@playerTypeString", playerStoreData);
+                }
+            });
         }
     }
 }

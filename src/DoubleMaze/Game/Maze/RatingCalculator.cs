@@ -13,7 +13,6 @@ namespace DoubleMaze.Game.Maze
         public double RoundValue => Round(Value, 1);
 
         public double Value { get; private set; }
-        public int Wins { get; private set; } = 0;
 
         public static void Update(Rating ra, Rating rb, bool raWin, bool rbWin)
         {
@@ -22,12 +21,6 @@ namespace DoubleMaze.Game.Maze
 
             ra.Value = Calc(raValue, rbValue, GetWinBalls(raWin, rbWin));
             rb.Value = Calc(rbValue, raValue, GetWinBalls(rbWin, raWin));
-
-            if (raWin)
-                ra.Wins++;
-
-            if (rbWin)
-                rb.Wins++;
         }
 
         private static double GetWinBalls(bool raWin, bool rbWin)
