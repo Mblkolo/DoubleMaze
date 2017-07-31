@@ -39,7 +39,7 @@ namespace DoubleMaze.Game
     public class MazeFieldCommandPlayer
     {
         public string name { get; set; }
-        public double rating { get; set; }
+        public decimal rating { get; set; }
     }
 
     public class SetTokenCommand : IGameCommand
@@ -68,7 +68,7 @@ namespace DoubleMaze.Game
     public class GameOverCommandRating
     {
         public string name { get; set; }
-        public double rating { get; set; }
+        public decimal rating { get; set; }
         public bool isMe { get; set; }
         public bool isEnemy { get; set; }
     }
@@ -91,7 +91,7 @@ namespace DoubleMaze.Game
     public class PlayerInfo : IGameCommand
     {
         public GameCommand command => GameCommand.PlayerInfo;
-        public double rating { get; set; }
+        public decimal rating { get; set; }
         public string name { get; set; }
     }
 
@@ -107,6 +107,6 @@ namespace DoubleMaze.Game
         public string id { get; set; }
         public bool isAwaible { get; set; }
         public string name { get; set; }
-        public double rating { get; set; }
+        public decimal rating { get; set; }
     }
 }

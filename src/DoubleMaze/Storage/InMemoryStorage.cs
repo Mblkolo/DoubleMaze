@@ -19,12 +19,12 @@ namespace DoubleMaze.Storage
 
         private PlayerStoreData GetPlayerOrNull(Guid playerId, PlayerType playerType)
         {
-            return players.SingleOrDefault(x => x.Id == playerId && x.PlayerType == playerType);
+            return players.SingleOrDefault(x => x.PlayerId == playerId && x.PlayerType == playerType);
         }
 
         public void SavePlayer(PlayerStoreData playerStoreData)
         {
-            var storedPlayer = GetPlayerOrNull(playerStoreData.Id, playerStoreData.PlayerType);
+            var storedPlayer = GetPlayerOrNull(playerStoreData.PlayerId, playerStoreData.PlayerType);
             players.Remove(storedPlayer);
 
             players.Add(playerStoreData);
@@ -70,11 +70,11 @@ namespace DoubleMaze.Storage
         {
             return new PlayerStoreData
             {
-                Id = playerId,
+                PlayerId = playerId,
                 IsActivated = false,
                 Name = null,
                 PlayerType = playerType,
-                Rating = new Game.Maze.Rating()
+                Rating = 1000
             };
         }
     }

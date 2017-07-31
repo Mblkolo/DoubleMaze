@@ -39,7 +39,7 @@ namespace DoubleMaze.Tests
         [TestCase(1000d, 0d)]
         [TestCase(2000, 1000)]
         [TestCase(1000, 2000)]
-        public void EloRatingSumNoChange(double rating1Value, double rating2Value)
+        public void EloRatingSumNoChange(decimal rating1Value, decimal rating2Value)
         {
             var rating1 = new Rating(rating1Value);
             var rating2 = new Rating(rating2Value);

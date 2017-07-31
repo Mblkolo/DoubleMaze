@@ -13,24 +13,33 @@ namespace DoubleMaze.Game
 {
     public class WorldState
     {
-        public Dictionary<Guid, PlayerContex> Players = new Dictionary<Guid, PlayerContex>();
-        public Dictionary<Guid, SimpleMaze> Games = new Dictionary<Guid, SimpleMaze>();
+        public readonly Dictionary<Guid, PlayerContex> Players = new Dictionary<Guid, PlayerContex>();
+        public readonly Dictionary<Guid, SimpleMaze> Games = new Dictionary<Guid, SimpleMaze>();
         public Guid? WaitPlayer;
 
-        public Pipe<IMessage> InputQueue;
+        public readonly Pipe<IMessage> InputQueue;
 
-        public List<Bot> Bots = new List<Bot>();
-        public HashSet<Guid> BotInGame = new HashSet<Guid>();
+        public readonly List<Bot> Bots = new List<Bot>();
+        public readonly HashSet<Guid> BotInGame = new HashSet<Guid>();
+
+        public readonly IStorage Storage;
+
+        public WorldState(Pipe<IMessage> inputQueue, IStorage storage)
+        {
+            InputQueue = inputQueue;
+            Storage = storage;
+        }
     }
 
     public class PlayerStoreData
     {
         public PlayerType PlayerType { get; set; }
+        public string PlayerTypeString => PlayerType.ToString();
 
-        public Guid Id { get; set; }
+        public Guid PlayerId { get; set; }
         public string Name { get; set; }
-        public Rating Rating { get; set; }
-        public bool IsActivated { get; internal set; }
+        public decimal Rating { get; set; }
+        public bool IsActivated { get; set; }
     }
 
     public class PlayerContex
@@ -49,8 +58,8 @@ namespace DoubleMaze.Game
         {
             Output = output;
 
-            Id = storeData.Id;
-            Rating = storeData.Rating;
+            Id = storeData.PlayerId;
+            Rating = new Rating(storeData.Rating);
             Name = storeData.Name;
             IsActivated = storeData.IsActivated;
             PlayerType = storeData.PlayerType;
@@ -66,9 +75,11 @@ namespace DoubleMaze.Game
         {
             return new PlayerStoreData
             {
-                Id = Id,
-                Rating = Rating,
-                Name = Name
+                PlayerId = Id,
+                Rating = Rating.Value,
+                Name = Name,
+                IsActivated = IsActivated,
+                PlayerType = PlayerType
             };
         }
 
@@ -85,19 +96,14 @@ namespace DoubleMaze.Game
     public class MessageDispatcher
     {
         private WorldState state;
-        private IStorage storage;
 
         private Dictionary<Guid, CancellationTokenSource> LoadingsPlayers = new Dictionary<Guid, CancellationTokenSource>();
 
-        public MessageDispatcher(Pipe<IMessage> inputQueue, IStorage storage)
+        public MessageDispatcher(WorldState state)
         {
-            state = new WorldState();
-            state.InputQueue = inputQueue;
+            this.state = state;
 
-            state.Bots.AddRange(BotDatas.Data.Select(x => new Bot(inputQueue, x.Depth, x.Id)));
-
-            //TODO заменить иньекцией
-            this.storage = storage;
+            state.Bots.AddRange(BotDatas.Data.Select(x => new Bot(state.InputQueue, x.Depth, x.Id)));
         }
 
         private bool canProcess(Guid playerId) => state.Players.ContainsKey(playerId);
@@ -118,7 +124,7 @@ namespace DoubleMaze.Game
 
                 LoadingsPlayers.Replace(playerId, source, old => old.Cancel());
 
-                storage.LoadPlayer(playerId, connection.PlayerType, x =>
+                state.Storage.LoadPlayer(playerId, connection.PlayerType, x =>
                 {
                     state.InputQueue.Post(new PlayerLoaded(x, source.Token, connection.OutputQueue));
                 });
@@ -153,7 +159,7 @@ namespace DoubleMaze.Game
 
             state.Players.RemoveOrThrow(playerId, x =>
             {
-                storage.SavePlayer(state.Players[playerId].GetStoreData());
+                state.Storage.SavePlayer(x.GetStoreData());
                 x.PlayerHandler.PlayerLeft();
             });
         }
