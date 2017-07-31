@@ -77,7 +77,7 @@ namespace DoubleMaze.Game.Areas
             var firstPlayer = new MazePlayer(state.Players[firstPlayerId]);
             var secondPlayer = new MazePlayer(state.Players[secondPlayerId]);
 
-            var game = new SimpleMaze(state, Guid.NewGuid(), firstPlayer, secondPlayer);
+            var game = new SimpleMaze(state, firstPlayer, secondPlayer);
             state.Games.Add(game.GameId, game);
 
             state.Players[firstPlayer.Id].SetHandler(new GameAreaHandler(firstPlayer.Id, state, game, firstPlayer));

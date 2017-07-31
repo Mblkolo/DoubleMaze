@@ -22,11 +22,11 @@ namespace DoubleMaze.Game
         public Guid GameId;
         private MazeField mazeField;
 
-        public SimpleMaze(WorldState state, Guid gameId, MazePlayer firstPlayer, MazePlayer secondPlayer)
+        public SimpleMaze(WorldState state, MazePlayer firstPlayer, MazePlayer secondPlayer)
         {
             mazeField = mazeGenerator.Generate(31, 21);
             this.state = state;
-            GameId = gameId;
+            GameId = Guid.NewGuid();
             this.firstPlayer = firstPlayer;
             this.secondPlayer = secondPlayer;
 
@@ -52,6 +52,9 @@ namespace DoubleMaze.Game
                 FinishGame();
 
                 Rating.Update(firstPlayer.Rating, secondPlayer.Rating, firstPlayer.IsWin, secondPlayer.IsWin);
+
+                state.Storage.SavePlayer(state.Players[firstPlayer.Id].GetStoreData());
+                state.Storage.SavePlayer(state.Players[secondPlayer.Id].GetStoreData());
 
                 SendState(firstPlayer);
                 SendState(secondPlayer);

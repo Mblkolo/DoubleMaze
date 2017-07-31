@@ -15,7 +15,7 @@ namespace DoubleMaze.Game
         {
             InputQueue = new Pipe<IMessage>();
             mainLoop = MainLoop(InputQueue);
-            dispatcher = new MessageDispatcher(InputQueue, storage);
+            dispatcher = new MessageDispatcher(new WorldState(InputQueue, storage));
         }
 
         private async Task MainLoop(Pipe<IMessage> messages)
