@@ -31,6 +31,7 @@ namespace DoubleMaze.Game.Areas
             if (o != null)
             {
                 state.Players[playerId].Name = string.IsNullOrWhiteSpace(o.Name) ? NameGenerator.GenerateName() : o.Name.Trim();
+                state.Players[playerId].IsActivated = true;
                 state.Players[playerId].SetHandler(new WaitGameHandler(playerId, state));
             }
         }

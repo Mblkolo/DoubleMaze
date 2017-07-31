@@ -66,7 +66,7 @@ namespace DoubleMaze.Storage
                 {
                     var playerData = con.ExecuteScalar<PlayerStoreData>(
                         @"UPDATE users SET name=@Name, is_activated = @isActivated, rating=@rating
-                            WHERE playerId=@playerId AND player_type=@playerTypeString", playerStoreData);
+                            WHERE player_id=@playerId AND player_type=@playerTypeString", playerStoreData);
                 }
             });
         }
