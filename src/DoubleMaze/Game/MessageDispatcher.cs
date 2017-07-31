@@ -78,7 +78,8 @@ namespace DoubleMaze.Game
                 PlayerId = Id,
                 Rating = Rating.Value,
                 Name = Name,
-                IsActivated = IsActivated
+                IsActivated = IsActivated,
+                PlayerType = PlayerType
             };
         }
 
