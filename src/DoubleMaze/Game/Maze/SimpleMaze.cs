@@ -254,6 +254,7 @@ namespace DoubleMaze.Game
             const float progressInTick = 0.3f;
 
             progress += progressInTick;
+
             if (progress > 1 || currentCommand == InputCommand.None)
             {
                 pos = nextpos;
@@ -280,6 +281,27 @@ namespace DoubleMaze.Game
                     progress = 0;
                     currentCommand = InputCommand.None;
                 }
+            }
+
+            //Реверс!
+            if (currentCommand != InputCommand.None && Сommand != InputCommand.None && currentCommand != Сommand && progress < 0.5)
+            {
+                var tPos = pos;
+                pos = nextpos;
+                nextpos = tPos;
+
+                progress = 1 - progress;
+                if (currentCommand == InputCommand.Left)
+                    currentCommand = InputCommand.Right;
+
+                if (currentCommand == InputCommand.Right)
+                    currentCommand = InputCommand.Left;
+
+                if (currentCommand == InputCommand.Down)
+                    currentCommand = InputCommand.Up;
+
+                if (currentCommand == InputCommand.Up)
+                    currentCommand = InputCommand.Down;
             }
         }
     }
