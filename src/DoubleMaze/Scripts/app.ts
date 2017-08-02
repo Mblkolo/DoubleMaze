@@ -3,7 +3,11 @@
 let controller = new AreaController(sendMessage);
 
 
-var uri = "ws://" + window.location.host + "/test";
+const loc = window.location;
+let uri = (loc.protocol === "https:") ? "wss:" : "ws:";
+uri += "//" + loc.host + loc.pathname.split('/').slice(0, -1).join('/') + "/test";
+
+
 let socket: WebSocket;
 function connect() {
     socket = new WebSocket(uri);
@@ -15,26 +19,10 @@ function connect() {
         console.log("closed connection from " + uri);
     };
     socket.onmessage = function (event) {
-        //appendItem(list, event.data);
-        console.log(event.data);
+        //console.log(event.data);
 
         var res = JSON.parse(event.data);
-
         controller.process(res);
-        //console.log(res);
-        //if (res.command == "getToken")
-        //    localStorage.setItem("token", res.Token);
-
-
-        //if (res.command === "playerState")
-        //    moveTo(res.myPos, res.enemyPos);
-        //else if (res.command === "mazeFeild")
-        //    setField(res.field)
-        //else if (res.command == "getToken")
-        //    localStorage.setItem("token", res.Token)
-        //else if (res.command == "gameOwer")
-        //    inGame = false;
-
     };
     socket.onerror = function (event) {
         console.log("error: " + event.returnValue);
