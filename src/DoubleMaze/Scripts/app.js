@@ -1,9 +1,9 @@
 "use strict";
 var AreaController_ts_1 = require("./AreaController.ts");
-var controller = new AreaController_ts_1.AreaController(sendMessage);
 var loc = window.location;
 var uri = (loc.protocol === "https:") ? "wss:" : "ws:";
-uri += "//" + loc.host + loc.pathname + "/test";
+uri += "//" + loc.host + loc.pathname.split('/').slice(0, -1).join('/') + "/test";
+var controller = new AreaController_ts_1.AreaController(sendMessage);
 var socket;
 function connect() {
     socket = new WebSocket(uri);
@@ -13,6 +13,8 @@ function connect() {
     };
     socket.onclose = function (event) {
         console.log("closed connection from " + uri);
+        alert("Нет связи с сервером, обновлю страницу, может помочь");
+        window.location.reload();
     };
     socket.onmessage = function (event) {
         //console.log(event.data);

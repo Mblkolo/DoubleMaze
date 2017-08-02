@@ -79,6 +79,9 @@ namespace DoubleMaze.Sockets
             while (socket.State == WebSocketState.Open)
             {
                 var input = await socket.ReadInputAsync(buffer);
+                if (input == null)
+                    return;
+
                 _world.InputQueue.Post(new PlayerInput(playerConnection.PlayerId, input));
             }
         }

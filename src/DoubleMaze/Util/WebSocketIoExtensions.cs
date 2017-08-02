@@ -32,6 +32,9 @@ namespace DoubleMaze.Util
             if (result.EndOfMessage == false)
                 throw new Exception("Слишком длинное сообщение");
 
+            if (result.MessageType == WebSocketMessageType.Close)
+                return null;
+
             if (result.MessageType != WebSocketMessageType.Text)
                 throw new Exception("Это сообщение не текст");
 
