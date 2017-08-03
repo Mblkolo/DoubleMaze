@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using DoubleMaze.Sockets;
 using DoubleMaze.Game;
+using DoubleMaze.Infrastructure.Logging;
 using DoubleMaze.Storage;
 
 namespace DoubleMaze
@@ -37,7 +38,8 @@ namespace DoubleMaze
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddJsonConsole();
             loggerFactory.AddDebug();
 
             app.UseWebSockets();
