@@ -37,13 +37,13 @@ namespace DoubleMaze.Infrastructure.Logging
             }
             if (!string.IsNullOrEmpty(message))
             {
-                JsonConvert.SerializeObject(new LogMessageDto
+                Console.WriteLine(JsonConvert.SerializeObject(new LogMessageDto
                 {
                     LogLevel = logLevel,
                     Name = name,
                     EventId = eventId.Name ?? eventId.Id.ToString(),
                     Message = message
-                });
+                }));
             }
         }
 
