@@ -1,6 +1,7 @@
 ﻿using DoubleMaze.Game;
 using DoubleMaze.Infrastructure;
 using DoubleMaze.Util;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net.WebSockets;
 using System.Threading;
@@ -8,41 +9,24 @@ using System.Threading.Tasks;
 
 namespace DoubleMaze.Sockets
 {
-    public class OutputChanel
+    public class OutputChanel : Actor<IGameCommand>
     {
-        public readonly Pipe<IGameCommand> InputQueue;
-        private readonly Task mainLoop;
-        private volatile WebSocket socket;
+        private readonly WebSocket socket;
 
-        public OutputChanel(WebSocket socket)
-        {
-            this.socket = socket;
-            InputQueue = new Pipe<IGameCommand>();
-            mainLoop = MainLoop(InputQueue);
-        }
-
-        internal void SetSocket(WebSocket socket)
+        public OutputChanel(WebSocket socket, ILoggerFactory factory)
+            : base(factory.CreateLogger<OutputChanel>())
         {
             this.socket = socket;
         }
 
-        private async Task MainLoop(Pipe<IGameCommand> messages)
+        protected override async Task ProcessAsync(IGameCommand item)
         {
-            try
-            {
-                while (await messages.OutputAvailableAsync())
-                {
-                    IGameCommand data = await messages.ReceiveAsync();
+            await socket.SendDataAsync(item);
+        }
 
-                    await socket.SendDataAsync(data);
-                }
-                //Console.WriteLine("Игрок отключился");
-                await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Да нормально всё!", CancellationToken.None);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+        protected override async Task OnFinishedAsync()
+        {
+             await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Да нормально всё!", CancellationToken.None);
         }
     }
 }

@@ -55,7 +55,7 @@ namespace DoubleMaze.Sockets
 
         private void RemoveConnection(PlayerConnection connection)
         {
-            connection.OutputChanel.InputQueue.Complete();
+            connection.OutputChanel.Pipe.Complete();
             PlayerConnections.Remove(connection);
         }
 
