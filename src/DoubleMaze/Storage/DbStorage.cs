@@ -64,7 +64,7 @@ namespace DoubleMaze.Storage
             {
                 using (IDbConnection con = new Npgsql.NpgsqlConnection(connectionString))
                 {
-                    var playerData = con.ExecuteScalar<PlayerStoreData>(
+                    con.ExecuteScalar<PlayerStoreData>(
                         @"UPDATE users SET name=@Name, is_activated = @isActivated, rating=@rating
                             WHERE player_id=@playerId AND player_type=@playerTypeString", playerStoreData);
                 }

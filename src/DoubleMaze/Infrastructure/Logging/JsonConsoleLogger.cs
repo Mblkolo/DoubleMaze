@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace DoubleMaze.Infrastructure.Logging
 {
@@ -36,7 +37,13 @@ namespace DoubleMaze.Infrastructure.Logging
             }
             if (!string.IsNullOrEmpty(message))
             {
-                Console.WriteLine($@"{{""name"": ""{name}"", ""level"": ""{logLevel}"", ""eventId"": ""{eventId.Id}"", ""message"": ""{message}""}}");
+                JsonConvert.SerializeObject(new LogMessageDto
+                {
+                    LogLevel = logLevel,
+                    Name = name,
+                    EventId = eventId.Name ?? eventId.Id.ToString(),
+                    Message = message
+                });
             }
         }
 
@@ -49,12 +56,20 @@ namespace DoubleMaze.Infrastructure.Logging
         {
             return new JsonConsoleLoggerScope();
         }
-    }
 
-    class JsonConsoleLoggerScope : IDisposable
-    {
-        public void Dispose()
+        private class JsonConsoleLoggerScope : IDisposable
         {
+            public void Dispose()
+            {
+            }
+        }
+
+        private class LogMessageDto
+        {
+            public string Name { get; set; }
+            public LogLevel LogLevel { get; set; }
+            public string EventId { get; set; }
+            public string Message { get; set; }
         }
     }
 }
