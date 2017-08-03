@@ -126,10 +126,10 @@ namespace DoubleMaze.Game
                 currentPos = newPos;
             }
 
-            Console.WriteLine(count);
+            //Console.WriteLine(count);
         }
 
-        private readonly static Move[] Moves = new[]
+        private static readonly Move[] Moves = 
             {
                 new Move{Direction = new Point(0, 1),  FromWall = Wall.Bottom, ToWall = Wall.Top },
                 new Move{Direction = new Point(0, -1), FromWall = Wall.Top, ToWall = Wall.Bottom },

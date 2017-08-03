@@ -166,7 +166,7 @@ namespace DoubleMaze.Game
 
         public void Process(PlayerInput input)
         {
-            Console.WriteLine(input.playerInput);
+            //Console.WriteLine(input.playerInput);
 
             if (canProcess(input.PlayerId))
             {

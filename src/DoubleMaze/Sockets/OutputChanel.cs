@@ -36,7 +36,7 @@ namespace DoubleMaze.Sockets
 
                     await socket.SendDataAsync(data);
                 }
-                Console.WriteLine("Игрок отключился");
+                //Console.WriteLine("Игрок отключился");
                 await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Да нормально всё!", CancellationToken.None);
             }
             catch (Exception)
