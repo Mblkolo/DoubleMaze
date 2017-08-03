@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.WebSockets;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace DoubleMaze.Sockets
 {
@@ -12,15 +10,12 @@ namespace DoubleMaze.Sockets
         public Guid ConnectionId { get; }
         public OutputChanel OutputChanel { get; }
         public Guid PlayerId { get; }
-        public WebSocket WebSocket { get; }
 
-        public PlayerConnection(Guid playerId, WebSocket socket)
+        public PlayerConnection(Guid playerId, OutputChanel outputChanel)
         {
-            PlayerId = playerId;
-
             ConnectionId = Guid.NewGuid();
-            OutputChanel = new OutputChanel(socket);
-            WebSocket = socket;
+            OutputChanel = outputChanel;
+            PlayerId = playerId;
         }
     }
 
@@ -37,14 +32,14 @@ namespace DoubleMaze.Sockets
             this.playerDisconnected = playerDisconnected;
         }
 
-        internal PlayerConnection PlayerConnected(Guid playerId, WebSocket socket)
+        internal PlayerConnection PlayerConnected(Guid playerId, OutputChanel outputChanel)
         {
             lock (Locker)
             {
                  foreach (var connection in PlayerConnections.Where(x => x.PlayerId == playerId).ToArray())
                     RemoveConnection(connection);
 
-                var newConnection = new PlayerConnection(playerId, socket);
+                var newConnection = new PlayerConnection(playerId, outputChanel);
                 PlayerConnections.Add(newConnection);
 
                 DisploseAndRemoveTimer(playerId);

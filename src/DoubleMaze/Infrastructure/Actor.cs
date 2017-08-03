@@ -7,11 +7,14 @@ namespace DoubleMaze.Infrastructure
     public abstract class Actor<T>
     {
         public readonly Pipe<T> Pipe = new Pipe<T>();
+
         private readonly ILogger logger;
+        private readonly Task processedTask;
 
         protected Actor(ILogger logger)
         {
             this.logger = logger;
+            processedTask = Processor();
         }
 
         public async Task Processor()
