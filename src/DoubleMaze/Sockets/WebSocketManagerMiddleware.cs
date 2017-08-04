@@ -2,6 +2,7 @@
 using DoubleMaze.Storage;
 using DoubleMaze.Util;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
@@ -14,13 +15,15 @@ namespace DoubleMaze.Sockets
         private readonly OutputConnectionManager _outConnectionManager;
         private readonly World _world;
         private readonly IStorage _storage;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public WebSocketManagerMiddleware(RequestDelegate next, OutputConnectionManager outConnectionManager, World world, IStorage storage)
+        public WebSocketManagerMiddleware(RequestDelegate next, OutputConnectionManager outConnectionManager, World world, IStorage storage, ILoggerFactory loggerFactory)
         {
             _next = next;
             _outConnectionManager = outConnectionManager;
             _world = world;
             _storage = storage;
+            _loggerFactory = loggerFactory;
         }
 
         public async Task Invoke(HttpContext context)
@@ -64,7 +67,7 @@ namespace DoubleMaze.Sockets
                 await _storage.CreateHumanPlayerAsync(playerId.Value, token);
             }
 
-            PlayerConnection playerConnection = _outConnectionManager.PlayerConnected(playerId.Value, socket);
+            PlayerConnection playerConnection = _outConnectionManager.PlayerConnected(playerId.Value, new OutputChanel(socket, _loggerFactory));
 
             await socket.SendDataAsync(new SetTokenCommand { playerId = playerId.Value.ToString("N"), token = token });
 
@@ -75,14 +78,14 @@ namespace DoubleMaze.Sockets
         {
             byte[] buffer = new byte[1024 * 4];
 
-            _world.InputQueue.Post(new PlayerConnected(playerConnection.PlayerId, playerConnection.OutputChanel.InputQueue, PlayerType.Human));
+            _world.Pipe.Post(new PlayerConnected(playerConnection.PlayerId, playerConnection.OutputChanel.Pipe, PlayerType.Human));
             while (socket.State == WebSocketState.Open)
             {
                 var input = await socket.ReadInputAsync(buffer);
                 if (input == null)
                     return;
 
-                _world.InputQueue.Post(new PlayerInput(playerConnection.PlayerId, input));
+                _world.Pipe.Post(new PlayerInput(playerConnection.PlayerId, input));
             }
         }
     }
