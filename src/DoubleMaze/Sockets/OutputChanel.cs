@@ -2,7 +2,6 @@
 using DoubleMaze.Infrastructure;
 using DoubleMaze.Util;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,16 +16,14 @@ namespace DoubleMaze.Sockets
             : base(factory.CreateLogger<OutputChanel>())
         {
             this.socket = socket;
+            StartProcess();
         }
 
-        protected override async Task ProcessAsync(IGameCommand item)
+        protected override async Task Proccess()
         {
-            await socket.SendDataAsync(item);
-        }
+            await LoopAsync(async x => await socket.SendDataAsync(x));
+            await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Да нормально всё!", CancellationToken.None);
 
-        protected override async Task OnFinishedAsync()
-        {
-             await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Да нормально всё!", CancellationToken.None);
         }
     }
 }

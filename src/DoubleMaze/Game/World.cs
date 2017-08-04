@@ -12,13 +12,12 @@ namespace DoubleMaze.Game
         public World(IStorage storage, ILoggerFactory loggetFactory)
             : base(loggetFactory.CreateLogger<World>())
         {
-            dispatcher = new MessageDispatcher(new WorldState(Pipe, storage));
+            dispatcher = new MessageDispatcher(new WorldState(Pipe, storage), loggetFactory);
         }
 
-        protected override Task ProcessAsync(IMessage item)
+        protected override async Task Proccess()
         {
-            dispatcher.Process((dynamic)item);
-            return Task.CompletedTask;
+            await Loop(item => dispatcher.Process((dynamic) item));
         }
     }
 }

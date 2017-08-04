@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Logging;
 
 namespace DoubleMaze.Infrastructure
@@ -9,24 +10,23 @@ namespace DoubleMaze.Infrastructure
         public readonly Pipe<T> Pipe = new Pipe<T>();
 
         private readonly ILogger logger;
-        private readonly Task processedTask;
+        private Task processedTask;
 
         protected Actor(ILogger logger)
         {
             this.logger = logger;
-            processedTask = Processor();
         }
 
-        public async Task Processor()
+        protected void StartProcess()
+        {
+            processedTask = ExecuteWithLogging();
+        }
+
+        private async Task ExecuteWithLogging()
         {
             try
             {
-                while (await Pipe.OutputAvailableAsync())
-                {
-                    await ProcessAsync(await Pipe.ReceiveAsync());
-                }
-
-                await OnFinishedAsync();
+                await Proccess();
             }
             catch(Exception e)
             {
@@ -34,12 +34,23 @@ namespace DoubleMaze.Infrastructure
             }
         }
 
-        protected abstract Task ProcessAsync(T item);
+        protected abstract Task Proccess();
 
-        protected virtual Task OnFinishedAsync()
+
+        protected async Task LoopAsync(Func<T, Task> action)
         {
-            return Task.CompletedTask;
+            while (await Pipe.OutputAvailableAsync())
+            {
+                await action(await Pipe.ReceiveAsync());
+            }
         }
 
+        protected async Task Loop(Action<T> action)
+        {
+            while (await Pipe.OutputAvailableAsync())
+            {
+                action(await Pipe.ReceiveAsync());
+            }
+        }
     }
 }
