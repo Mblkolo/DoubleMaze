@@ -78,14 +78,14 @@ namespace DoubleMaze.Sockets
         {
             byte[] buffer = new byte[1024 * 4];
 
-            _world.InputQueue.Post(new PlayerConnected(playerConnection.PlayerId, playerConnection.OutputChanel.Pipe, PlayerType.Human));
+            _world.Pipe.Post(new PlayerConnected(playerConnection.PlayerId, playerConnection.OutputChanel.Pipe, PlayerType.Human));
             while (socket.State == WebSocketState.Open)
             {
                 var input = await socket.ReadInputAsync(buffer);
                 if (input == null)
                     return;
 
-                _world.InputQueue.Post(new PlayerInput(playerConnection.PlayerId, input));
+                _world.Pipe.Post(new PlayerInput(playerConnection.PlayerId, input));
             }
         }
     }
