@@ -13,6 +13,7 @@ namespace DoubleMaze.Game
             : base(loggetFactory.CreateLogger<World>())
         {
             dispatcher = new MessageDispatcher(new WorldState(Pipe, storage), loggetFactory);
+            StartProcess();
         }
 
         protected override async Task Proccess()

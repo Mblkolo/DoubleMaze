@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace DoubleMaze.Game
 {
@@ -85,8 +86,7 @@ namespace DoubleMaze.Game
 
         public void SetHandler(IAreaHandler handler)
         {
-            if (PlayerHandler != null)
-                PlayerHandler.PlayerLeft();
+            PlayerHandler?.PlayerLeft();
 
             PlayerHandler = handler;
             PlayerHandler.PlayerJoin();
@@ -95,15 +95,15 @@ namespace DoubleMaze.Game
 
     public class MessageDispatcher
     {
-        private WorldState state;
+        private readonly WorldState state;
 
-        private Dictionary<Guid, CancellationTokenSource> LoadingsPlayers = new Dictionary<Guid, CancellationTokenSource>();
+        private readonly Dictionary<Guid, CancellationTokenSource> LoadingsPlayers = new Dictionary<Guid, CancellationTokenSource>();
 
-        public MessageDispatcher(WorldState state)
+        public MessageDispatcher(WorldState state, ILoggerFactory loggerFactory)
         {
             this.state = state;
 
-            state.Bots.AddRange(BotDatas.Data.Select(x => new Bot(state.InputQueue, x.Depth, x.Id)));
+            state.Bots.AddRange(BotDatas.Data.Select(x => new Bot(state.InputQueue, x.Depth, x.Id, loggerFactory)));
         }
 
         private bool canProcess(Guid playerId) => state.Players.ContainsKey(playerId);
