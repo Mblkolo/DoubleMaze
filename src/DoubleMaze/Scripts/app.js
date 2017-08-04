@@ -1,7 +1,9 @@
 "use strict";
 var AreaController_ts_1 = require("./AreaController.ts");
+var loc = window.location;
+var uri = (loc.protocol === "https:") ? "wss:" : "ws:";
+uri += "//" + loc.host + loc.pathname.split('/').slice(0, -1).join('/') + "/test";
 var controller = new AreaController_ts_1.AreaController(sendMessage);
-var uri = "ws://" + window.location.host + "/test";
 var socket;
 function connect() {
     socket = new WebSocket(uri);
@@ -11,23 +13,13 @@ function connect() {
     };
     socket.onclose = function (event) {
         console.log("closed connection from " + uri);
+        alert("Нет связи с сервером, обновлю страницу, может помочь");
+        window.location.reload();
     };
     socket.onmessage = function (event) {
-        //appendItem(list, event.data);
-        console.log(event.data);
+        //console.log(event.data);
         var res = JSON.parse(event.data);
         controller.process(res);
-        //console.log(res);
-        //if (res.command == "getToken")
-        //    localStorage.setItem("token", res.Token);
-        //if (res.command === "playerState")
-        //    moveTo(res.myPos, res.enemyPos);
-        //else if (res.command === "mazeFeild")
-        //    setField(res.field)
-        //else if (res.command == "getToken")
-        //    localStorage.setItem("token", res.Token)
-        //else if (res.command == "gameOwer")
-        //    inGame = false;
     };
     socket.onerror = function (event) {
         console.log("error: " + event.returnValue);

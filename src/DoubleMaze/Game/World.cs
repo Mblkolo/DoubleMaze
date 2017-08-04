@@ -1,39 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using DoubleMaze.Infrastructure;
+using DoubleMaze.Storage;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
+using Microsoft.Extensions.Logging;
 
 namespace DoubleMaze.Game
 {
-    public class World
+    public class World : Actor<IMessage>
     {
-        public BufferBlock<IMessage> InputQueue { get; private set; }
-        private readonly Task mainLoop;
         private readonly MessageDispatcher dispatcher;
 
-        public World()
+        public World(IStorage storage, ILoggerFactory loggetFactory)
+            : base(loggetFactory.CreateLogger<World>())
         {
-            InputQueue = new BufferBlock<IMessage>();
-            mainLoop = MainLoop(InputQueue);
-            dispatcher = new MessageDispatcher(InputQueue);
+            dispatcher = new MessageDispatcher(new WorldState(Pipe, storage), loggetFactory);
+            StartProcess();
         }
 
-        private async Task MainLoop(BufferBlock<IMessage> messages)
+        protected override async Task Proccess()
         {
-            try
-            {
-                while (await messages.OutputAvailableAsync())
-                {
-                    var message = await messages.ReceiveAsync();
-                    (dispatcher).Process((dynamic)message);
-                }
-            }
-            catch(Exception)
-            {
-                throw;
-            }
+            await Loop(item => dispatcher.Process((dynamic) item));
         }
     }
 }

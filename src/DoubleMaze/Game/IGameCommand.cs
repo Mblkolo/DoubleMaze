@@ -15,10 +15,11 @@ namespace DoubleMaze.Game
         SetToken,
         GameOver,
         Goto,
-        WaitOpponent
+        PlayerInfo, 
+        ShowBots
     }
 
-    public class PlayerPos : IGameCommand
+    public class PlayerPosCommand : IGameCommand
     {
         public GameCommand command => GameCommand.PlayerState;
         public Pos myPos { get; set; }
@@ -30,11 +31,21 @@ namespace DoubleMaze.Game
         public GameCommand command => GameCommand.MazeFeild;
 
         public Wall[,] field { get; set; }
+
+        public MazeFieldCommandPlayer me { get; set; } 
+        public MazeFieldCommandPlayer enemy { get; set; }
+    }
+
+    public class MazeFieldCommandPlayer
+    {
+        public string name { get; set; }
+        public decimal rating { get; set; }
     }
 
     public class SetTokenCommand : IGameCommand
     {
         public GameCommand command => GameCommand.SetToken;
+        public string playerId { get; set; }
         public string token { get; set; }
     }
 
@@ -50,6 +61,16 @@ namespace DoubleMaze.Game
 
         public GameCommand command => GameCommand.GameOver;
         public Statuses status { get; set; }
+
+        public GameOverCommandRating[] ratings {get; set;}
+    }
+
+    public class GameOverCommandRating
+    {
+        public string name { get; set; }
+        public decimal rating { get; set; }
+        public bool isMe { get; set; }
+        public bool isEnemy { get; set; }
     }
 
     public class GotoCommand : IGameCommand
@@ -57,15 +78,35 @@ namespace DoubleMaze.Game
         public enum Areas
         {
             Welcome,
-            Game
+            Game,
+            Return,
+            Wait,
+            Stasis
         }
 
         public GameCommand command => GameCommand.Goto;
         public Areas area { get; set; }
     }
 
-    public class WaitOpponent : IGameCommand
+    public class PlayerInfo : IGameCommand
     {
-        public GameCommand command => GameCommand.WaitOpponent;
+        public GameCommand command => GameCommand.PlayerInfo;
+        public decimal rating { get; set; }
+        public string name { get; set; }
+    }
+
+    public class ShowBotsCommand : IGameCommand
+    {
+        public GameCommand command => GameCommand.ShowBots;
+
+        public ShowBotsBot[] bots { get; set; }
+    }
+
+    public class ShowBotsBot
+    {
+        public string id { get; set; }
+        public bool isAwaible { get; set; }
+        public string name { get; set; }
+        public decimal rating { get; set; }
     }
 }

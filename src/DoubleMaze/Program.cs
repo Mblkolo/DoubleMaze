@@ -25,6 +25,8 @@ namespace DoubleMaze
                 return settings;
             });
 
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
             var host = new WebHostBuilder()
                     .UseKestrel()
                     .UseContentRoot(Directory.GetCurrentDirectory())
