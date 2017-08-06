@@ -89,6 +89,24 @@ html {
     font-size: 5rem;
 }
 
+.title-small
+{
+    text-align: center;
+    color: #227F32;
+    text-transform: uppercase;
+    font-size: 4rem;
+}
+
+.space_3
+{
+    height: 3rem;
+}
+
+.space_4
+{
+    height: 4rem;
+}
+
 .welcome-title
 {
     text-align: center;
@@ -222,7 +240,7 @@ html {
 
 .wait-game-bots {
     table-layout: fixed;
-    padding-top: 4rem;
+    /*padding-top: 4rem;*/
     border-collapse: separate;
     border-spacing: 0;
     padding-bottom: 4rem;
@@ -273,4 +291,10 @@ html {
     height: 6rem;
     border-bottom: #fff 1px solid;
     border-top: #fff 1px solid;
+}
+
+.wait-game__back {
+    width: 12rem;
+    line-height: 3rem;
+    font-size: 2rem;
 }
