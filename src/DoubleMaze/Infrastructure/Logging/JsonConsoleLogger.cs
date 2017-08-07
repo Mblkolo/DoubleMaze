@@ -20,21 +20,16 @@ namespace DoubleMaze.Infrastructure.Logging
                 return;
             }
             var message = string.Empty;
-            if (formatter != null)
+
+            if (state != null)
             {
-                message = formatter(state, exception);
+                message += state;
             }
-            else
+            if (exception != null)
             {
-                if (state != null)
-                {
-                    message += state;
-                }
-                if (exception != null)
-                {
-                    message += Environment.NewLine + exception;
-                }
+                message += Environment.NewLine + exception;
             }
+
             if (!string.IsNullOrEmpty(message))
             {
                 Console.WriteLine(JsonConvert.SerializeObject(new LogMessageDto
