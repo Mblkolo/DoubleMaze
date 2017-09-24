@@ -54,12 +54,25 @@ html {
         padding: 0 4rem;
     }
 
+    .link-button--middle {
+        font-size: 3rem;
+        line-height: 6rem;
+        padding: 0 3rem;
+    }
+
+    .link-button--small{
+        font-size: 2rem;
+        line-height: 4rem;
+        padding: 0 2rem;
+    }
+
 .content {
     background-color: #fff;
     width: 100rem; 
     padding: 5rem;
     font-size: 1.5rem;
     box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5) ;
+    font-size: 2rem;
 }
 
 .rating
@@ -68,7 +81,7 @@ html {
     table-layout: fixed;
     border-collapse: collapse;
     width: 50rem;
-    font-size: 3rem;
+    font-size: 2rem;
     line-height:5rem;
 }
 
@@ -82,7 +95,7 @@ html {
     .rating tr td:nth-child(1)
     {
         text-align: right;
-        width: 7rem;
+        width: 5rem;
         padding-right: 3rem;
     }
 
@@ -94,25 +107,26 @@ html {
     .rating tr td:nth-child(3) {
         width: 10rem;
         text-align: right;
+        padding-right: 2rem;
     }
 
     .rating__lvl 
     {
         vertical-align: super;
-        font-size: 2rem;
+        font-size: 1rem;
         line-height: 0;
         background-color: #dedede;
         border-radius: 2rem;
         padding: 0.25rem 0.5rem;
     }
 
-    .rating__select td/*:nth-child(1)*/
+    .rating__select /* td:nth-child(1)*/
     {
-        font-size: 4rem;
+        /*font-size: 3rem;*/
 
            /*border-bottom: solid #000 1px;*/
 
-        /*box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5) ;*/
+        box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5) ;
     }
 
     .welcome-page__rating {
@@ -120,24 +134,36 @@ html {
     }
 
     .welcome-page__play-button {
-        padding-top: 4rem;
+        padding-top: 6rem;
     }
 
 
-/*.welcome-play-button{
-    font-size: 4rem;
-    line-height: 8rem;
-    width: 32rem;
-    margin-bottom: 10rem;
+.bots 
+{
+    width: 25rem;
+    line-height: 5rem;
 }
 
-.welcome-player-name{
-    width: 60rem;
+    .bots >tbody> tr > td:nth-child(1)
+    {
+        width: 10rem;
+    }
+
+    .bots >tbody> tr > td:nth-child(2)
+    {
+        width: 15rem;
+        text-align: right;
+    }
+
+
+.wait-sreen__delimeter {
     text-align: center;
-    font-size: 3rem;
-    height: 4rem;
-    margin-bottom: 4rem;
-}*/
+}
+
+.wait-sreen__online {
+    text-align: center;
+}
+
 .welcome-intro
 {
     font-size: 2rem;
@@ -168,6 +194,11 @@ html {
     margin: 0;
 }
 
+.space_2
+{
+    height: 2rem;
+}
+
 .space_3
 {
     height: 3rem;
@@ -176,6 +207,26 @@ html {
 .space_4
 {
     height: 4rem;
+}
+
+.space_5
+{
+    height: 5rem;
+}
+
+.space_6
+{
+    height: 6rem;
+}
+
+.space_7
+{
+    height: 7rem;
+}
+
+.space_8
+{
+    height: 8rem;
 }
 
 .welcome-title
