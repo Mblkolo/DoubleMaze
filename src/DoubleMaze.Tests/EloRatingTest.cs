@@ -23,6 +23,18 @@ namespace DoubleMaze.Tests
         }
 
         [Test]
+        public void EloRatingGotoAvergateWhenDraw()
+        {
+            var rating1 = new Rating(1008);
+            var rating2 = new Rating(992);
+
+            Rating.Update(rating1, rating2, false, false);
+
+            Assert.That(rating1.Value, Is.LessThan(1008d));
+            Assert.That(rating2.Value, Is.GreaterThan(992d));
+        }
+
+        [Test]
         public void EloRatingNoChangeWhenDraw2()
         {
             var rating1 = new Rating();
