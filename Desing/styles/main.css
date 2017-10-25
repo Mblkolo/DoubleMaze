@@ -110,16 +110,6 @@ html {
         padding-right: 2rem;
     }
 
-    .rating__lvl 
-    {
-        vertical-align: super;
-        font-size: 1rem;
-        line-height: 0;
-        background-color: #dedede;
-        border-radius: 2rem;
-        padding: 0.25rem 0.5rem;
-    }
-
     .rating__select /* td:nth-child(1)*/
     {
         /*font-size: 3rem;*/
@@ -155,6 +145,18 @@ html {
         text-align: right;
     }
 
+.player {
+
+}
+
+.player__level {
+    vertical-align: super;
+    font-size: 1rem;
+    line-height: 0;
+    background-color: #dedede;
+    border-radius: 2rem;
+    padding: 0.25rem 0.5rem;
+}
 
 .wait-sreen__delimeter {
     text-align: center;

@@ -23,27 +23,27 @@
 
             <tr>
                 <td>56</td>
-                <td>Коля<span class="rating__lvl">0</span></td>
+                <td>Коля<span class="player__level">0</span></td>
                 <td>2345</td>
             </tr>
             <tr>
                 <td>57</td>
-                <td>Александр<span class="rating__lvl">2</span></td>
+                <td>Александр<span class="player__level">2</span></td>
                 <td>235643</td>
             </tr>
             <tr class="rating__select">
                 <td>58</td>
-                <td>Вася<span class="rating__lvl">21</span></td>
+                <td>Вася<span class="player__level">21</span></td>
                 <td>23</td>
             </tr>        
             <tr>
                 <td>59</td>
-                <td>Дима<span class="rating__lvl">4</span></td>
+                <td>Дима<span class="player__level">4</span></td>
                 <td>234</td>
             </tr>     
             <tr>
                 <td>60</td>
-                <td>Маша<span class="rating__lvl">2</span></td>
+                <td>Маша<span class="player__level">2</span></td>
                 <td>34</td>
             </tr>
 
@@ -82,23 +82,23 @@
 
         <table class="bots center-block">
             <tr>
-                <td>Бот 5<span class="rating__lvl">0</span></td>
+                <td><div class="player">Бот 5<span class="player__level">0</span></div></td>
                 <td><a href="#" class="link-button link-button--small" >Играть</a></td>
             </tr>
             <tr>
-                <td>Бот 15<span class="rating__lvl">2</span></td>
+                <td><div class="player">Бот 15<span class="player__level">2</span></div></td>
                 <td><a href="#" class="link-button link-button--small">Играть</a></td>
             </tr>
             <tr>
-                <td>Бот 20<span class="rating__lvl">4</span></td>
+                <td><div class="player">Бот 20<span class="player__level">4</span></div></td>
                 <td><a href="#" class="link-button link-button--small">Играть</a></td>
             </tr>
             <tr>
-                <td>Бот 25<span class="rating__lvl">6</span></td>
+                <td><div class="player">Бот 25<span class="player__level">6</span></div></td>
                 <td><a href="#" class="link-button link-button--small">Играть</a></td>
             </tr>
             <tr>
-                <td>Бот 30<span class="rating__lvl">8</span></td>
+                <td><div class="player">Бот 30<span class="player__level">8</span></div></td>
                 <td><a href="#" class="link-button link-button--small">Играть</a></td>
             </tr>
 
@@ -106,6 +106,38 @@
     </div>
 
     <div class="space_4" ></div>
+
+    <div class="content center-block game-screen">
+        <h1 class="title-small">Беги в центр!</h1>
+
+        <div class="player">Вася<span class="player__level">8</span></div>
+        <div class="" id="game-canvas-screen">
+            <div class="game-canvas-vs-block">
+                <span class="game-canvas-name-with-rating">
+                    <span class="game-canvas-my-name my-name">Расчётливый петух</span>
+                    <span class="game-canvas-my-rating"></span>
+                </span>
+
+                <span class="game-canvas-name-with-rating">
+                    <span class="game-canvas-enemy-name enemy-name"></span>
+                    <span class="game-canvas-enemy-rating"></span>
+                </span>
+            </div>
+            <!--<canvas width="640" height="440" id="game-canvas" class="center-block"></canvas>-->
+            <img src="images/maze_sample.png" class="center-block" />
+        </div>
+        <div class="hidden" id="game-gameover-screen">
+            <h1 class="title winner hidden">Ты победил</h1>
+            <h1 class="title looser hidden">Ты проиграл</h1>
+            <br />
+            <br />
+            <a href="#again" class="link-button game-gameover-screen-button center-block">Ещё раз</a>
+            <br />
+            <table class="game-canvas-ratings"></table>
+        </div>
+    </div>
+
+    <div class="space_8"></div>
 
     <script type="text/template" id="welcome-area-template">
         <div class="content center-block welcome-page">

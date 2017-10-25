@@ -16,6 +16,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DoubleMaze.Tests", "src\Dou
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DoubleMaze.Migrations", "src\DoubleMaze.Migrations\DoubleMaze.Migrations.xproj", "{24F8CC23-BBAB-4374-89EB-4B6A09CB25AC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoubleMaze.Frontend", "DoubleMaze.Frontend\DoubleMaze.Frontend.csproj", "{F7BA4D4E-7A7F-40FD-B9F1-C98A4565D24D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,10 @@ Global
 		{24F8CC23-BBAB-4374-89EB-4B6A09CB25AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24F8CC23-BBAB-4374-89EB-4B6A09CB25AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24F8CC23-BBAB-4374-89EB-4B6A09CB25AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7BA4D4E-7A7F-40FD-B9F1-C98A4565D24D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7BA4D4E-7A7F-40FD-B9F1-C98A4565D24D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7BA4D4E-7A7F-40FD-B9F1-C98A4565D24D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7BA4D4E-7A7F-40FD-B9F1-C98A4565D24D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -42,5 +48,6 @@ Global
 		{27D4DD2D-87F3-4ABF-8AF9-714E3BA966C3} = {A4BDB30F-7A8B-47DB-8CE2-7818D9055271}
 		{E971C452-387F-4FFE-A8B4-FC14F6D8F1B6} = {A4BDB30F-7A8B-47DB-8CE2-7818D9055271}
 		{24F8CC23-BBAB-4374-89EB-4B6A09CB25AC} = {A4BDB30F-7A8B-47DB-8CE2-7818D9055271}
+		{F7BA4D4E-7A7F-40FD-B9F1-C98A4565D24D} = {A4BDB30F-7A8B-47DB-8CE2-7818D9055271}
 	EndGlobalSection
 EndGlobal
