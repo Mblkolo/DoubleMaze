@@ -1,0 +1,424 @@
+﻿body {
+    padding: 0;
+    margin: 0;
+    background-color: #e8e8e8;
+    font-family: Verdana;
+}
+
+html {
+    background-color: #fff;
+    font-size: 8px;
+}
+
+.show {
+    display: block !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+
+.center-block {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.center-text
+{
+    text-align: center;
+}
+
+.link-button {
+    display: inline-block;
+    text-decoration: none;
+    color: #FFF;
+    background: #227F32;
+    text-transform: uppercase;
+    font-weight: 500;
+    text-align: center;
+}
+    .link-button:hover {
+        box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5);
+    }
+
+    .link-button:active {
+        color: #227F32;
+        background: #fff;
+    }
+
+    .link-button--big {
+        font-size: 4rem;
+        line-height: 8rem;
+        padding: 0 4rem;
+    }
+
+    .link-button--middle {
+        font-size: 3rem;
+        line-height: 6rem;
+        padding: 0 3rem;
+    }
+
+    .link-button--small{
+        font-size: 2rem;
+        line-height: 4rem;
+        padding: 0 2rem;
+    }
+
+.content {
+    background-color: #fff;
+    width: 100rem; 
+    padding: 5rem;
+    font-size: 1.5rem;
+    box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5) ;
+    font-size: 2rem;
+}
+
+.rating
+{
+    /*background-color: #eee;*/
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 50rem;
+    font-size: 2rem;
+    line-height:5rem;
+}
+
+    .rating tr:nth-child(1)
+    {
+        /*border-bottom: solid #000 1px;*/
+        line-height: 6rem;
+        vertical-align: top;
+    }
+
+    .rating tr td:nth-child(1)
+    {
+        text-align: right;
+        width: 5rem;
+        padding-right: 3rem;
+    }
+
+    .rating tr td:nth-child(2)
+    {
+        width: 30rem;
+    }
+
+    .rating tr td:nth-child(3) {
+        width: 10rem;
+        text-align: right;
+        padding-right: 2rem;
+    }
+
+    .rating__select /* td:nth-child(1)*/
+    {
+        /*font-size: 3rem;*/
+
+           /*border-bottom: solid #000 1px;*/
+
+        box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5) ;
+    }
+
+    .welcome-page__rating {
+        padding-top: 8rem;
+    }
+
+    .welcome-page__play-button {
+        padding-top: 6rem;
+    }
+
+
+.bots 
+{
+    width: 25rem;
+    line-height: 5rem;
+}
+
+    .bots >tbody> tr > td:nth-child(1)
+    {
+        width: 10rem;
+    }
+
+    .bots >tbody> tr > td:nth-child(2)
+    {
+        width: 15rem;
+        text-align: right;
+    }
+
+.player {
+
+}
+
+.player__level {
+    vertical-align: super;
+    font-size: 1rem;
+    line-height: 0;
+    background-color: #dedede;
+    border-radius: 2rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.wait-sreen__delimeter {
+    text-align: center;
+}
+
+.wait-sreen__online {
+    text-align: center;
+}
+
+.welcome-intro
+{
+    font-size: 2rem;
+    width: 60rem;
+    margin-bottom: 7rem;
+    margin-top: 7rem;
+}
+
+.welcome-intro p{
+    margin: 0 0 1rem 0;
+}
+
+.title
+{
+    text-align: center;
+    color: #227F32;
+    text-transform: uppercase;
+    font-size: 5rem;
+    margin: 0;
+}
+
+.title-small
+{
+    text-align: center;
+    color: #227F32;
+    text-transform: uppercase;
+    font-size: 4rem;
+    margin: 0;
+}
+
+.space_2
+{
+    height: 2rem;
+}
+
+.space_3
+{
+    height: 3rem;
+}
+
+.space_4
+{
+    height: 4rem;
+}
+
+.space_5
+{
+    height: 5rem;
+}
+
+.space_6
+{
+    height: 6rem;
+}
+
+.space_7
+{
+    height: 7rem;
+}
+
+.space_8
+{
+    height: 8rem;
+}
+
+.welcome-title
+{
+    text-align: center;
+    color: #227F32;
+    text-transform: uppercase;
+    font-size: 5rem;
+}
+
+.game-gameover-screen-button
+{
+    width: 20rem;
+    line-height: 5rem;
+    height: 5rem;
+    font-size: 3rem;
+}
+
+.game-canvas-vs-block
+{
+    padding: 2rem 0;
+    text-align: center;
+    font-size: 2rem;
+    line-height: 2rem;
+    text-transform: uppercase;
+}
+
+.game-canvas-my-name, .game-canvas-enemy-name
+{
+    font-size: 3rem;
+    line-height: 3rem;
+    overflow: hidden;
+}
+
+.my-name
+{
+    color: #227F32;
+}
+
+.enemy-name
+{
+    color: #BF0D31;
+}
+
+.game-canvas-vs-text, .game-canvas-name-with-rating
+{
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0 5px;
+    max-width: 45%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+
+.game-canvas-my-rating, .game-canvas-enemy-rating
+{
+    display: block;
+    line-height: 3rem;
+}
+
+
+.game-canvas-ratings {
+    table-layout: fixed;
+    padding-top: 4rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    padding-bottom: 4rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.game-canvas-ratings tr td:nth-child(1) {
+    padding-right: 2rem;
+    text-align: right;
+    font-size: 3rem;
+}
+
+.game-canvas-ratings tr td:nth-child(2) {
+    max-width: 30rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+
+}
+
+.game-canvas-ratings tr td:nth-child(3) {
+    text-align: right;
+    padding-left: 1rem;
+}
+
+.game-canvas-ratings tr td {
+    height: 5rem;
+    font-size: 2rem;
+    border-bottom: #fff 1px solid;
+    border-top: #fff 1px solid;
+}
+
+.game-canvas-ratings tr:hover td {
+    border-bottom: #227F32 1px solid;
+    border-top: #227F32 1px solid;
+}
+
+.game-canvas-ratings tr td {
+    height: 6rem;
+    border-bottom: #fff 1px solid;
+    border-top: #fff 1px solid;
+}
+
+.return-page__play-again-button {
+    font-size: 4rem;
+    line-height: 8rem;
+    width: 32rem;
+    margin-bottom: 4rem;
+    margin-top: 6rem;
+}
+
+.return-page__reset-button {
+    font-size: 2rem;
+    line-height: 4rem;
+    width: 32rem;
+}
+
+.return-page__intro {
+    font-size: 2rem;
+    width: 60rem;
+    margin-top: 9rem;
+    margin-bottom: 7rem;
+    text-align: center;
+}
+
+
+.wait-game-bots {
+    table-layout: fixed;
+    /*padding-top: 4rem;*/
+    border-collapse: separate;
+    border-spacing: 0;
+    padding-bottom: 4rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.wait-game-bots tr td:nth-child(1) {
+    padding-right: 2rem;
+    text-align: right;
+    font-size: 3rem;
+}
+
+.wait-game-bots tr td:nth-child(2) {
+    max-width: 30rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+
+}
+
+.wait-game-bots tr td:nth-child(3) {
+    text-align: right;
+    padding-left: 3rem;
+}
+
+.wait-game-bots tr td:nth-child(4) a {
+    width: 15rem;
+    height: 4rem;
+    line-height: 4rem;
+    margin-left: 5rem;
+
+}
+
+.wait-game-bots tr td {
+    height: 5rem;
+    font-size: 2rem;
+    border-bottom: #fff 1px solid;
+    border-top: #fff 1px solid;
+}
+
+.wait-game-bots tr:hover td {
+    border-bottom: #227F32 1px solid;
+    border-top: #227F32 1px solid;
+}
+
+.wait-game-bots tr td {
+    height: 6rem;
+    border-bottom: #fff 1px solid;
+    border-top: #fff 1px solid;
+}
+
+.wait-game__back {
+    width: 12rem;
+    line-height: 3rem;
+    font-size: 2rem;
+}

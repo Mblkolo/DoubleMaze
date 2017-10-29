@@ -23,6 +23,7 @@
     <Content Include="app.css" />
     <Content Include="dist\bundle.js" />
     <Content Include="index.html" />
+    <Content Include="main.css" />
     <Content Include="webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
