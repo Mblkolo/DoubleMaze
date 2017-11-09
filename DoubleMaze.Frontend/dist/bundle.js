@@ -99,11 +99,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue__);
 
+function LoadTemplate(name) {
+    var element = document.getElementById(name);
+    return (element == null) ? "Bad template name" : element.innerHTML;
+}
 window.onload = function () {
     console.log("hello world");
 };
 var buttonComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
-    template: '<a href="#" class="link-button"  :class="computedSize">{{text}}</a>',
+    template: LoadTemplate("link-button-template"),
     props: {
         'text': {
             type: String,
@@ -120,14 +124,33 @@ var buttonComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
         }
     }
 });
+var titleComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
+    template: LoadTemplate("title-template"),
+    props: {
+        'text': {
+            type: String,
+            default: "###"
+        },
+        'size': {
+            type: String,
+            default: null
+        }
+    },
+    computed: {
+        computedSize: function () {
+            return this.size === null ? "" : "title--" + this.size;
+        }
+    }
+});
 var v = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
     el: "#content",
-    template: "\n    <div>\n        <div>Hello {{name}}!</div>\n        Name: <input v-model=\"name\" type=\"text\">\n       \n        <LinkButton text=\"\u0419\u0430 \u043C\u0435\u043B\u043A\u043E \u043A\u043D\u043E\u043F\u043A\u043E\" size=\"small\" />\n        <LinkButton text=\"\u0419\u0430 \u043A\u043D\u043E\u043F\u043A\u043E\" />\n        <LinkButton text=\"\u0419\u0430 \u0433\u0440\u043E\u0441 \u043A\u043D\u043E\u043F\u043A\u043E\" size=\"big\" />\n    </div>",
+    template: "\n    <div>\n        <Header text=\"\u0419\u0430 \u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A!\"  />\n        <div>Hello {{name}}!</div>\n        Name: <input v-model=\"name\" type=\"text\">\n\n        <LinkButton text=\"\u0419\u0430 \u043C\u0435\u043B\u043A\u043E \u043A\u043D\u043E\u043F\u043A\u043E\" size=\"small\" />\n        <LinkButton text=\"\u0419\u0430 \u043A\u043D\u043E\u043F\u043A\u043E\" />\n        <LinkButton text=\"\u0419\u0430 \u0433\u0440\u043E\u0441 \u043A\u043D\u043E\u043F\u043A\u043E\" size=\"big\" />\n    </div>",
     data: {
         name: "World"
     },
     components: {
-        'LinkButton': buttonComponent
+        'LinkButton': buttonComponent,
+        'Header': titleComponent
     }
 });
 

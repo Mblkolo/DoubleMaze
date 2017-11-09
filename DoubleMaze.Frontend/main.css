@@ -187,13 +187,9 @@ html {
     margin: 0;
 }
 
-.title-small
+.title--small
 {
-    text-align: center;
-    color: #227F32;
-    text-transform: uppercase;
     font-size: 4rem;
-    margin: 0;
 }
 
 .space_2
