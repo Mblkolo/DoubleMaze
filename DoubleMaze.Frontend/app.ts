@@ -1,6 +1,6 @@
 ﻿import Vue from 'vue'
 
-function LoadTemplate(name: string) : string {
+function LoadTemplate(name: string): string {
     const element = document.getElementById(name);
     return (element == null) ? "Bad template name" : element.innerHTML;
 }
@@ -49,23 +49,79 @@ const titleComponent = Vue.extend({
     }
 })
 
+const pageComponent = Vue.extend({
+    template: `
+        <div class="content center-block">
+            <slot>Какое-то содержимое</slot>
+        </div>
+    `
+})
+
+const ratingTableComponent = Vue.extend({
+    template: `
+        <table class="rating">
+            <tr v-for="line in ratings" :class="(line.isCurrent ? 'rating__select' : '' )">
+                <td>{{line.place}}</td>
+                <td>{{line.name}}<span class="player__level">{{line.rating}}</span></td>
+            </tr>
+        </table>    `,
+    data: function() {
+        return {
+            ratings: [
+                {
+                    place: 56,
+                    name: "Коля",
+                    rating: "0",
+                    isCurrent: false
+                }, {
+                    place: 57,
+                    name: "Александр",
+                    rating: "2",
+                    isCurrent: false
+                }, {
+                    place: 58,
+                    name: "Вася",
+                    rating: "21",
+                    isCurrent: true
+                }, {
+                    place: 59,
+                    name: "Дима",
+                    rating: "2",
+                    isCurrent: false
+                }, {
+                    place: 60,
+                    name: "Маша",
+                    rating: "4",
+                    isCurrent: false
+                }]
+        }
+    },
+    computed: {
+        computerSelect: function () {
+            return 
+        }
+    }
+})
+
+
 let v = new Vue({
     el: "#content",
     template: `
-    <div>
-        <Header text="Йа заголовок!"  />
-        <div>Hello {{name}}!</div>
-        Name: <input v-model="name" type="text">
-
-        <LinkButton text="Йа мелко кнопко" size="small" />
-        <LinkButton text="Йа кнопко" />
-        <LinkButton text="Йа грос кнопко" size="big" />
-    </div>`,
+        <Page class=welcome-page>
+            <Header text="Лабиринт наперегонки"  />
+            <RatingTable class="center-block welcome-page__rating" />
+            <div style="text-align: center" class="welcome-page__play-button" >
+                <LinkButton text="Играть" size="big" class="center-block"/>
+            </div>
+        </Page>
+`,
     data: {
         name: "World"
     },
     components: {
         'LinkButton': buttonComponent,
-        'Header': titleComponent
+        'Header': titleComponent,
+        'Page': pageComponent,
+        'RatingTable': ratingTableComponent
     }
 });

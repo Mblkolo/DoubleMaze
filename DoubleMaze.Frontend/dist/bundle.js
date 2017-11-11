@@ -142,15 +142,60 @@ var titleComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
         }
     }
 });
+var pageComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
+    template: "\n        <div class=\"content center-block\">\n            <slot>\u041A\u0430\u043A\u043E\u0435-\u0442\u043E \u0441\u043E\u0434\u0435\u0440\u0436\u0438\u043C\u043E\u0435</slot>\n        </div>\n    "
+});
+var ratingTableComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
+    template: "\n        <table class=\"rating\">\n            <tr v-for=\"line in ratings\" :class=\"(line.isCurrent ? 'rating__select' : '' )\">\n                <td>{{line.place}}</td>\n                <td>{{line.name}}<span class=\"player__level\">{{line.rating}}</span></td>\n            </tr>\n        </table>\n    ",
+    data: function () {
+        return {
+            ratings: [
+                {
+                    place: 56,
+                    name: "Коля",
+                    rating: "0",
+                    isCurrent: false
+                }, {
+                    place: 57,
+                    name: "Александр",
+                    rating: "2",
+                    isCurrent: false
+                }, {
+                    place: 58,
+                    name: "Вася",
+                    rating: "21",
+                    isCurrent: true
+                }, {
+                    place: 59,
+                    name: "Дима",
+                    rating: "2",
+                    isCurrent: false
+                }, {
+                    place: 60,
+                    name: "Маша",
+                    rating: "4",
+                    isCurrent: false
+                }
+            ]
+        };
+    },
+    computed: {
+        computerSelect: function () {
+            return;
+        }
+    }
+});
 var v = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
     el: "#content",
-    template: "\n    <div>\n        <Header text=\"\u0419\u0430 \u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A!\"  />\n        <div>Hello {{name}}!</div>\n        Name: <input v-model=\"name\" type=\"text\">\n\n        <LinkButton text=\"\u0419\u0430 \u043C\u0435\u043B\u043A\u043E \u043A\u043D\u043E\u043F\u043A\u043E\" size=\"small\" />\n        <LinkButton text=\"\u0419\u0430 \u043A\u043D\u043E\u043F\u043A\u043E\" />\n        <LinkButton text=\"\u0419\u0430 \u0433\u0440\u043E\u0441 \u043A\u043D\u043E\u043F\u043A\u043E\" size=\"big\" />\n    </div>",
+    template: "\n        <Page class=welcome-page>\n            <Header text=\"\u041B\u0430\u0431\u0438\u0440\u0438\u043D\u0442 \u043D\u0430\u043F\u0435\u0440\u0435\u0433\u043E\u043D\u043A\u0438\"  />\n            <RatingTable class=\"center-block welcome-page__rating\" />\n            <div style=\"text-align: center\" class=\"welcome-page__play-button\" >\n                <LinkButton text=\"\u0418\u0433\u0440\u0430\u0442\u044C\" size=\"big\" class=\"center-block\"/>\n            </div>\n        </Page>\n",
     data: {
         name: "World"
     },
     components: {
         'LinkButton': buttonComponent,
-        'Header': titleComponent
+        'Header': titleComponent,
+        'Page': pageComponent,
+        'RatingTable': ratingTableComponent
     }
 });
 

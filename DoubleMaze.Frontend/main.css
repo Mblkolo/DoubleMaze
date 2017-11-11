@@ -80,17 +80,10 @@ html {
     /*background-color: #eee;*/
     table-layout: fixed;
     border-collapse: collapse;
-    width: 50rem;
+    width: 35rem;
     font-size: 2rem;
     line-height:5rem;
 }
-
-    .rating tr:nth-child(1)
-    {
-        /*border-bottom: solid #000 1px;*/
-        line-height: 6rem;
-        vertical-align: top;
-    }
 
     .rating tr td:nth-child(1)
     {
@@ -104,28 +97,19 @@ html {
         width: 30rem;
     }
 
-    .rating tr td:nth-child(3) {
-        width: 10rem;
-        text-align: right;
-        padding-right: 2rem;
-    }
 
-    .rating__select /* td:nth-child(1)*/
+    .rating__select
     {
-        /*font-size: 3rem;*/
-
-           /*border-bottom: solid #000 1px;*/
-
         box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5) ;
     }
 
-    .welcome-page__rating {
-        padding-top: 8rem;
-    }
+.welcome-page__rating {
+    padding-top: 6rem;
+}
 
-    .welcome-page__play-button {
-        padding-top: 6rem;
-    }
+.welcome-page__play-button {
+    padding-top: 6rem;
+}
 
 
 .bots 
