@@ -145,10 +145,22 @@ var titleComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
 var pageComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
     template: "\n        <div class=\"content center-block\">\n            <slot>\u041A\u0430\u043A\u043E\u0435-\u0442\u043E \u0441\u043E\u0434\u0435\u0440\u0436\u0438\u043C\u043E\u0435</slot>\n        </div>\n    "
 });
+var playerComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
+    template: "\n        <span>{{name}}<span class=\"player__level\">{{rating}}</span></span>\n    ",
+    props: ["name", "rating"]
+});
 var ratingTableComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
-    template: "\n        <table class=\"rating\">\n            <tr v-for=\"line in ratings\" :class=\"(line.isCurrent ? 'rating__select' : '' )\">\n                <td>{{line.place}}</td>\n                <td>{{line.name}}<span class=\"player__level\">{{line.rating}}</span></td>\n            </tr>\n        </table>\n    ",
-    data: function () {
-        return {
+    template: "\n        <table class=\"rating\">\n            <tr v-for=\"line in ratings\" :class=\"(line.isCurrent ? 'rating__select' : '' )\">\n                <td>{{line.place}}</td>\n                <td><Player :name=\"line.name\" :rating=\"line.rating\" /></td>\n            </tr>\n        </table>\n    ",
+    props: ["ratings"],
+    components: {
+        'Player': playerComponent
+    }
+});
+var v = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
+    el: "#content",
+    template: "\n        <div>\n            <Page class=welcome-page>\n                <Header text=\"\u041B\u0430\u0431\u0438\u0440\u0438\u043D\u0442 \u043D\u0430\u043F\u0435\u0440\u0435\u0433\u043E\u043D\u043A\u0438\"  />\n                <RatingTable class=\"center-block welcome-page__rating\" :ratings=\"welcome.ratings\" />\n                <div style=\"text-align: center\" class=\"welcome-page__play-button\" >\n                    <LinkButton text=\"\u0418\u0433\u0440\u0430\u0442\u044C\" size=\"big\" class=\"center-block\"/>\n                </div>\n            </Page>\n\n            <div class=\"space_4\"></div>\n\n            <Page class=wait-page>\n                <LinkButton text=\"\u041D\u0430\u0437\u0430\u0434\" size=\"small\" />\n                <Header text=\"\u0414\u043E\u0436\u0434\u0438\u0441\u044C \u043F\u0440\u043E\u0442\u0438\u0432\u043D\u0438\u043A\u0430\" size=\"small\"  />\n                <img src=images/preloader.gif class=\"center-block top-padding4\" />\n                <div class=\"wait-page__online top-padding2\">\u0418\u0433\u0440\u043E\u043A\u043E\u0432 \u043E\u043D\u043B\u0430\u0439\u043D: {{wait.online_count}}</div>\n                <div class=\"wait-page__delimeter top-padding6\">\u0418\u043B\u0438</div>\n                <Header text=\"\u0421\u044B\u0433\u0440\u0430\u0439 \u0441 \u0431\u043E\u0442\u043E\u043C\" size=\"small\" class=\"top-padding2\"  />\n            </Page>\n        </div>\n",
+    data: {
+        welcome: {
             ratings: [
                 {
                     place: 56,
@@ -177,25 +189,17 @@ var ratingTableComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
                     isCurrent: false
                 }
             ]
-        };
-    },
-    computed: {
-        computerSelect: function () {
-            return;
+        },
+        wait: {
+            online_count: 6,
         }
-    }
-});
-var v = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
-    el: "#content",
-    template: "\n        <Page class=welcome-page>\n            <Header text=\"\u041B\u0430\u0431\u0438\u0440\u0438\u043D\u0442 \u043D\u0430\u043F\u0435\u0440\u0435\u0433\u043E\u043D\u043A\u0438\"  />\n            <RatingTable class=\"center-block welcome-page__rating\" />\n            <div style=\"text-align: center\" class=\"welcome-page__play-button\" >\n                <LinkButton text=\"\u0418\u0433\u0440\u0430\u0442\u044C\" size=\"big\" class=\"center-block\"/>\n            </div>\n        </Page>\n",
-    data: {
-        name: "World"
     },
     components: {
         'LinkButton': buttonComponent,
         'Header': titleComponent,
         'Page': pageComponent,
-        'RatingTable': ratingTableComponent
+        'RatingTable': ratingTableComponent,
+        'Player': playerComponent
     }
 });
 

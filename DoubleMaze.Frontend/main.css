@@ -142,11 +142,11 @@ html {
     padding: 0.25rem 0.5rem;
 }
 
-.wait-sreen__delimeter {
+.wait-page__delimeter {
     text-align: center;
 }
 
-.wait-sreen__online {
+.wait-page__online {
     text-align: center;
 }
 
@@ -174,6 +174,35 @@ html {
 .title--small
 {
     font-size: 4rem;
+}
+
+
+.top-padding2 {
+    padding-top: 2rem;
+}
+
+.top-padding3 {
+    padding-top: 3rem;
+}
+
+.top-padding4 {
+    padding-top: 4rem;
+}
+
+.top-padding5 {
+    padding-top: 5rem;
+}
+
+.top-padding6 {
+    padding-top: 6rem;
+}
+
+.top-padding7 {
+    padding-top: 7rem;
+}
+
+.top-padding8 {
+    padding-top: 8rem;
 }
 
 .space_2

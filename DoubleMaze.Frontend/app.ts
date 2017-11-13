@@ -57,16 +57,57 @@ const pageComponent = Vue.extend({
     `
 })
 
+const playerComponent = Vue.extend({
+    template: `
+        <span>{{name}}<span class="player__level">{{rating}}</span></span>
+    `,
+    props: ["name", "rating"]
+})
+
 const ratingTableComponent = Vue.extend({
     template: `
         <table class="rating">
             <tr v-for="line in ratings" :class="(line.isCurrent ? 'rating__select' : '' )">
                 <td>{{line.place}}</td>
-                <td>{{line.name}}<span class="player__level">{{line.rating}}</span></td>
+                <td><Player :name="line.name" :rating="line.rating" /></td>
             </tr>
-        </table>    `,
-    data: function() {
-        return {
+        </table>
+    `,
+    props: ["ratings"],
+    components: {
+        'Player': playerComponent
+    }
+})
+
+
+
+
+let v = new Vue({
+    el: "#content",
+    template: `
+        <div>
+            <Page class=welcome-page>
+                <Header text="Лабиринт наперегонки"  />
+                <RatingTable class="center-block welcome-page__rating" :ratings="welcome.ratings" />
+                <div style="text-align: center" class="welcome-page__play-button" >
+                    <LinkButton text="Играть" size="big" class="center-block"/>
+                </div>
+            </Page>
+
+            <div class="space_4"></div>
+
+            <Page class=wait-page>
+                <LinkButton text="Назад" size="small" />
+                <Header text="Дождись противника" size="small"  />
+                <img src=images/preloader.gif class="center-block top-padding4" />
+                <div class="wait-page__online top-padding2">Игроков онлайн: {{wait.online_count}}</div>
+                <div class="wait-page__delimeter top-padding6">Или</div>
+                <Header text="Сыграй с ботом" size="small" class="top-padding2"  />
+            </Page>
+        </div>
+`,
+    data: {
+        welcome: {
             ratings: [
                 {
                     place: 56,
@@ -94,34 +135,17 @@ const ratingTableComponent = Vue.extend({
                     rating: "4",
                     isCurrent: false
                 }]
-        }
-    },
-    computed: {
-        computerSelect: function () {
-            return 
-        }
-    }
-})
+        },
+        wait: {
+            online_count: 6,
 
-
-let v = new Vue({
-    el: "#content",
-    template: `
-        <Page class=welcome-page>
-            <Header text="Лабиринт наперегонки"  />
-            <RatingTable class="center-block welcome-page__rating" />
-            <div style="text-align: center" class="welcome-page__play-button" >
-                <LinkButton text="Играть" size="big" class="center-block"/>
-            </div>
-        </Page>
-`,
-    data: {
-        name: "World"
+        }
     },
     components: {
         'LinkButton': buttonComponent,
         'Header': titleComponent,
         'Page': pageComponent,
-        'RatingTable': ratingTableComponent
+        'RatingTable': ratingTableComponent,
+        'Player': playerComponent
     }
 });
