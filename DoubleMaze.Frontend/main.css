@@ -205,40 +205,6 @@ html {
     padding-top: 8rem;
 }
 
-.space_2
-{
-    height: 2rem;
-}
-
-.space_3
-{
-    height: 3rem;
-}
-
-.space_4
-{
-    height: 4rem;
-}
-
-.space_5
-{
-    height: 5rem;
-}
-
-.space_6
-{
-    height: 6rem;
-}
-
-.space_7
-{
-    height: 7rem;
-}
-
-.space_8
-{
-    height: 8rem;
-}
 
 .welcome-title
 {
@@ -368,66 +334,4 @@ html {
     margin-top: 9rem;
     margin-bottom: 7rem;
     text-align: center;
-}
-
-
-.wait-game-bots {
-    table-layout: fixed;
-    /*padding-top: 4rem;*/
-    border-collapse: separate;
-    border-spacing: 0;
-    padding-bottom: 4rem;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.wait-game-bots tr td:nth-child(1) {
-    padding-right: 2rem;
-    text-align: right;
-    font-size: 3rem;
-}
-
-.wait-game-bots tr td:nth-child(2) {
-    max-width: 30rem;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-
-}
-
-.wait-game-bots tr td:nth-child(3) {
-    text-align: right;
-    padding-left: 3rem;
-}
-
-.wait-game-bots tr td:nth-child(4) a {
-    width: 15rem;
-    height: 4rem;
-    line-height: 4rem;
-    margin-left: 5rem;
-
-}
-
-.wait-game-bots tr td {
-    height: 5rem;
-    font-size: 2rem;
-    border-bottom: #fff 1px solid;
-    border-top: #fff 1px solid;
-}
-
-.wait-game-bots tr:hover td {
-    border-bottom: #227F32 1px solid;
-    border-top: #227F32 1px solid;
-}
-
-.wait-game-bots tr td {
-    height: 6rem;
-    border-bottom: #fff 1px solid;
-    border-top: #fff 1px solid;
-}
-
-.wait-game__back {
-    width: 12rem;
-    line-height: 3rem;
-    font-size: 2rem;
 }

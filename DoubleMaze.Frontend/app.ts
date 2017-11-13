@@ -79,14 +79,28 @@ const ratingTableComponent = Vue.extend({
     }
 })
 
-
+const botTableComponent = Vue.extend({
+    template: `
+        <table class="bots">
+            <tr v-for="line in bots">
+                <td><Player :name="line.name" :rating="line.rating" /></td>
+                <td><LinkButton text="Играть" size="small" /></td>
+            </tr>
+        </table>
+    `,
+    props: ["bots"],
+    components: {
+        'Player': playerComponent,
+        'LinkButton': buttonComponent
+    }
+})
 
 
 let v = new Vue({
     el: "#content",
     template: `
         <div>
-            <Page class=welcome-page>
+            <Page class=welcome-page v-if="welcome != null">
                 <Header text="Лабиринт наперегонки"  />
                 <RatingTable class="center-block welcome-page__rating" :ratings="welcome.ratings" />
                 <div style="text-align: center" class="welcome-page__play-button" >
@@ -94,15 +108,15 @@ let v = new Vue({
                 </div>
             </Page>
 
-            <div class="space_4"></div>
-
-            <Page class=wait-page>
+            <Page class="wait-page"  v-if="wait != null">
                 <LinkButton text="Назад" size="small" />
                 <Header text="Дождись противника" size="small"  />
                 <img src=images/preloader.gif class="center-block top-padding4" />
                 <div class="wait-page__online top-padding2">Игроков онлайн: {{wait.online_count}}</div>
                 <div class="wait-page__delimeter top-padding6">Или</div>
+
                 <Header text="Сыграй с ботом" size="small" class="top-padding2"  />
+                <BotTable :bots="wait.bots" class="center-block top-padding2" />
             </Page>
         </div>
 `,
@@ -138,7 +152,28 @@ let v = new Vue({
         },
         wait: {
             online_count: 6,
-
+            bots: [
+                {
+                    name: "Бот 5",
+                    rating: 0
+                },
+                {
+                    name: "Бот 7",
+                    rating: 3
+                },
+                {
+                    name: "Бот 9",
+                    rating: 78
+                },
+                {
+                    name: "Бот 11",
+                    rating: 1293
+                },
+                {
+                    name: "Бот 19",
+                    rating: 12933
+                }
+            ]
         }
     },
     components: {
@@ -146,6 +181,7 @@ let v = new Vue({
         'Header': titleComponent,
         'Page': pageComponent,
         'RatingTable': ratingTableComponent,
-        'Player': playerComponent
+        'Player': playerComponent,
+        'BotTable': botTableComponent
     }
 });

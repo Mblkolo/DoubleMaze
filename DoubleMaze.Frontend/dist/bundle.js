@@ -156,9 +156,17 @@ var ratingTableComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
         'Player': playerComponent
     }
 });
+var botTableComponent = __WEBPACK_IMPORTED_MODULE_0_vue___default.a.extend({
+    template: "\n        <table class=\"bots\">\n            <tr v-for=\"line in bots\">\n                <td><Player :name=\"line.name\" :rating=\"line.rating\" /></td>\n                <td><LinkButton text=\"\u0418\u0433\u0440\u0430\u0442\u044C\" size=\"small\" /></td>\n            </tr>\n        </table>\n    ",
+    props: ["bots"],
+    components: {
+        'Player': playerComponent,
+        'LinkButton': buttonComponent
+    }
+});
 var v = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
     el: "#content",
-    template: "\n        <div>\n            <Page class=welcome-page>\n                <Header text=\"\u041B\u0430\u0431\u0438\u0440\u0438\u043D\u0442 \u043D\u0430\u043F\u0435\u0440\u0435\u0433\u043E\u043D\u043A\u0438\"  />\n                <RatingTable class=\"center-block welcome-page__rating\" :ratings=\"welcome.ratings\" />\n                <div style=\"text-align: center\" class=\"welcome-page__play-button\" >\n                    <LinkButton text=\"\u0418\u0433\u0440\u0430\u0442\u044C\" size=\"big\" class=\"center-block\"/>\n                </div>\n            </Page>\n\n            <div class=\"space_4\"></div>\n\n            <Page class=wait-page>\n                <LinkButton text=\"\u041D\u0430\u0437\u0430\u0434\" size=\"small\" />\n                <Header text=\"\u0414\u043E\u0436\u0434\u0438\u0441\u044C \u043F\u0440\u043E\u0442\u0438\u0432\u043D\u0438\u043A\u0430\" size=\"small\"  />\n                <img src=images/preloader.gif class=\"center-block top-padding4\" />\n                <div class=\"wait-page__online top-padding2\">\u0418\u0433\u0440\u043E\u043A\u043E\u0432 \u043E\u043D\u043B\u0430\u0439\u043D: {{wait.online_count}}</div>\n                <div class=\"wait-page__delimeter top-padding6\">\u0418\u043B\u0438</div>\n                <Header text=\"\u0421\u044B\u0433\u0440\u0430\u0439 \u0441 \u0431\u043E\u0442\u043E\u043C\" size=\"small\" class=\"top-padding2\"  />\n            </Page>\n        </div>\n",
+    template: "\n        <div>\n            <Page class=welcome-page v-if=\"welcome != null\">\n                <Header text=\"\u041B\u0430\u0431\u0438\u0440\u0438\u043D\u0442 \u043D\u0430\u043F\u0435\u0440\u0435\u0433\u043E\u043D\u043A\u0438\"  />\n                <RatingTable class=\"center-block welcome-page__rating\" :ratings=\"welcome.ratings\" />\n                <div style=\"text-align: center\" class=\"welcome-page__play-button\" >\n                    <LinkButton text=\"\u0418\u0433\u0440\u0430\u0442\u044C\" size=\"big\" class=\"center-block\"/>\n                </div>\n            </Page>\n\n            <Page class=\"wait-page\"  v-if=\"wait != null\">\n                <LinkButton text=\"\u041D\u0430\u0437\u0430\u0434\" size=\"small\" />\n                <Header text=\"\u0414\u043E\u0436\u0434\u0438\u0441\u044C \u043F\u0440\u043E\u0442\u0438\u0432\u043D\u0438\u043A\u0430\" size=\"small\"  />\n                <img src=images/preloader.gif class=\"center-block top-padding4\" />\n                <div class=\"wait-page__online top-padding2\">\u0418\u0433\u0440\u043E\u043A\u043E\u0432 \u043E\u043D\u043B\u0430\u0439\u043D: {{wait.online_count}}</div>\n                <div class=\"wait-page__delimeter top-padding6\">\u0418\u043B\u0438</div>\n\n                <Header text=\"\u0421\u044B\u0433\u0440\u0430\u0439 \u0441 \u0431\u043E\u0442\u043E\u043C\" size=\"small\" class=\"top-padding2\"  />\n                <BotTable :bots=\"wait.bots\" class=\"center-block top-padding2\" />\n            </Page>\n        </div>\n",
     data: {
         welcome: {
             ratings: [
@@ -192,6 +200,28 @@ var v = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
         },
         wait: {
             online_count: 6,
+            bots: [
+                {
+                    name: "Бот 5",
+                    rating: 0
+                },
+                {
+                    name: "Бот 7",
+                    rating: 3
+                },
+                {
+                    name: "Бот 9",
+                    rating: 78
+                },
+                {
+                    name: "Бот 11",
+                    rating: 1293
+                },
+                {
+                    name: "Бот 19",
+                    rating: 12933
+                }
+            ]
         }
     },
     components: {
@@ -199,7 +229,8 @@ var v = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
         'Header': titleComponent,
         'Page': pageComponent,
         'RatingTable': ratingTableComponent,
-        'Player': playerComponent
+        'Player': playerComponent,
+        'BotTable': botTableComponent
     }
 });
 
