@@ -20,10 +20,15 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Components\LinkButton.ts">
+      <DependentUpon>LinkButton.vue</DependentUpon>
+    </Content>
+    <Content Include="Components\LinkButton.vue" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="AreaController.js">
       <DependentUpon>AreaController.ts</DependentUpon>
     </Content>
-    <Content Include="Components\LinkButton.html" />
     <Content Include="IArea.js">
       <DependentUpon>IArea.ts</DependentUpon>
     </Content>
@@ -48,13 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="AreaController.ts" />
-    <TypeScriptCompile Include="Components\LinkButton.ts" />
     <TypeScriptCompile Include="vue-file.d.ts" />
     <TypeScriptCompile Include="IArea.ts" />
     <TypeScriptCompile Include="key_code.ts" />
-    <Content Include="Components\LinkButton.vue">
-      <SubType>Designer</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
