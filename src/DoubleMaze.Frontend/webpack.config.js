@@ -3,7 +3,7 @@
 module.exports = {
     entry: "./app.ts",
     output: {
-        filename: "./dist/bundle.js"
+        filename: "../DoubleMaze/wwwroot/js/bundle.js"
     },
     resolve: {
         extensions: [".ts", ".tsx", ".js", ".json"],

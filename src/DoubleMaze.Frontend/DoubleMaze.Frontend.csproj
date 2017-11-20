@@ -20,16 +20,35 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="app.css" />
-    <Content Include="dist\bundle.js" />
-    <Content Include="images\preloader.gif" />
-    <Content Include="index.html" />
+    <Content Include="AreaController.js">
+      <DependentUpon>AreaController.ts</DependentUpon>
+    </Content>
+    <Content Include="IArea.js">
+      <DependentUpon>IArea.ts</DependentUpon>
+    </Content>
+    <Content Include="key_code.js">
+      <DependentUpon>key_code.ts</DependentUpon>
+    </Content>
     <Content Include="main.css" />
     <Content Include="webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.ts" />
     <Content Include="tsconfig.json" />
+    <Content Include="IArea.js.map">
+      <DependentUpon>IArea.js</DependentUpon>
+    </Content>
+    <Content Include="key_code.js.map">
+      <DependentUpon>key_code.js</DependentUpon>
+    </Content>
+    <Content Include="AreaController.js.map">
+      <DependentUpon>AreaController.js</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="AreaController.ts" />
+    <TypeScriptCompile Include="IArea.ts" />
+    <TypeScriptCompile Include="key_code.ts" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>

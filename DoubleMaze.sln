@@ -16,7 +16,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DoubleMaze.Tests", "src\Dou
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DoubleMaze.Migrations", "src\DoubleMaze.Migrations\DoubleMaze.Migrations.xproj", "{24F8CC23-BBAB-4374-89EB-4B6A09CB25AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoubleMaze.Frontend", "DoubleMaze.Frontend\DoubleMaze.Frontend.csproj", "{F7BA4D4E-7A7F-40FD-B9F1-C98A4565D24D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoubleMaze.Frontend", "src\DoubleMaze.Frontend\DoubleMaze.Frontend.csproj", "{F7BA4D4E-7A7F-40FD-B9F1-C98A4565D24D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
