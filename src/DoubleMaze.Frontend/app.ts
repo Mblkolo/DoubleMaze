@@ -1,5 +1,8 @@
 ﻿import Vue from 'vue'
 import {AreaController } from "./AreaController";
+import LinkButton from './Components/LinkButton.vue';
+
+
 
 function LoadTemplate(name: string): string {
     const element = document.getElementById(name);
@@ -9,26 +12,6 @@ function LoadTemplate(name: string): string {
 window.onload = function () {
     console.log("hello world");
 };
-
-const buttonComponent = Vue.extend({
-    template: LoadTemplate("link-button-template"),
-    props: {
-        'text': {
-            type: String,
-            default: "###"
-        },
-        'size': {
-            type: String,
-            default: "middle"
-        }
-    },
-
-    computed: {
-        computedSize: function (): string {
-            return "link-button--" + this.size;
-        }
-    }
-})
 
 const titleComponent = Vue.extend({
     template: LoadTemplate("title-template"),
@@ -92,9 +75,12 @@ const botTableComponent = Vue.extend({
     props: ["bots"],
     components: {
         'Player': playerComponent,
-        'LinkButton': buttonComponent
+        'LinkButton': LinkButton
     }
 })
+
+
+
 
 
 let v = new Vue({
@@ -178,7 +164,7 @@ let v = new Vue({
         }
     },
     components: {
-        'LinkButton': buttonComponent,
+        'LinkButton': LinkButton,
         'Header': titleComponent,
         'Page': pageComponent,
         'RatingTable': ratingTableComponent,

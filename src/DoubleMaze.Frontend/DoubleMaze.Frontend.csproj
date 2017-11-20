@@ -23,6 +23,7 @@
     <Content Include="AreaController.js">
       <DependentUpon>AreaController.ts</DependentUpon>
     </Content>
+    <Content Include="Components\LinkButton.html" />
     <Content Include="IArea.js">
       <DependentUpon>IArea.ts</DependentUpon>
     </Content>
@@ -47,9 +48,15 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="AreaController.ts" />
+    <TypeScriptCompile Include="Components\LinkButton.ts" />
+    <TypeScriptCompile Include="vue-file.d.ts" />
     <TypeScriptCompile Include="IArea.ts" />
     <TypeScriptCompile Include="key_code.ts" />
+    <Content Include="Components\LinkButton.vue">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>
