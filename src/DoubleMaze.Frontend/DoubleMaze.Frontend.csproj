@@ -50,9 +50,21 @@
     <Content Include="AreaController.js.map">
       <DependentUpon>AreaController.js</DependentUpon>
     </Content>
+    <Content Include="Components\Title.vue" />
+    <Content Include="Components\Player.vue" />
+    <Content Include="Components\Page.vue" />
+    <Content Include="Components\RatingTable.vue" />
+    <Content Include="Components\BotTable.vue" />
+    <Content Include="Components\WelcomePage.vue" />
+    <Content Include="Components\WaitPage.vue" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="AreaController.ts" />
+    <TypeScriptCompile Include="Components\BotTable.ts" />
+    <TypeScriptCompile Include="Components\WaitPage.ts" />
+    <TypeScriptCompile Include="Components\WelcomePage.ts" />
+    <TypeScriptCompile Include="Components\RatingTable.ts" />
+    <TypeScriptCompile Include="Components\Title.ts" />
     <TypeScriptCompile Include="vue-file.d.ts" />
     <TypeScriptCompile Include="IArea.ts" />
     <TypeScriptCompile Include="key_code.ts" />

@@ -25,122 +25,6 @@ html {
     margin-right: auto;
 }
 
-.center-text
-{
-    text-align: center;
-}
-
-.content {
-    background-color: #fff;
-    width: 100rem; 
-    padding: 5rem;
-    font-size: 1.5rem;
-    box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5) ;
-    font-size: 2rem;
-}
-
-.rating
-{
-    /*background-color: #eee;*/
-    table-layout: fixed;
-    border-collapse: collapse;
-    width: 35rem;
-    font-size: 2rem;
-    line-height:5rem;
-}
-
-    .rating tr td:nth-child(1)
-    {
-        text-align: right;
-        width: 5rem;
-        padding-right: 3rem;
-    }
-
-    .rating tr td:nth-child(2)
-    {
-        width: 30rem;
-    }
-
-
-    .rating__select
-    {
-        box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5) ;
-    }
-
-.welcome-page__rating {
-    padding-top: 6rem;
-}
-
-.welcome-page__play-button {
-    padding-top: 6rem;
-}
-
-
-.bots 
-{
-    width: 25rem;
-    line-height: 5rem;
-}
-
-    .bots >tbody> tr > td:nth-child(1)
-    {
-        width: 10rem;
-    }
-
-    .bots >tbody> tr > td:nth-child(2)
-    {
-        width: 15rem;
-        text-align: right;
-    }
-
-.player {
-
-}
-
-.player__level {
-    vertical-align: super;
-    font-size: 1rem;
-    line-height: 0;
-    background-color: #dedede;
-    border-radius: 2rem;
-    padding: 0.25rem 0.5rem;
-}
-
-.wait-page__delimeter {
-    text-align: center;
-}
-
-.wait-page__online {
-    text-align: center;
-}
-
-.welcome-intro
-{
-    font-size: 2rem;
-    width: 60rem;
-    margin-bottom: 7rem;
-    margin-top: 7rem;
-}
-
-.welcome-intro p{
-    margin: 0 0 1rem 0;
-}
-
-.title
-{
-    text-align: center;
-    color: #227F32;
-    text-transform: uppercase;
-    font-size: 5rem;
-    margin: 0;
-}
-
-.title--small
-{
-    font-size: 4rem;
-}
-
-
 .top-padding2 {
     padding-top: 2rem;
 }
@@ -168,6 +52,31 @@ html {
 .top-padding8 {
     padding-top: 8rem;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/*.welcome-intro
+{
+    font-size: 2rem;
+    width: 60rem;
+    margin-bottom: 7rem;
+    margin-top: 7rem;
+}
+
+.welcome-intro p{
+    margin: 0 0 1rem 0;
+}
+
+
 
 
 .welcome-title
@@ -298,4 +207,4 @@ html {
     margin-top: 9rem;
     margin-bottom: 7rem;
     text-align: center;
-}
+}*/

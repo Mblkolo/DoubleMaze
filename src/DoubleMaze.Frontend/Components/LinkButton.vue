@@ -1,4 +1,4 @@
-<script lang="ts" src="./LinkButton.ts"></script>
+﻿<script lang="ts" src="./LinkButton.ts"></script>
 
 <template>
     <a href="#" class="link-button" :class="computedSize">{{text}}</a>
