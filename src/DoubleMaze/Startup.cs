@@ -40,8 +40,8 @@ namespace DoubleMaze
 
             app.UseWebSockets();
 
-            //var storage = new InMemoryStorage();
-            var storage = new DbStorage("Host=127.0.0.1;Username=doublemazeuser;Password=mycoolpass;Database=doublemaze");
+            var storage = new InMemoryStorage();
+            //var storage = new DbStorage("Host=127.0.0.1;Username=doublemazeuser;Password=mycoolpass;Database=doublemaze");
             var world = new World(storage, loggerFactory);
             var outConnection = new OutputConnectionManager(x => world.Pipe.Post(new PlayerDisconnected(x)));
             app.Map("/test", (_app) => _app.UseMiddleware<WebSocketManagerMiddleware>(outConnection, world, storage, loggerFactory));

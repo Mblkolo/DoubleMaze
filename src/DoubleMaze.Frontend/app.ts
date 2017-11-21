@@ -4,20 +4,20 @@ import WaitPage from './Components/WaitPage.vue';
 import WelcomePage from './Components/WelcomePage.vue';
 
 
-let v = new Vue({
-    el: "#content",
-    template: `
-        <div>
-            <WelcomePage />
-            <WaitPage />
-        </div>
-`,
+//let v = new Vue({
+//    el: "#content",
+//    template: `
+//        <div>
+//            <WelcomePage />
+//            <WaitPage />
+//        </div>
+//`,
 
-    components: {
-        WaitPage,
-        WelcomePage
-    }
-});
+//    components: {
+//        WaitPage,
+//        WelcomePage
+//    }
+//});
 
 
 

@@ -1,5 +1,7 @@
 ﻿import {IArea} from "./IArea";
 import {KeyCode} from "./key_code";
+import Vue from "vue";
+import WelcomePage from "./Components/WelcomePage.vue";
 
 export class AreaController {
     private areas: { [id: string]: () => IArea } = {};
@@ -7,7 +9,7 @@ export class AreaController {
 
     public constructor(sendData: (data: any) => void) {
         this.areas["loading"] = () => new LoadingArea(sendData);
-        //this.areas["welcome"] = () => new WelcomeArea(sendData);
+        this.areas["welcome"] = () => new WelcomeArea(sendData);
         //this.areas["wait"] = () => new WaitArea(sendData);
         //this.areas["game"] = () => new GameArea(sendData);
         //this.areas["return"] = () => new ReturnArea(sendData);
@@ -61,31 +63,35 @@ class LoadingArea implements IArea {
 
 }
 
-//class WelcomeArea implements IArea {
-//    private sendData: (data: any) => void;
+class WelcomeArea implements IArea {
+    private sendData: (data: any) => void;
+    private vm: any;
 
-//    public constructor(sendData: (data: any) => void) {
-//        this.sendData = sendData;
-//    }
+    public constructor(sendData: (data: any) => void) {
+        this.sendData = sendData;
+    }
 
-//    public enter() {
-//        $("#main-content").html($("#welcome-area-template").html());
-//        $(".welcome-play-button").on("click", (arg: JQueryEventObject) => this.onClick(arg));
-//    }
+    public enter() {
+        this.vm = new Vue({
+            el: "#content",
+            template: `<div><WelcomePage /></div>`,
+            components: {
+                WelcomePage
+            }
+        });
+    }
 
-//    public onClick(arg: JQueryEventObject) {
-//        const name = $(".welcome-player-name").val();
-//        this.sendData(JSON.stringify({ Type: "PlayerName", Name: name }));
-//    }
 
-//    public leave() {
-//    }
+    public leave() {
+        this.vm.$destroy;
+        this.vm.$el.innerHTML = "";
+    }
 
-//    public process(data: any) {
+    public process(data: any) {
 
-//    }
+    }
 
-//}
+}
 
 //class WaitArea implements IArea {
 //    private sendData: (data: any) => void;
