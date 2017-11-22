@@ -1,7 +1,7 @@
 ﻿<script lang="ts" src="./LinkButton.ts"></script>
 
 <template>
-    <a href="#" class="link-button" :class="computedSize">{{text}}</a>
+    <a href="#" class="link-button" :class="computedSize"  v-on:click="$emit('click')">{{text}}</a>
 </template>
 
 <style>

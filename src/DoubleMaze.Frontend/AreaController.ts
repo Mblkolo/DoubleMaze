@@ -72,11 +72,18 @@ class WelcomeArea implements IArea {
     }
 
     public enter() {
+        const sendData = this.sendData;
+
         this.vm = new Vue({
             el: "#content",
-            template: `<div><WelcomePage /></div>`,
+            template: `<WelcomePage v-on:start="start" />`,
             components: {
                 WelcomePage
+            },
+            methods: {
+                start: () => {
+                    sendData(JSON.stringify({ Type: "PlayerName", Name: name }));
+                }
             }
         });
     }

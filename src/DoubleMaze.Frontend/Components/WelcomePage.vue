@@ -5,7 +5,7 @@
         <Title text="Лабиринт наперегонки" />
         <RatingTable class="center-block welcome-page__rating" :ratings="ratings" />
         <div style="text-align: center" class="welcome-page__play-button">
-            <LinkButton text="Играть" size="big" class="center-block" />
+            <LinkButton text="Играть" size="big" v-on:click="$emit('start')" class="center-block" />
         </div>
     </Page>
 </template>
