@@ -2,6 +2,8 @@
 import {KeyCode} from "./key_code";
 import Vue from "vue";
 import WelcomePage from "./Components/WelcomePage.vue";
+import Page from "./Components/Page.vue";
+import Title from "./Components/Title.vue";
 
 export class AreaController {
     private areas: { [id: string]: () => IArea } = {};
@@ -38,12 +40,23 @@ export class AreaController {
 
 class LoadingArea implements IArea {
     private sendData: (data: any) => void;
+    private vm: any;
 
     public constructor(sendData: (data: any) => void) {
         this.sendData = sendData;
     }
 
     public enter() {
+        this.vm = new Vue({
+            el: "#content",
+            template: `<Page><Title text="Загрузонька" /></Page>`,
+            components: {
+                Page,
+                Title,
+            },
+        });
+
+
         this.sendData(JSON.stringify({
             Type: "token",
             PlayerId: localStorage.getItem("playerId"),
@@ -52,6 +65,8 @@ class LoadingArea implements IArea {
     }
 
     public leave() {
+        this.vm.$destroy;
+        this.vm.$el.parentElement.innerHTML = '<div id="content"></div>';
     }
 
     public process(data: any) {
@@ -63,6 +78,7 @@ class LoadingArea implements IArea {
 
 }
 
+import "./WelcomePageModel.ts"
 class WelcomeArea implements IArea {
     private sendData: (data: any) => void;
     private vm: any;
@@ -73,10 +89,39 @@ class WelcomeArea implements IArea {
 
     public enter() {
         const sendData = this.sendData;
+        const data: WelcomePageModel = {
+            ratings: [
+                {
+                    place: 111,
+                    name: "Коля",
+                    rating: "0",
+                    isCurrent: false
+                }, {
+                    place: 57,
+                    name: "Александр",
+                    rating: "2",
+                    isCurrent: false
+                }, {
+                    place: 58,
+                    name: "Вася",
+                    rating: "21",
+                    isCurrent: true
+                }, {
+                    place: 59,
+                    name: "Дима",
+                    rating: "2",
+                    isCurrent: false
+                }, {
+                    place: 60,
+                    name: "Маша",
+                    rating: "4",
+                    isCurrent: false
+                }]
+        }
 
         this.vm = new Vue({
             el: "#content",
-            template: `<WelcomePage v-on:start="start" />`,
+            template: `<WelcomePage v-on:start="start" v-bind="data" />`,
             components: {
                 WelcomePage
             },
@@ -84,7 +129,8 @@ class WelcomeArea implements IArea {
                 start: () => {
                     sendData(JSON.stringify({ Type: "PlayerName", Name: name }));
                 }
-            }
+            },
+            data: { data }
         });
     }
 

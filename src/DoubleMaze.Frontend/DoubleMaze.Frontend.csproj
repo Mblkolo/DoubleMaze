@@ -68,6 +68,7 @@
     <TypeScriptCompile Include="vue-file.d.ts" />
     <TypeScriptCompile Include="IArea.ts" />
     <TypeScriptCompile Include="key_code.ts" />
+    <TypeScriptCompile Include="WelcomePageModel.ts" />
     <TypeScriptCompile Include="WaitPageModel.ts" />
   </ItemGroup>
   <ItemGroup />

@@ -11233,6 +11233,12 @@ function sendMessage(message) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Components_WelcomePage_vue__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Components_Page_vue__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Components_Title_vue__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__WelcomePageModel_ts__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__WelcomePageModel_ts___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__WelcomePageModel_ts__);
+
+
 
 
 var AreaController = /** @class */ (function () {
@@ -11268,6 +11274,14 @@ var LoadingArea = /** @class */ (function () {
         this.sendData = sendData;
     }
     LoadingArea.prototype.enter = function () {
+        this.vm = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
+            el: "#content",
+            template: "<Page><Title text=\"\u0417\u0430\u0433\u0440\u0443\u0437\u043E\u043D\u044C\u043A\u0430\" /></Page>",
+            components: {
+                Page: __WEBPACK_IMPORTED_MODULE_2__Components_Page_vue__["a" /* default */],
+                Title: __WEBPACK_IMPORTED_MODULE_3__Components_Title_vue__["a" /* default */],
+            },
+        });
         this.sendData(JSON.stringify({
             Type: "token",
             PlayerId: localStorage.getItem("playerId"),
@@ -11275,6 +11289,8 @@ var LoadingArea = /** @class */ (function () {
         }));
     };
     LoadingArea.prototype.leave = function () {
+        this.vm.$destroy;
+        this.vm.$el.parentElement.innerHTML = '<div id="content"></div>';
     };
     LoadingArea.prototype.process = function (data) {
         if (data.command === "setToken") {
@@ -11284,15 +11300,46 @@ var LoadingArea = /** @class */ (function () {
     };
     return LoadingArea;
 }());
+
 var WelcomeArea = /** @class */ (function () {
     function WelcomeArea(sendData) {
         this.sendData = sendData;
     }
     WelcomeArea.prototype.enter = function () {
         var sendData = this.sendData;
+        var data = {
+            ratings: [
+                {
+                    place: 111,
+                    name: "Коля",
+                    rating: "0",
+                    isCurrent: false
+                }, {
+                    place: 57,
+                    name: "Александр",
+                    rating: "2",
+                    isCurrent: false
+                }, {
+                    place: 58,
+                    name: "Вася",
+                    rating: "21",
+                    isCurrent: true
+                }, {
+                    place: 59,
+                    name: "Дима",
+                    rating: "2",
+                    isCurrent: false
+                }, {
+                    place: 60,
+                    name: "Маша",
+                    rating: "4",
+                    isCurrent: false
+                }
+            ]
+        };
         this.vm = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
             el: "#content",
-            template: "<WelcomePage v-on:start=\"start\" />",
+            template: "<WelcomePage v-on:start=\"start\" v-bind=\"data\" />",
             components: {
                 WelcomePage: __WEBPACK_IMPORTED_MODULE_1__Components_WelcomePage_vue__["a" /* default */]
             },
@@ -11300,7 +11347,8 @@ var WelcomeArea = /** @class */ (function () {
                 start: function () {
                     sendData(JSON.stringify({ Type: "PlayerName", Name: name }));
                 }
-            }
+            },
+            data: { data: data }
         });
     };
     WelcomeArea.prototype.leave = function () {
@@ -12164,38 +12212,7 @@ module.exports = function listToStyles (parentId, list) {
         RatingTable: __WEBPACK_IMPORTED_MODULE_3__RatingTable_vue__["a" /* default */],
         LinkButton: __WEBPACK_IMPORTED_MODULE_4__LinkButton_vue__["a" /* default */]
     },
-    data: function () {
-        return {
-            ratings: [
-                {
-                    place: 56,
-                    name: "Коля",
-                    rating: "0",
-                    isCurrent: false
-                }, {
-                    place: 57,
-                    name: "Александр",
-                    rating: "2",
-                    isCurrent: false
-                }, {
-                    place: 58,
-                    name: "Вася",
-                    rating: "21",
-                    isCurrent: true
-                }, {
-                    place: 59,
-                    name: "Дима",
-                    rating: "2",
-                    isCurrent: false
-                }, {
-                    place: 60,
-                    name: "Маша",
-                    rating: "4",
-                    isCurrent: false
-                }
-            ]
-        };
-    }
+    props: ["ratings"]
 }));
 
 
@@ -12967,6 +12984,14 @@ if (false) {
     require("vue-loader/node_modules/vue-hot-reload-api")      .rerender("data-v-3529824e", esExports)
   }
 }
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 
 /***/ })
 /******/ ]);
