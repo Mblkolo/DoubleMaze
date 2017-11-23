@@ -9,6 +9,9 @@ export default Vue.extend({
         'size': {
             type: String,
             default: "middle"
+        },
+        'value': {
+            default: null
         }
     },
 

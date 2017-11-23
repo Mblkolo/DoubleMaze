@@ -9,7 +9,7 @@
         <div class="wait-page__delimeter top-padding6">Или</div>
 
         <Title text="Сыграй с ботом" size="small" class="top-padding2" />
-        <BotTable :bots="bots" class="center-block top-padding2" />
+        <BotTable :bots="bots" class="center-block top-padding2" @playWithBot="x => $emit('playWithBot', x)" />
     </Page>
 </template>
 

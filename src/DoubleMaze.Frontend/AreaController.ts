@@ -2,6 +2,7 @@
 import {KeyCode} from "./key_code";
 import Vue from "vue";
 import WelcomePage from "./Components/WelcomePage.vue";
+import WaitPage from "./Components/WaitPage.vue";
 import Page from "./Components/Page.vue";
 import Title from "./Components/Title.vue";
 
@@ -12,7 +13,7 @@ export class AreaController {
     public constructor(sendData: (data: any) => void) {
         this.areas["loading"] = () => new LoadingArea(sendData);
         this.areas["welcome"] = () => new WelcomeArea(sendData);
-        //this.areas["wait"] = () => new WaitArea(sendData);
+        this.areas["wait"] = () => new WaitArea(sendData);
         //this.areas["game"] = () => new GameArea(sendData);
         //this.areas["return"] = () => new ReturnArea(sendData);
     }
@@ -137,7 +138,7 @@ class WelcomeArea implements IArea {
 
     public leave() {
         this.vm.$destroy;
-        this.vm.$el.innerHTML = "";
+        this.vm.$el.parentElement.innerHTML = '<div id="content"></div>';
     }
 
     public process(data: any) {
@@ -146,46 +147,59 @@ class WelcomeArea implements IArea {
 
 }
 
-//class WaitArea implements IArea {
-//    private sendData: (data: any) => void;
+class WaitArea implements IArea {
+    private sendData: (data: any) => void;
+    private vm: any;
 
-//    public constructor(sendData: (data: any) => void) {
-//        this.sendData = sendData;
-//    }
+    public constructor(sendData: (data: any) => void) {
+        this.sendData = sendData;
+    }
 
-//    public enter() {
-//        $("#main-content").html($("#wait-area-template").html());
-//    }
+    public enter() {
 
-//    public leave() {
-//    }
+        const data: WaitPageModel = {
+            online_count: 234,
+            bots: []
+        }
 
-//    public process(data: any) {
-//        if (data.command === "showBots") {
-//            for (let i = 0; i < data.bots.length; ++i) {
-//                const bot = data.bots[i];
+        const sendData = this.sendData;
 
-//                $(".wait-game-bots").append(`<tr><td>${i + 1}</td><td></td><td></td><td></td></tr>`);
+        this.vm = new Vue({
+            el: "#content",
+            template: `<WaitPage v-bind="data" @playWithBot="botId => playWithBot(botId)" />`,
+            components: {
+                WaitPage
+            },
+            methods: {
+                playWithBot: (botId: number) => {
+                    console.log(botId);
+                    sendData(JSON.stringify({ type: "playWithBot", botId: botId }));
+                }
+            },
+            data: { data }
+        });
+    }
 
-//                const cells = $(".wait-game-bots").children().last().children();
-//                cells.eq(1).text(bot.name).prop("title", bot.name);
-//                cells.eq(2).text(bot.rating);
+    public leave() {
+        this.vm.$destroy;
+        this.vm.$el.parentElement.innerHTML = '<div id="content"></div>';
+    }
 
-//                if (bot.isAwaible) {
-//                    cells.eq(3).append("<a href=\"#play\" class=\"link-button\">Играть</a>");
-//                    cells.eq(3).on("click", "a", bot.id, (arg: JQueryEventObject) => this.playWithBot(arg.data));
-//                }
-//                else {
-//                    cells.eq(3).text("В игре");
-//                }
-//            }
-//        }
-//    }
+    public process(data: any) {
+        if (data.command === "showBots") {
 
-//    public playWithBot(botId: string) {
-//        this.sendData(JSON.stringify({ type: "playWithBot", botId: botId }));
-//    }
-//}
+            this.vm.data.bots = data.bots as WaitPageModel;
+
+            console.log(data.bots);
+
+
+        }
+    }
+
+    public playWithBot(botId: string) {
+        this.sendData(JSON.stringify({ type: "playWithBot", botId: botId }));
+    }
+}
 
 //class GameArea implements IArea {
 //    private sendData: (data: any) => void;

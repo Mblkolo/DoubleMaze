@@ -3,8 +3,12 @@
 <template>
     <table class="bots">
         <tr v-for="line in bots">
-            <td><Player :name="line.name" :rating="line.rating" /></td>
-            <td><LinkButton text="Играть" size="small" /></td>
+            <td class="bots__name"><Player :name="line.name" :rating="line.rating" /></td>
+            <td>
+                <LinkButton v-if="line.isAwaible" text="Играть" :value="line.id" size="small"
+                             @click="botId => $emit('playWithBot', botId)" />
+                <span v-else>В игре</span>
+            </td>
         </tr>
     </table>
 </template>
@@ -16,9 +20,9 @@
         line-height: 5rem;
     }
 
-    .bots >tbody> tr > td:nth-child(1)
+    .bots__name
     {
-        width: 10rem;
+        width: 12rem;
     }
 
     .bots >tbody> tr > td:nth-child(2)
